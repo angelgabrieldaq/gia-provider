@@ -180,6 +180,57 @@
     .coll-btn:hover{background:var(--bg2)}
     .coll-body{display:none;border-top:1px solid var(--brd)}.coll-body.open{display:block}
 
+    /* HISTORY */
+    .hsum{display:flex;gap:8px;padding:12px 20px;flex-wrap:wrap}
+    .hsc{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r);padding:9px 14px;display:flex;flex-direction:column;gap:2px}
+    .hsc-v{font-family:'DM Serif Display',serif;font-size:20px;color:var(--txt);line-height:1}
+    .hsc-l{font-size:10px;color:var(--txt3);font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+    .htabs{display:flex;gap:6px;padding:0 20px 10px;flex-wrap:wrap}
+    .htab{font-size:11px;padding:5px 13px;border-radius:20px;border:1px solid var(--brd2);background:var(--bg);color:var(--txt2);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .12s}
+    .htab:hover{border-color:var(--p);color:var(--p)}
+    .htab.on{background:var(--p);border-color:var(--p);color:white;font-weight:600}
+    .htl{padding:0 20px 24px;display:flex;flex-direction:column;gap:0}
+    .hentry{display:flex;gap:0;position:relative}
+    .hentry:not(:last-child) .hline{background:var(--brd2)}
+    .hleft{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
+    .hnode{width:12px;height:12px;border-radius:50%;border:2px solid var(--bg3);flex-shrink:0;margin-top:14px;z-index:1;position:relative}
+    .hn-c{background:var(--s-err-m);border-color:var(--s-err-l)}
+    .hn-a{background:var(--s-warn-m);border-color:var(--s-warn-l)}
+    .hn-v{background:var(--s-info-m);border-color:var(--s-info-l)}
+    .hn-s{background:var(--s-ok-m);border-color:var(--s-ok-l)}
+    .hline{width:2px;flex:1;background:var(--brd);margin:0 auto}
+    .hcard{flex:1;background:var(--bg);border:1px solid var(--brd);border-radius:var(--r-lg);margin:8px 0 8px 8px;overflow:hidden;transition:border-color .12s}
+    .hcard:hover{border-color:var(--brd2)}
+    .hcard.hc-c{border-left:3px solid var(--s-err-m)}
+    .hcard.hc-a{border-left:3px solid var(--s-warn-m)}
+    .hcard.hc-v{border-left:3px solid var(--s-info-m)}
+    .hcard.hc-s{border-left:3px solid var(--s-ok-m)}
+    .hcard-top{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none}
+    .hcard-top:hover .hexp{color:var(--p)}
+    .hdate{font-size:12px;font-weight:700;color:var(--txt);line-height:1.3}
+    .hsem{font-size:10px;color:var(--txt3);font-weight:500}
+    .hvits{display:flex;gap:12px;margin-left:auto;align-items:center;flex-wrap:wrap}
+    .hvit{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+    .hvit-v{font-size:12px;font-weight:600;color:var(--txt);line-height:1}
+    .hvit-v.err{color:var(--s-err)}.hvit-v.warn{color:var(--s-warn)}.hvit-v.ok{color:var(--s-ok)}
+    .hvit-l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .hexp{font-size:16px;color:var(--txt3);margin-left:8px;transition:transform .15s;flex-shrink:0}
+    .hexp.open{transform:rotate(180deg)}
+    .hbody{display:none;border-top:1px solid var(--brd);padding:12px 14px;background:var(--bg2)}
+    .hbody.open{display:block}
+    .hdet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+    .hdet{display:flex;flex-direction:column;gap:2px}
+    .hdet-l{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .hdet-v{font-size:12px;font-weight:600;color:var(--txt)}
+    .hdet-v.err{color:var(--s-err)}.hdet-v.warn{color:var(--s-warn)}.hdet-v.ok{color:var(--s-ok)}
+    .hcond{margin-top:6px;padding:8px 10px;background:var(--bg);border:1px solid var(--brd);border-radius:var(--r);font-size:11px;color:var(--txt2);display:flex;gap:6px;align-items:center}
+    .hcond strong{color:var(--txt);font-weight:600}
+    .hnotes{margin-top:6px;font-size:11px;color:var(--txt3);line-height:1.5;font-style:italic}
+    .hempty{display:none;flex-direction:column;align-items:center;padding:40px 20px;gap:8px;color:var(--txt3)}
+    .hempty.show{display:flex}
+    .hempty-ico{font-size:28px;opacity:.4}
+    .hempty-txt{font-size:12px}
+
     /* MODAL */
     .modal-bg{background:rgba(26,26,24,.7);border-radius:0;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 86px)}
     .modal{background:var(--bg);border-radius:16px;width:100%;max-width:420px;overflow:hidden;border:1px solid var(--brd2);box-shadow:0 8px 40px rgba(0,0,0,0.15)}
@@ -371,7 +422,7 @@
         <div class="act-bar">
           <button class="btn-p" onclick="showForm()">+ Nueva consulta</button>
           <button class="btn-s">Exportar PDF</button>
-          <button class="btn-s">Historial completo</button>
+          <button class="btn-s" onclick="showHistory()">Historial completo</button>
         </div>
       </div>
 
@@ -462,6 +513,321 @@
         <div style="height:20px"></div>
       </div>
 
+      <!-- HISTORIAL CLÍNICO -->
+      <div class="screen" id="sc-history">
+        <div class="ph" style="padding:12px 20px">
+          <div class="ph-top">
+            <div class="ph-av av-r" style="width:38px;height:38px;font-size:12px">LR</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;font-family:'DM Serif Display',serif">Ramírez, Laura Beatriz</div>
+              <div class="ph-meta">29 años · G2P1 · EGA actual: 34+2 semanas · Preeclampsia activa</div>
+            </div>
+            <button class="btn-s" onclick="showPatient()" style="align-self:center;font-size:11px">← Volver a ficha</button>
+          </div>
+        </div>
+
+        <div class="hsum">
+          <div class="hsc"><div class="hsc-v">9</div><div class="hsc-l">Consultas registradas</div></div>
+          <div class="hsc"><div class="hsc-v">22</div><div class="hsc-l">Semanas de seguimiento</div></div>
+          <div class="hsc"><div class="hsc-v" style="color:var(--s-err)">3</div><div class="hsc-l">Alertas generadas</div></div>
+          <div class="hsc"><div class="hsc-v">↑18</div><div class="hsc-l">Variación sistólica (mmHg)</div></div>
+        </div>
+
+        <div class="htabs">
+          <button class="htab on" onclick="filterHist(this,'all')">Todas (9)</button>
+          <button class="htab" onclick="filterHist(this,'alert')">⚠ Solo alertas (3)</button>
+          <button class="htab" onclick="filterHist(this,'t3')">3er trimestre</button>
+          <button class="htab" onclick="filterHist(this,'t2')">2do trimestre</button>
+          <button class="htab" onclick="filterHist(this,'t1')">1er trimestre</button>
+        </div>
+
+        <div class="htl" id="hist-tl">
+
+          <!-- Consulta 9 — sem 34 — CRÍTICO -->
+          <div class="hentry" data-sem="34" data-status="c">
+            <div class="hleft"><div class="hnode hn-c"></div><div class="hline"></div></div>
+            <div class="hcard hc-c">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">6 may 2026</div><div class="hsem">Semana 34+2 · hace 2 días</div></div>
+                <span class="estado e-c" style="margin-left:10px">● Crítico</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v err">158/102</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v err">2+</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">68 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v err">158 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v err">102 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v err">2+</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v warn">Moderados</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">68 kg <span style="font-size:10px;color:var(--s-warn)">+1.2 kg</span></div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">144 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Altura uterina</div><div class="hdet-v">32 cm</div></div>
+                  <div class="hdet"><div class="hdet-l">Síntomas de alarma</div><div class="hdet-v warn">Cefalea</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Derivación urgente — requiere internación para estabilización</div>
+                <div class="hnotes">Estudios solicitados: hemograma, creatinina, proteinuria 24h, transaminasas. Próximo control: internada.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 8 — sem 33 — ALERTA -->
+          <div class="hentry" data-sem="33" data-status="a">
+            <div class="hleft"><div class="hnode hn-a"></div><div class="hline"></div></div>
+            <div class="hcard hc-a">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">29 abr 2026</div><div class="hsem">Semana 33+1 · hace 9 días</div></div>
+                <span class="estado e-a" style="margin-left:10px">● En alerta</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v err">148/98</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v warn">2+</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">67.8 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v err">148 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v err">98 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v warn">2+</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v warn">Leves</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">67.8 kg <span style="font-size:10px;color:var(--s-warn)">+1.0 kg</span></div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">148 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Síntomas de alarma</div><div class="hdet-v ok">Ninguno</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">💊 <strong>Conducta:</strong> Ajusta medicación — aumenta dosis de labetalol a 200 mg c/8h</div>
+                <div class="hnotes">Próximo control: en 7 días. Se refuerza reposo relativo y control de TA en domicilio.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 7 — sem 32 — ALERTA -->
+          <div class="hentry" data-sem="32" data-status="a">
+            <div class="hleft"><div class="hnode hn-a"></div><div class="hline"></div></div>
+            <div class="hcard hc-a">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">22 abr 2026</div><div class="hsem">Semana 32+0 · hace 16 días</div></div>
+                <span class="estado e-a" style="margin-left:10px">● En alerta</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v err">144/94</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v warn">1+</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">66.5 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v err">144 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v err">94 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v warn">1+</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v warn">Leves</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">66.5 kg <span style="font-size:10px;color:var(--s-warn)">+1.2 kg</span></div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">152 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Síntomas de alarma</div><div class="hdet-v ok">Ninguno</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">🔬 <strong>Conducta:</strong> Solicita estudios — proteínas en orina 24h, perfil bioquímico, eco doppler</div>
+                <div class="hnotes">Primera aparición de proteinuria. Se inicia monitoreo intensificado semanal.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 6 — sem 31 — ALERTA -->
+          <div class="hentry" data-sem="31" data-status="a">
+            <div class="hleft"><div class="hnode hn-a"></div><div class="hline"></div></div>
+            <div class="hcard hc-a">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">15 abr 2026</div><div class="hsem">Semana 31+0 · hace 23 días</div></div>
+                <span class="estado e-a" style="margin-left:10px">● En alerta</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v err">140/90</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v">Trazas</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">65.3 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v err">140 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v err">90 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v">Trazas</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">65.3 kg <span style="font-size:10px;color:var(--s-warn)">+0.8 kg</span></div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">150 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Síntomas de alarma</div><div class="hdet-v ok">Ninguno</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Continúa seguimiento — control semanal, reposo relativo</div>
+                <div class="hnotes">TA en umbral de alerta (140/90). Sin proteinuria significativa aún. Se refuerza hidratación.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 5 — sem 28 — VIGILANCIA -->
+          <div class="hentry" data-sem="28" data-status="v">
+            <div class="hleft"><div class="hnode hn-v"></div><div class="hline"></div></div>
+            <div class="hcard hc-v">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">25 mar 2026</div><div class="hsem">Semana 28+0 · hace 44 días</div></div>
+                <span class="estado e-v" style="margin-left:10px">● En vigilancia</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">135/88</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v ok">Neg.</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">63 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v warn">135 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v warn">88 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v ok">Negativas</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">63 kg</div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">155 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Síntomas de alarma</div><div class="hdet-v ok">Ninguno</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Continúa seguimiento — control cada 3 semanas por antecedente de HTA</div>
+                <div class="hnotes">TA levemente elevada pero sin proteinuria. Se inicia vigilancia reforzada por antecedentes.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 4 — sem 24 — ESTABLE -->
+          <div class="hentry" data-sem="24" data-status="s">
+            <div class="hleft"><div class="hnode hn-s"></div><div class="hline"></div></div>
+            <div class="hcard hc-s">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">25 feb 2026</div><div class="hsem">Semana 24+0 · hace 74 días</div></div>
+                <span class="estado e-s" style="margin-left:10px">● Estable</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">128/82</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v ok">Neg.</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">60.5 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v">128 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v">82 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v ok">Negativas</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">60.5 kg</div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">148 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Altura uterina</div><div class="hdet-v">24 cm</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Continúa seguimiento — control mensual estándar</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 3 — sem 20 — ESTABLE -->
+          <div class="hentry" data-sem="20" data-status="s">
+            <div class="hleft"><div class="hnode hn-s"></div><div class="hline"></div></div>
+            <div class="hcard hc-s">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">28 ene 2026</div><div class="hsem">Semana 20+0 · hace 102 días</div></div>
+                <span class="estado e-s" style="margin-left:10px">● Estable</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">120/78</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v ok">Neg.</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">57.8 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v">120 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v">78 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v ok">Negativas</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">57.8 kg</div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">144 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Altura uterina</div><div class="hdet-v">20 cm</div></div>
+                  <div class="hdet"><div class="hdet-l">Movimientos fetales</div><div class="hdet-v ok">Presentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Continúa seguimiento — eco morfológica de 2do trimestre solicitada</div>
+                <div class="hnotes">Eco morfológica: anatomía fetal sin alteraciones. Placenta normoinserta. Líquido amniótico normal.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 2 — sem 16 — ESTABLE -->
+          <div class="hentry" data-sem="16" data-status="s">
+            <div class="hleft"><div class="hnode hn-s"></div><div class="hline"></div></div>
+            <div class="hcard hc-s">
+              <div class="hcard-top" onclick="togH(this)">
+                <div><div class="hdate">31 dic 2025</div><div class="hsem">Semana 16+0 · hace 130 días</div></div>
+                <span class="estado e-s" style="margin-left:10px">● Estable</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">115/75</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v ok">Neg.</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">55.2 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v">115 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v">75 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v ok">Negativas</div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">140 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">55.2 kg</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Continúa seguimiento — próximo control a las 20 semanas</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consulta 1 — sem 12 — ESTABLE (PRIMERA) -->
+          <div class="hentry" data-sem="12" data-status="s" style="--last:1">
+            <div class="hleft"><div class="hnode hn-s"></div></div>
+            <div class="hcard hc-s">
+              <div class="hcard-top" onclick="togH(this)">
+                <div>
+                  <div class="hdate">3 dic 2025</div>
+                  <div class="hsem">Semana 12+0 · hace 158 días · <strong style="color:var(--p)">Primera consulta</strong></div>
+                </div>
+                <span class="estado e-s" style="margin-left:10px">● Estable</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">112/72</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v ok">Neg.</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">53 kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v">112 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v">72 mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v ok">Negativas</div></div>
+                  <div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v ok">152 lpm</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">53 kg</div></div>
+                  <div class="hdet"><div class="hdet-l">Edemas</div><div class="hdet-v ok">Ausentes</div></div>
+                </div>
+                <div class="hcond">📋 <strong>Conducta:</strong> Inicia seguimiento — paciente con antecedente de HTA crónica, riesgo moderado-alto</div>
+                <div class="hnotes">G2P1. Parto anterior sin complicaciones. Se solicita laboratorio completo y eco obstétrica de 1er trimestre. LMP: 15/08/2025.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hempty" id="hist-empty">
+            <div class="hempty-ico">🔍</div>
+            <div class="hempty-txt">No hay consultas en este filtro</div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- MODAL -->
       <div class="screen" id="sc-modal">
         <div class="modal-bg">
@@ -514,6 +880,37 @@ function showPatient(){
 }
 function showForm(){go('sc-form');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Nueva consulta'}]);}
 function showModal(){go('sc-modal');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Alerta crítica'}]);}
+function showHistory(){
+  go('sc-history');
+  setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Historial clínico'}]);
+  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
+  document.getElementById('si-l').classList.add('active');
+}
+function togH(top){
+  const body=top.nextElementSibling;
+  const exp=top.querySelector('.hexp');
+  const open=body.classList.toggle('open');
+  exp.classList.toggle('open',open);
+}
+function filterHist(btn,f){
+  document.querySelectorAll('.htab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  const semMap={t1:[12,19],t2:[20,27],t3:[28,42]};
+  const entries=document.querySelectorAll('#hist-tl .hentry');
+  let vis=0;
+  entries.forEach(e=>{
+    const st=e.dataset.status;
+    const sem=+e.dataset.sem;
+    let show=true;
+    if(f==='alert') show=(st==='c'||st==='a');
+    else if(f==='t1') show=sem>=semMap.t1[0]&&sem<=semMap.t1[1];
+    else if(f==='t2') show=sem>=semMap.t2[0]&&sem<=semMap.t2[1];
+    else if(f==='t3') show=sem>=semMap.t3[0]&&sem<=semMap.t3[1];
+    e.style.display=show?'flex':'none';
+    if(show) vis++;
+  });
+  document.getElementById('hist-empty').classList.toggle('show',vis===0);
+}
 function togB(btn){
   const b=document.getElementById('tb');b.classList.toggle('open');
   btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'Colapsar ▲':'Expandir ▼';
