@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gia · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --p:#2B57D9;--p-dark:#1A3FAA;--p-light:#EBF2FF;--p-mid:#A3C0F8;
+      --bg:#ffffff;--bg2:#f5f4f0;--bg3:#f0efea;
+      --txt:#1a1a18;--txt2:#5f5e5a;--txt3:#888780;
+      --brd:rgba(0,0,0,0.10);--brd2:rgba(0,0,0,0.18);
+      --s-ok:#0F6E56;--s-ok-l:#E1F5EE;--s-ok-m:#9FE1CB;
+      --s-warn:#633806;--s-warn-l:#FAEEDA;--s-warn-m:#EF9F27;
+      --s-err:#791F1F;--s-err-l:#FCEBEB;--s-err-m:#E24B4A;
+      --s-info:#0C447C;--s-info-l:#E6F1FB;--s-info-m:#B5D4F4;
+      --r:8px;--r-lg:12px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg3);color:var(--txt);overflow:hidden}
+
+    .app{display:flex;flex-direction:column;height:100vh;animation:fadeIn .4s ease both}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    /* TOPBAR */
+    .topbar{background:var(--p-dark);display:flex;align-items:center;gap:0;padding:0 20px;height:52px;flex-shrink:0}
+    .logo-wrap{display:flex;flex-direction:column;line-height:1;gap:2px;margin-right:24px}
+    .logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:white;letter-spacing:-.3px}
+    .logo-by{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.5px;font-weight:500;text-transform:uppercase}
+    .nav{display:flex;gap:2px}
+    .npill{font-size:12px;padding:5px 12px;border-radius:var(--r);color:rgba(255,255,255,.55);cursor:pointer;background:transparent;border:none;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .12s}
+    .npill:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8)}
+    .npill.active{background:rgba(255,255,255,.15);color:white}
+    .topbar-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+    .btn-top{background:var(--p-light);color:var(--p-dark);border:none;padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-top:hover{background:white}
+    .ava{width:30px;height:30px;border-radius:50%;background:var(--p-mid);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--p-dark)}
+    .logout-btn{font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.2);padding:4px 10px;border-radius:var(--r);font-family:'DM Sans',sans-serif}
+    .logout-btn:hover{border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.8)}
+
+    /* BREADCRUMB */
+    .bbar{background:var(--bg);border-bottom:1px solid var(--brd2);padding:0 20px;height:34px;display:flex;align-items:center;gap:5px;flex-shrink:0}
+    .bc{font-size:12px;color:var(--txt3);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0}
+    .bc:hover{color:var(--p)}
+    .bc-sep{font-size:11px;color:var(--txt3)}
+    .bc-act{font-size:12px;color:var(--txt);font-weight:600}
+
+    /* LAYOUT */
+    .body{display:flex;flex:1;overflow:hidden}
+    .sidebar{width:220px;background:var(--bg);border-right:1px solid var(--brd2);display:flex;flex-direction:column;flex-shrink:0}
+    .sb-head{padding:12px 14px 10px;border-bottom:1px solid var(--brd2);background:var(--bg2)}
+    .sb-lbl{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .sb-search{width:100%;padding:8px 11px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg);color:var(--txt);font-size:12px;outline:none;font-family:'DM Sans',sans-serif}
+    .sb-search::placeholder{color:var(--txt2)}
+    .sb-search:focus{border-color:var(--p);box-shadow:0 0 0 2px var(--p-light)}
+    .pat-list{flex:1;overflow-y:auto}
+    .pitem{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-left:3px solid transparent;transition:background .1s;background:transparent}
+    .pitem:hover{background:var(--bg2)}
+    .pitem.active{background:var(--p-light);border-left-color:var(--p)}
+    .pitem.ec{border-left-color:var(--s-err-m)}.pitem.ec.active{background:var(--s-err-l)}
+    .pitem.ea{border-left-color:var(--s-warn-m)}.pitem.ea.active{background:var(--s-warn-l)}
+    .pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+    .av-r{background:var(--s-err-l);color:var(--s-err)}
+    .av-a{background:var(--s-warn-l);color:var(--s-warn)}
+    .av-b{background:var(--p-light);color:var(--p-dark)}
+    .pname{font-size:12px;font-weight:600;color:var(--txt);line-height:1.3}
+    .psub{font-size:11px;color:var(--txt2)}
+    .edot{width:7px;height:7px;border-radius:50%;margin-left:auto;flex-shrink:0}
+    .sb-foot{padding:12px 14px;border-top:1px solid var(--brd2);background:var(--bg)}
+    .btn-p-full{width:100%;padding:9px;border-radius:var(--r);background:var(--p);color:white;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif}
+    .btn-p-full:hover{background:var(--p-dark)}
+
+    /* BUTTONS */
+    .btn-p{background:var(--p);color:white;border:none;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-p:hover{background:var(--p-dark)}
+    .btn-s{background:var(--bg);color:var(--txt2);border:1px solid var(--brd2);padding:7px 14px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-s:hover{background:var(--bg2)}
+    .btn-danger{background:#6B1010;color:white;border:none;padding:8px 18px;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-sm{font-size:11px;padding:5px 11px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg);color:var(--txt2);cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-sm:hover{background:var(--bg2)}
+    .btn-off{font-size:12px;padding:7px 14px;border:1px solid var(--brd2);border-radius:var(--r);background:transparent;color:var(--txt3);opacity:.4;cursor:not-allowed;font-family:'DM Sans',sans-serif}
+
+    /* INPUTS */
+    .fld-input{padding:9px 11px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg2);color:var(--txt);font-size:13px;outline:none;width:100%;font-family:'DM Sans',sans-serif}
+    .fld-input:focus{border-color:var(--p);box-shadow:0 0 0 2px var(--p-light)}
+    .fld-input.ferr{border-color:var(--s-err-m);background:var(--s-err-l)}
+    .fld-input.fok{border-color:var(--s-ok-m);background:var(--s-ok-l)}
+
+    /* BADGES */
+    .badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;display:inline-block;line-height:1.6}
+    .b-err{background:var(--s-err-l);color:var(--s-err);border:1px solid var(--s-err-m)}
+    .b-warn{background:var(--s-warn-l);color:var(--s-warn);border:1px solid var(--s-warn-m)}
+    .b-ok{background:var(--s-ok-l);color:var(--s-ok);border:1px solid var(--s-ok-m)}
+    .b-info{background:var(--s-info-l);color:var(--s-info);border:1px solid var(--s-info-m)}
+    .b-p{background:var(--p-light);color:var(--p-dark);border:1px solid var(--p-mid)}
+    .estado{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;line-height:1.4}
+    .e-c{background:var(--s-err-l);color:var(--s-err);border:1px solid var(--s-err-m)}
+    .e-a{background:var(--s-warn-l);color:var(--s-warn);border:1px solid var(--s-warn-m)}
+    .e-v{background:var(--s-info-l);color:var(--s-info);border:1px solid var(--s-info-m)}
+    .e-s{background:var(--s-ok-l);color:var(--s-ok);border:1px solid var(--s-ok-m)}
+
+    /* MAIN */
+    .main{flex:1;overflow-y:auto;background:var(--bg3)}
+    .screen{display:none}.screen.active{display:block}
+
+    /* DASHBOARD */
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 12px}
+    .kpi{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r-lg);padding:12px 16px}
+    .kpi-v{font-family:'DM Serif Display',serif;font-size:30px;color:var(--txt);line-height:1}
+    .kpi-v.err{color:var(--s-err-m)}.kpi-v.warn{color:var(--s-warn-m)}.kpi-v.ok{color:var(--s-ok)}
+    .kpi-l{font-size:11px;color:var(--txt2);margin-top:5px;font-weight:500}
+    .strip{margin:0 20px 12px;background:var(--s-err-l);border:1px solid var(--s-err-m);border-radius:var(--r);padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+    .sdot{width:8px;height:8px;border-radius:50%;background:var(--s-err-m);flex-shrink:0;animation:sblink 1.4s ease-in-out infinite}
+    @keyframes sblink{0%,100%{opacity:1}50%{opacity:.3}}
+    .stxt{font-size:12px;color:var(--s-err);flex:1;line-height:1.4}
+    .scta{font-size:11px;color:var(--s-err);font-weight:700;white-space:nowrap;text-decoration:underline}
+    .tbl{margin:0 20px;background:var(--bg);border:1px solid var(--brd);border-radius:var(--r-lg);overflow:hidden}
+    .tbl-head{display:grid;grid-template-columns:2fr 80px 140px 140px 64px;padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--brd2)}
+    .th{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
+    .tbl-row{display:grid;grid-template-columns:2fr 80px 140px 140px 64px;padding:11px 16px;border-bottom:1px solid var(--brd);cursor:pointer;align-items:center;background:var(--bg);transition:background .1s}
+    .tbl-row:last-child{border-bottom:none}
+    .tbl-row:hover{background:var(--bg2)}
+    .td-name{font-size:12px;font-weight:600;color:var(--txt)}
+    .td-sub{font-size:11px;color:var(--txt3)}
+    .td{font-size:12px;color:var(--txt)}
+
+    /* PATIENT DETAIL */
+    .ph{padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--brd2)}
+    .ph-top{display:flex;align-items:flex-start;gap:14px}
+    .ph-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+    .ph-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--txt);letter-spacing:-.2px}
+    .ph-meta{font-size:12px;color:var(--txt2);margin-top:3px;line-height:1.6}
+    .ph-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+    .ph-r{margin-left:auto;text-align:right;flex-shrink:0}
+    .ph-ega{font-family:'DM Serif Display',serif;font-size:32px;color:var(--txt);letter-spacing:-.5px}
+    .ph-ega-s{font-size:11px;color:var(--txt2);margin-top:2px}
+    .sec-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;padding:14px 20px 7px}
+    .trend{margin:0 20px 12px;background:var(--bg);border:1px solid var(--brd);border-radius:var(--r-lg);padding:16px}
+    .trend-top{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+    .trend-lbl{font-size:12px;font-weight:600;color:var(--txt2)}
+    .trend-val{font-family:'DM Serif Display',serif;font-size:22px;color:var(--s-err)}
+    .trend-delta{font-size:11px;color:var(--s-err);font-weight:500}
+    .bars{display:flex;align-items:flex-end;gap:10px;height:56px}
+    .bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .bar{width:100%;border-radius:4px 4px 0 0}
+    .blbl{font-size:9px;color:var(--txt3);text-align:center;line-height:1.4}
+    .vitals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 20px 12px}
+    .vcard{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r);padding:11px 14px}
+    .vcard.danger{border-color:var(--s-err-m);background:var(--s-err-l)}
+    .vcard.warn{border-color:var(--s-warn-m);background:var(--s-warn-l)}
+    .vlbl{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .vval{font-family:'DM Serif Display',serif;font-size:22px;color:var(--txt);margin:4px 0}
+    .vval.err{color:var(--s-err)}.vval.warn{color:var(--s-warn)}.vval.ok{color:var(--s-ok)}
+    .vunit{font-size:11px;color:var(--txt2)}
+    .act-bar{display:flex;gap:8px;padding:0 20px 16px}
+
+    /* FORM */
+    .fhead{padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--brd2);display:flex;align-items:center;justify-content:space-between}
+    .ftitle{font-size:15px;font-weight:700;color:var(--txt)}
+    .fsub{font-size:11px;color:var(--txt2);margin-top:2px}
+    .fhead-r{display:flex;gap:8px}
+    .warn-note{margin:10px 20px;background:var(--s-warn-l);border:1px solid var(--s-warn-m);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--s-warn);display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+    .tier{margin:8px 20px;border:1px solid var(--brd);border-radius:var(--r-lg);overflow:hidden;background:var(--bg)}
+    .tier-hd{padding:10px 16px;display:flex;align-items:center;gap:8px;background:var(--bg2);border-bottom:1px solid var(--brd)}
+    .tier-pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+    .tp-a{background:var(--s-err-l);color:var(--s-err);border:1px solid var(--s-err-m)}
+    .tp-b{background:var(--s-warn-l);color:var(--s-warn);border:1px solid var(--s-warn-m)}
+    .tier-title{font-size:12px;font-weight:600;color:var(--txt)}
+    .tier-note{margin-left:auto;font-size:11px;color:var(--txt3)}
+    .fields{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .fld{display:flex;flex-direction:column;gap:5px}
+    .flbl{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px}
+    .fhint{font-size:10px;color:var(--txt3)}.fhint.err{color:var(--s-err)}.fhint.ok{color:var(--s-ok)}
+    .chks{padding:0 16px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .chk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt)}
+    .coll-btn{width:100%;background:transparent;border:none;display:flex;align-items:center;gap:8px;padding:11px 16px;cursor:pointer;color:var(--txt2);font-size:12px;font-family:'DM Sans',sans-serif;text-align:left}
+    .coll-btn:hover{background:var(--bg2)}
+    .coll-body{display:none;border-top:1px solid var(--brd)}.coll-body.open{display:block}
+
+    /* MODAL */
+    .modal-bg{background:rgba(26,26,24,.7);border-radius:0;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 86px)}
+    .modal{background:var(--bg);border-radius:16px;width:100%;max-width:420px;overflow:hidden;border:1px solid var(--brd2);box-shadow:0 8px 40px rgba(0,0,0,0.15)}
+    .mhd{background:#6B1010;padding:16px 20px;display:flex;gap:12px;align-items:flex-start}
+    .mhd-ico{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;flex-shrink:0}
+    .mhd-title{font-size:15px;font-weight:700;color:white}
+    .mhd-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+    .mbd{padding:16px 20px}
+    .mcrit{background:var(--s-err-l);border:1px solid var(--s-err-m);border-radius:var(--r);padding:11px 14px;margin-bottom:14px}
+    .mcrit-title{font-size:10px;font-weight:700;color:var(--s-err);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+    .mcrit-txt{font-size:12px;color:var(--s-err);line-height:1.6}
+    .mcond-title{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px}
+    .copts{display:flex;flex-direction:column;gap:6px}
+    .copt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--brd);border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--txt);background:var(--bg2);font-family:'DM Sans',sans-serif;transition:all .1s}
+    .copt:hover{border-color:var(--p);background:var(--p-light);color:var(--p-dark)}
+    .copt.sel{border-color:var(--p);background:var(--p-light);color:var(--p-dark);font-weight:600}
+    .mft{padding:12px 20px;border-top:1px solid var(--brd);display:flex;justify-content:flex-end;gap:8px}
+    .mnote{font-size:10px;color:var(--txt3);padding:0 20px 14px;line-height:1.6}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo-wrap">
+      <span class="logo-name">Gia</span>
+      <span class="logo-by">by Zenoxia</span>
+    </div>
+    <div class="nav">
+      <button class="npill active" onclick="showDash()">Dashboard</button>
+      <button class="npill">Agenda</button>
+      <button class="npill">Reportes</button>
+    </div>
+    <div class="topbar-r">
+      <button class="btn-top">+ Nueva paciente</button>
+      <div class="ava">MG</div>
+      <button class="logout-btn" onclick="window.location.href='index.html'">Salir</button>
+    </div>
+  </div>
+
+  <div class="bbar" id="bbar"><span class="bc-act">Dashboard</span></div>
+
+  <div class="body">
+    <div class="sidebar">
+      <div class="sb-head">
+        <div class="sb-lbl">Pacientes activas</div>
+        <input type="text" class="sb-search" placeholder="Buscar paciente…" />
+      </div>
+      <div class="pat-list">
+        <div class="pitem ec" id="si-l" onclick="showPatient()">
+          <div class="pav av-r">LR</div>
+          <div style="flex:1;min-width:0"><div class="pname">Ramírez, Laura</div><div class="psub">34 sem · Preeclampsia</div></div>
+          <div class="edot" style="background:var(--s-err-m)"></div>
+        </div>
+        <div class="pitem ea" onclick="showPatient()">
+          <div class="pav av-a">CS</div>
+          <div style="flex:1;min-width:0"><div class="pname">Castro, Sofía</div><div class="psub">28 sem · HTA crónica</div></div>
+          <div class="edot" style="background:var(--s-warn-m)"></div>
+        </div>
+        <div class="pitem" onclick="showPatient()">
+          <div class="pav av-b">MP</div>
+          <div style="flex:1;min-width:0"><div class="pname">Martínez, Paula</div><div class="psub">20 sem · Control</div></div>
+          <div class="edot" style="background:var(--s-ok-m)"></div>
+        </div>
+        <div class="pitem" onclick="showPatient()">
+          <div class="pav av-b">GV</div>
+          <div style="flex:1;min-width:0"><div class="pname">González, Valeria</div><div class="psub">12 sem · 1er trimestre</div></div>
+          <div class="edot" style="background:var(--s-ok-m)"></div>
+        </div>
+        <div class="pitem" onclick="showPatient()">
+          <div class="pav av-b">DF</div>
+          <div style="flex:1;min-width:0"><div class="pname">Díaz, Florencia</div><div class="psub">38 sem · Término</div></div>
+          <div class="edot" style="background:var(--s-info-m)"></div>
+        </div>
+      </div>
+      <div class="sb-foot">
+        <button class="btn-p-full">+ Nueva paciente</button>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="screen active" id="sc-dash">
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-v err">1</div><div class="kpi-l">Estado crítico</div></div>
+          <div class="kpi"><div class="kpi-v warn">1</div><div class="kpi-l">En alerta</div></div>
+          <div class="kpi"><div class="kpi-v ok">3</div><div class="kpi-l">Estables</div></div>
+          <div class="kpi"><div class="kpi-v">2</div><div class="kpi-l">Controles hoy</div></div>
+        </div>
+        <div class="strip" onclick="showPatient()">
+          <div class="sdot"></div>
+          <div class="stxt"><strong>Alerta crítica:</strong> Ramírez, Laura — presión 158/102 + proteínas en orina 2+. Requiere atención inmediata.</div>
+          <div class="scta">Ver ficha →</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-head">
+            <div class="th">Paciente</div>
+            <div class="th">Semanas</div>
+            <div class="th">Riesgo del embarazo</div>
+            <div class="th">Estado actual</div>
+            <div class="th"></div>
+          </div>
+          <div class="tbl-row" onclick="showPatient()">
+            <div><div class="td-name">Ramírez, Laura</div><div class="td-sub">Próx. control: hoy</div></div>
+            <div class="td">34 + 2</div>
+            <div class="td"><span class="badge b-err">Alto</span></div>
+            <div class="td"><span class="estado e-c">● Crítico</span></div>
+            <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
+          </div>
+          <div class="tbl-row" onclick="showPatient()">
+            <div><div class="td-name">Castro, Sofía</div><div class="td-sub">Próx. control: jueves</div></div>
+            <div class="td">28 + 0</div>
+            <div class="td"><span class="badge b-warn">Moderado</span></div>
+            <div class="td"><span class="estado e-a">● En alerta</span></div>
+            <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
+          </div>
+          <div class="tbl-row" onclick="showPatient()">
+            <div><div class="td-name">Martínez, Paula</div><div class="td-sub">Próx. control: 20 may</div></div>
+            <div class="td">20 + 3</div>
+            <div class="td"><span class="badge b-ok">Bajo</span></div>
+            <div class="td"><span class="estado e-s">● Estable</span></div>
+            <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
+          </div>
+          <div class="tbl-row" onclick="showPatient()">
+            <div><div class="td-name">González, Valeria</div><div class="td-sub">Próx. control: 3 jun</div></div>
+            <div class="td">12 + 1</div>
+            <div class="td"><span class="badge b-ok">Bajo</span></div>
+            <div class="td"><span class="estado e-s">● Estable</span></div>
+            <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
+          </div>
+          <div class="tbl-row" onclick="showPatient()">
+            <div><div class="td-name">Díaz, Florencia</div><div class="td-sub">Próx. control: mañana</div></div>
+            <div class="td">38 + 5</div>
+            <div class="td"><span class="badge b-ok">Bajo</span></div>
+            <div class="td"><span class="estado e-v">● En vigilancia</span></div>
+            <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATIENT DETAIL -->
+      <div class="screen" id="sc-patient">
+        <div class="ph">
+          <div class="ph-top">
+            <div class="ph-av av-r">LR</div>
+            <div style="flex:1">
+              <div class="ph-name">Ramírez, Laura Beatriz</div>
+              <div class="ph-meta">29 años · G2P1 · Última menstruación: 15/08/2025 · Parto estimado: 22/05/2026</div>
+              <div class="ph-tags">
+                <span class="badge b-err">Riesgo alto</span>
+                <span class="estado e-c">● Estado crítico</span>
+                <span class="badge b-p">Preeclampsia activa</span>
+              </div>
+            </div>
+            <div class="ph-r">
+              <div class="ph-ega">34+2</div>
+              <div class="ph-ega-s">18 días para el parto estimado</div>
+            </div>
+          </div>
+        </div>
+        <div class="strip" style="margin:12px 20px 0;border-radius:var(--r)">
+          <div class="sdot"></div>
+          <div class="stxt"><strong>Alerta crítica activa:</strong> Presión 158/102 + proteínas en orina 2+. Se requiere registrar la conducta tomada.</div>
+          <div class="scta">Registrar →</div>
+        </div>
+        <div class="sec-title">Evolución de la presión arterial — últimas 4 consultas</div>
+        <div class="trend">
+          <div class="trend-top">
+            <span class="trend-lbl">Sistólica</span>
+            <span class="trend-val">158 mmHg</span>
+            <span class="trend-delta">↑ +18 en 3 semanas</span>
+          </div>
+          <div class="bars">
+            <div class="bw"><div class="bar" style="height:32px;background:var(--s-warn-m)"></div><div class="blbl">140<br>sem 31</div></div>
+            <div class="bw"><div class="bar" style="height:36px;background:var(--s-warn-m)"></div><div class="blbl">144<br>sem 32</div></div>
+            <div class="bw"><div class="bar" style="height:40px;background:var(--s-err-m)"></div><div class="blbl">148<br>sem 33</div></div>
+            <div class="bw"><div class="bar" style="height:52px;background:#6B1010"></div><div class="blbl">158<br>sem 34</div></div>
+          </div>
+        </div>
+        <div class="sec-title">Signos vitales — última consulta</div>
+        <div class="vitals">
+          <div class="vcard danger"><div class="vlbl">Presión arterial</div><div class="vval err">158 / 102</div><div class="vunit">mmHg · hace 2 días</div></div>
+          <div class="vcard danger"><div class="vlbl">Proteínas en orina</div><div class="vval err">2+</div><div class="vunit">Tira reactiva</div></div>
+          <div class="vcard warn"><div class="vlbl">Peso</div><div class="vval warn">68 kg</div><div class="vunit">+1.2 kg en 7 días</div></div>
+          <div class="vcard"><div class="vlbl">Frecuencia cardíaca fetal</div><div class="vval ok">144 lpm</div><div class="vunit">Doppler · normal</div></div>
+        </div>
+        <div class="act-bar">
+          <button class="btn-p" onclick="showForm()">+ Nueva consulta</button>
+          <button class="btn-s">Exportar PDF</button>
+          <button class="btn-s">Historial completo</button>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="screen" id="sc-form">
+        <div class="fhead">
+          <div>
+            <div class="ftitle">Nueva consulta — Ramírez, Laura</div>
+            <div class="fsub">34 sem + 2 días · Riesgo alto · Borrador guardado automáticamente</div>
+          </div>
+          <div class="fhead-r">
+            <button class="btn-s" onclick="showPatient()">Cancelar</button>
+            <button class="btn-p" onclick="showModal()">Cerrar consulta</button>
+          </div>
+        </div>
+        <div class="warn-note">
+          <span style="font-weight:700;flex-shrink:0">⚠</span>
+          <span>Paciente de riesgo alto — proteínas en orina, edemas y síntomas de alarma son obligatorios.</span>
+        </div>
+        <div class="tier">
+          <div class="tier-hd">
+            <span class="tier-pill tp-a">Prioridad 1</span>
+            <span class="tier-title">Signos vitales obligatorios</span>
+            <span class="tier-note">Siempre visibles · Obligatorios para cerrar</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label class="flbl">Presión sistólica (mmHg)</label>
+              <input type="number" class="fld-input ferr" id="f-s" value="158" min="60" max="220" oninput="chk()"/>
+              <div class="fhint err" id="h-s">⚠ Valor elevado — se generará alerta al guardar</div>
+            </div>
+            <div class="fld">
+              <label class="flbl">Presión diastólica (mmHg)</label>
+              <input type="number" class="fld-input ferr" id="f-d" value="102" min="40" max="140" oninput="chk()"/>
+              <div class="fhint err" id="h-d">⚠ Valor elevado — se generará alerta al guardar</div>
+            </div>
+            <div class="fld">
+              <label class="flbl">Peso (kg)</label>
+              <input type="number" class="fld-input" value="68"/>
+              <div class="fhint">+1.2 kg respecto a la consulta anterior</div>
+            </div>
+            <div class="fld">
+              <label class="flbl">Frecuencia cardíaca fetal (lpm)</label>
+              <input type="number" class="fld-input fok" value="144"/>
+              <div class="fhint ok">Normal (rango 100–180 lpm)</div>
+            </div>
+            <div class="fld">
+              <label class="flbl">Proteínas en orina</label>
+              <select class="fld-input"><option>Negativas</option><option>Trazas</option><option>1+</option><option selected>2+</option><option>3+</option></select>
+            </div>
+            <div class="fld">
+              <label class="flbl">Edemas</label>
+              <select class="fld-input"><option>Ausentes</option><option>Leves</option><option selected>Moderados</option><option>Severos</option></select>
+            </div>
+          </div>
+          <div style="padding:0 16px 12px">
+            <div class="flbl" style="margin-bottom:8px">Síntomas de alarma</div>
+            <div class="chks">
+              <label class="chk"><input type="checkbox" checked/> Dolor de cabeza</label>
+              <label class="chk"><input type="checkbox"/> Destellos visuales</label>
+              <label class="chk"><input type="checkbox"/> Manchas en la visión</label>
+              <label class="chk"><input type="checkbox"/> Dolor en boca del estómago</label>
+              <label class="chk"><input type="checkbox"/> Zumbido en los oídos</label>
+              <label class="chk"><input type="checkbox"/> Ninguno</label>
+            </div>
+          </div>
+          <div style="padding:0 16px 14px">
+            <div class="flbl" style="margin-bottom:6px">Conducta</div>
+            <select class="fld-input"><option>Continúa seguimiento</option><option>Solicita estudios</option><option>Ajusta medicación</option><option selected>Derivación</option><option>Internación</option></select>
+          </div>
+        </div>
+        <div class="tier">
+          <button class="coll-btn" onclick="togB(this)">
+            <span class="tier-pill tp-b">Opcional</span>
+            <span style="font-size:12px;font-weight:600;color:var(--txt)">Datos adicionales</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--txt3)">Expandir ▼</span>
+          </button>
+          <div class="coll-body" id="tb">
+            <div class="fields">
+              <div class="fld"><label class="flbl">Altura uterina (cm)</label><input type="number" class="fld-input" placeholder="ej. 32"/></div>
+              <div class="fld"><label class="flbl">Movimientos fetales</label><select class="fld-input"><option>Presentes y normales</option><option>Disminuidos</option><option>Ausentes</option></select></div>
+            </div>
+            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Estudios solicitados</div><input type="text" class="fld-input" placeholder="hemograma, proteínas en orina 24h…"/></div>
+            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Próximo control</div><input type="date" class="fld-input" value="2026-05-08"/><div class="fhint">Sugerido: en 48 horas por estado crítico</div></div>
+            <div style="padding:0 16px 14px"><div class="flbl" style="margin-bottom:5px">Notas de la consulta</div><textarea class="fld-input" rows="2" placeholder="Texto libre — no se analiza automáticamente…"></textarea></div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- MODAL -->
+      <div class="screen" id="sc-modal">
+        <div class="modal-bg">
+          <div class="modal">
+            <div class="mhd">
+              <div class="mhd-ico">⚠</div>
+              <div>
+                <div class="mhd-title">Alerta crítica — acción requerida</div>
+                <div class="mhd-sub">Ramírez, Laura · 34 semanas · No se puede continuar sin registrar conducta</div>
+              </div>
+            </div>
+            <div class="mbd">
+              <div class="mcrit">
+                <div class="mcrit-title">Criterios detectados</div>
+                <div class="mcrit-txt">Presión 158/102 mmHg con proteínas en orina 2+. Dos signos objetivos simultáneos. Criterios de preeclampsia con características de severidad.</div>
+              </div>
+              <div class="mcond-title">¿Qué conducta tomó?</div>
+              <div class="copts">
+                <div class="copt" onclick="selC(this)">🏥 Internación</div>
+                <div class="copt sel" onclick="selC(this)">🚑 Derivación urgente</div>
+                <div class="copt" onclick="selC(this)">🕐 Control en 24 horas</div>
+                <div class="copt" onclick="selC(this)">✏️ Otra (describir)</div>
+              </div>
+            </div>
+            <div class="mft">
+              <button class="btn-off" disabled>Cancelar</button>
+              <button class="btn-danger" onclick="showPatient()">Confirmar y cerrar consulta</button>
+            </div>
+            <div class="mnote">Esta acción queda registrada de forma permanente con fecha, hora y nombre de la profesional.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function setBB(p){
+  document.getElementById('bbar').innerHTML=p.map((x,i)=>
+    i<p.length-1?`<button class="bc" onclick="${x.f||''}">${x.l}</button><span class="bc-sep">›</span>`
+    :`<span class="bc-act">${x.l}</span>`).join('');
+}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showDash(){go('sc-dash');setBB([{l:'Dashboard'}]);document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));}
+function showPatient(){
+  go('sc-patient');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura'}]);
+  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
+  document.getElementById('si-l').classList.add('active');
+}
+function showForm(){go('sc-form');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Nueva consulta'}]);}
+function showModal(){go('sc-modal');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Alerta crítica'}]);}
+function togB(btn){
+  const b=document.getElementById('tb');b.classList.toggle('open');
+  btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'Colapsar ▲':'Expandir ▼';
+}
+function selC(el){document.querySelectorAll('.copt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
+function chk(){
+  const s=+document.getElementById('f-s').value||0,d=+document.getElementById('f-d').value||0;
+  const si=document.getElementById('f-s'),di=document.getElementById('f-d');
+  const sh=document.getElementById('h-s'),dh=document.getElementById('h-d');
+  if(s>=160){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='⚠ Valor muy elevado (≥160) — alerta crítica al guardar';}
+  else if(s>=140){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='⚠ Valor elevado (≥140) — alerta moderada al guardar';}
+  else if(s<60||s>220){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='✗ Fuera de rango válido (60–220) — verificar medición';}
+  else{si.className='fld-input fok';sh.className='fhint ok';sh.textContent='✓ Dentro del rango normal';}
+  if(d>=110){di.className='fld-input ferr';dh.className='fhint err';dh.textContent='⚠ Valor muy elevado (≥110) — alerta crítica al guardar';}
+  else if(d>=90){di.className='fld-input ferr';dh.className='fhint err';dh.textContent='⚠ Valor elevado (≥90) — alerta moderada al guardar';}
+  else{di.className='fld-input fok';dh.className='fhint ok';dh.textContent='✓ Dentro del rango normal';}
+}
+</script>
+</body>
+</html>
