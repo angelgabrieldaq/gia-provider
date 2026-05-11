@@ -68,4 +68,6 @@ Gia es un **Software as a Medical Device (SaMD)** bajo normativa ANMAT Argentina
 
 ---
 
-*Zenoxia · Mayo 2026 · Confidencial*
+© 2026 Zenoxia. Todos los derechos reservados.
+Este código es confidencial y propietario de Zenoxia.
+No se permite su uso, copia o distribución sin autorización expresa.
