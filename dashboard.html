@@ -252,6 +252,32 @@
     .hcl-ref{font-size:10px;color:var(--txt3);margin-left:auto}
     .hchart-wrap svg{width:100%;height:auto;display:block;overflow:visible}
 
+    /* NUEVA PACIENTE — RISK WIDGET */
+    .risk-widget{display:grid;grid-template-columns:1fr 210px;gap:14px;align-items:start}
+    .risk-chks{display:flex;flex-direction:column;gap:5px}
+    .risk-sep{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:6px 0 2px}
+    .risk-result{border-radius:var(--r-lg);padding:14px 16px;border:1px solid var(--brd2);background:var(--bg2);transition:all .22s;position:sticky;top:12px}
+    .risk-result.rr-high{background:var(--s-err-l);border-color:var(--s-err-m)}
+    .risk-result.rr-mod{background:var(--s-warn-l);border-color:var(--s-warn-m)}
+    .risk-result.rr-low{background:var(--s-ok-l);border-color:var(--s-ok-m)}
+    .rr-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+    .rr-val{font-family:'DM Serif Display',serif;font-size:28px;color:var(--txt);line-height:1}
+    .risk-result.rr-high .rr-val{color:var(--s-err)}
+    .risk-result.rr-mod .rr-val{color:var(--s-warn)}
+    .risk-result.rr-low .rr-val{color:var(--s-ok)}
+    .rr-sub{font-size:10px;color:var(--txt3);margin-top:6px;line-height:1.5}
+    .risk-result.rr-high .rr-sub{color:var(--s-err)}
+    .risk-result.rr-mod .rr-sub{color:var(--s-warn)}
+    .risk-result.rr-low .rr-sub{color:var(--s-ok)}
+    .rr-ref{font-size:9px;color:var(--txt3);margin-top:8px;padding-top:8px;border-top:1px solid var(--brd);line-height:1.5}
+    .np-success{display:none;position:fixed;inset:0;background:rgba(240,239,234,.92);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+    .np-success.show{display:flex}
+    .np-scard{background:var(--bg);border:1px solid var(--brd2);border-radius:20px;padding:40px 48px;text-align:center;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.1)}
+    .np-sico{width:52px;height:52px;border-radius:50%;background:var(--s-ok-l);border:1px solid var(--s-ok-m);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px}
+    .np-stitle{font-family:'DM Serif Display',serif;font-size:22px;color:var(--txt);margin-bottom:6px}
+    .np-sname{font-size:15px;font-weight:700;color:var(--p-dark);margin-bottom:4px}
+    .np-ssub{font-size:12px;color:var(--txt3);line-height:1.5;margin-bottom:20px}
+
     /* MODAL */
     .modal-bg{background:rgba(26,26,24,.7);border-radius:0;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 86px)}
     .modal{background:var(--bg);border-radius:16px;width:100%;max-width:420px;overflow:hidden;border:1px solid var(--brd2);box-shadow:0 8px 40px rgba(0,0,0,0.15)}
@@ -287,7 +313,7 @@
       <button class="npill">Reportes</button>
     </div>
     <div class="topbar-r">
-      <button class="btn-top">+ Nueva paciente</button>
+      <button class="btn-top" onclick="showNueva()">+ Nueva paciente</button>
       <div class="ava">MG</div>
       <button class="logout-btn" onclick="window.location.href='index.html'">Salir</button>
     </div>
@@ -329,7 +355,7 @@
         </div>
       </div>
       <div class="sb-foot">
-        <button class="btn-p-full">+ Nueva paciente</button>
+        <button class="btn-p-full" onclick="showNueva()">+ Nueva paciente</button>
       </div>
     </div>
 
@@ -966,6 +992,184 @@
         </div>
       </div>
 
+      <!-- NUEVA PACIENTE -->
+      <div class="screen" id="sc-nueva">
+        <div class="fhead">
+          <div>
+            <div class="ftitle">Nueva paciente</div>
+            <div class="fsub">Completá los datos para registrar una paciente en el sistema</div>
+          </div>
+          <div class="fhead-r">
+            <button class="btn-s" onclick="showDash()">Cancelar</button>
+            <button class="btn-p" onclick="savePatient()">Guardar paciente</button>
+          </div>
+        </div>
+
+        <!-- Datos personales -->
+        <div class="tier" style="margin-top:12px">
+          <div class="tier-hd">
+            <span class="tier-pill tp-a">Obligatorio</span>
+            <span class="tier-title">Datos de la paciente</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label class="flbl">Nombre</label>
+              <input type="text" class="fld-input" id="np-nombre" placeholder="ej. Laura" oninput="updateNPHeader()"/>
+            </div>
+            <div class="fld">
+              <label class="flbl">Apellido</label>
+              <input type="text" class="fld-input" id="np-apellido" placeholder="ej. Ramírez" oninput="updateNPHeader()"/>
+            </div>
+            <div class="fld">
+              <label class="flbl">Fecha de nacimiento</label>
+              <input type="date" class="fld-input" id="np-fnac" oninput="calcEdad()"/>
+              <div class="fhint" id="h-edad"></div>
+            </div>
+            <div class="fld">
+              <label class="flbl">DNI</label>
+              <input type="text" class="fld-input" placeholder="ej. 32.456.789"/>
+            </div>
+            <div class="fld">
+              <label class="flbl">Cobertura médica</label>
+              <select class="fld-input">
+                <option value="">— Seleccionar —</option>
+                <option>OSDE</option><option>Swiss Medical</option><option>Galeno</option>
+                <option>IOMA</option><option>PAMI</option><option>Particular</option><option>Otra</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label class="flbl">Teléfono de contacto</label>
+              <input type="tel" class="fld-input" placeholder="ej. +54 11 1234-5678"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historia obstétrica -->
+        <div class="tier">
+          <div class="tier-hd">
+            <span class="tier-pill tp-a">Obligatorio</span>
+            <span class="tier-title">Historia obstétrica</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label class="flbl">Fecha última menstruación (FUM)</label>
+              <input type="date" class="fld-input" id="np-fum" oninput="calcEGA()"/>
+              <div class="fhint" id="h-ega"></div>
+            </div>
+            <div class="fld">
+              <label class="flbl">Gestas previas</label>
+              <select class="fld-input" id="np-g" onchange="calcRisk()">
+                <option value="0">Ninguna — primigesta</option>
+                <option value="1">1 gesta previa</option>
+                <option value="2">2 gestas previas</option>
+                <option value="3">3 o más</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label class="flbl">Partos</label>
+              <select class="fld-input">
+                <option value="0">Ninguno</option>
+                <option value="1">1 parto</option>
+                <option value="2">2 partos</option>
+                <option value="3">3 o más</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label class="flbl">Tipo de parto anterior</label>
+              <select class="fld-input">
+                <option>No aplica</option><option>Vaginal</option>
+                <option>Cesárea</option><option>Ambos</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Factores de riesgo + clasificación live -->
+        <div class="tier">
+          <div class="tier-hd">
+            <span class="tier-pill tp-a">Obligatorio</span>
+            <span class="tier-title">Factores de riesgo para preeclampsia</span>
+            <span class="tier-note">Criterios ISSHP 2018 · determina la clasificación inicial</span>
+          </div>
+          <div style="padding:14px 16px">
+            <div class="risk-widget">
+              <div class="risk-chks">
+                <div class="risk-sep">Factores mayores — riesgo alto por sí solos</div>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> HTA crónica diagnosticada</label>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Diabetes pregestacional (tipo 1 o 2)</label>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Enfermedad renal crónica</label>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Síndrome antifosfolípido (SAF)</label>
+                <div class="risk-sep" style="margin-top:4px">Factores moderados — alto riesgo si hay 2 o más</div>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Embarazo múltiple</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Obesidad pregestacional (IMC ≥ 30)</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Antecedente familiar de preeclampsia</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Intervalo intergenésico > 10 años</label>
+              </div>
+              <div class="risk-result" id="np-risk-result">
+                <div class="rr-lbl">Clasificación inicial</div>
+                <div class="rr-val" id="np-rr-val">—</div>
+                <div class="rr-sub" id="np-rr-sub">Seleccioná factores para clasificar</div>
+                <div class="rr-ref">Basado en criterios ISSHP 2018 y guías del ACOG. La clasificación puede actualizarse con cada consulta.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos adicionales (colapsable) -->
+        <div class="tier">
+          <button class="coll-btn" onclick="togNP(this)">
+            <span class="tier-pill tp-b">Opcional</span>
+            <span style="font-size:12px;font-weight:600;color:var(--txt)">Datos adicionales</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--txt3)">Expandir ▼</span>
+          </button>
+          <div class="coll-body" id="tb-np">
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Peso pre-gestacional (kg)</label>
+                <input type="number" class="fld-input" placeholder="ej. 62"/>
+              </div>
+              <div class="fld">
+                <label class="flbl">Talla (cm)</label>
+                <input type="number" class="fld-input" placeholder="ej. 165"/>
+              </div>
+              <div class="fld">
+                <label class="flbl">Grupo sanguíneo</label>
+                <select class="fld-input">
+                  <option>No informado</option>
+                  <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                  <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                </select>
+              </div>
+              <div class="fld">
+                <label class="flbl">Médico derivante</label>
+                <input type="text" class="fld-input" placeholder="ej. Dr. González, clínica médica"/>
+              </div>
+            </div>
+            <div style="padding:0 16px 14px">
+              <div class="flbl" style="margin-bottom:5px">Antecedentes y observaciones</div>
+              <textarea class="fld-input" rows="2" placeholder="Medicación actual, alergias, comorbilidades…"></textarea>
+            </div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+
+      <!-- SUCCESS OVERLAY -->
+      <div class="np-success" id="np-success">
+        <div class="np-scard">
+          <div class="np-sico">✓</div>
+          <div class="np-stitle">Paciente registrada</div>
+          <div class="np-sname" id="np-sname"></div>
+          <div class="np-ssub" id="np-ssub"></div>
+          <button class="btn-p" style="width:100%" onclick="document.getElementById('np-success').classList.remove('show');showPatient()">Ver ficha de la paciente</button>
+          <div style="height:8px"></div>
+          <button class="btn-s" style="width:100%" onclick="document.getElementById('np-success').classList.remove('show');showDash()">Volver al dashboard</button>
+        </div>
+      </div>
+
       <!-- MODAL -->
       <div class="screen" id="sc-modal">
         <div class="modal-bg">
@@ -1018,6 +1222,85 @@ function showPatient(){
 }
 function showForm(){go('sc-form');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Nueva consulta'}]);}
 function showModal(){go('sc-modal');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Alerta crítica'}]);}
+function showNueva(){
+  go('sc-nueva');
+  setBB([{l:'Dashboard',f:'showDash()'},{l:'Nueva paciente'}]);
+  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
+}
+function togNP(btn){
+  const b=document.getElementById('tb-np');
+  b.classList.toggle('open');
+  btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'Colapsar ▲':'Expandir ▼';
+}
+function updateNPHeader(){}
+function calcEdad(){
+  const v=document.getElementById('np-fnac').value;
+  const h=document.getElementById('h-edad');
+  if(!v){h.textContent='';return;}
+  const d=new Date(v),t=new Date();
+  let age=t.getFullYear()-d.getFullYear();
+  if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate()))age--;
+  if(age<12||age>55){h.className='fhint err';h.textContent='✗ Verificar fecha';return;}
+  h.className='fhint ok';h.textContent=age+' años';
+  calcRisk();
+}
+function calcEGA(){
+  const v=document.getElementById('np-fum').value;
+  const h=document.getElementById('h-ega');
+  if(!v){h.textContent='';return;}
+  const fum=new Date(v),hoy=new Date();
+  const dias=Math.floor((hoy-fum)/(86400000));
+  if(dias<0||dias>294){h.className='fhint err';h.textContent='✗ Verificar fecha de FUM';return;}
+  const sem=Math.floor(dias/7),rem=dias%7;
+  const pep=new Date(fum);pep.setDate(pep.getDate()+280);
+  const pepStr=pep.toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
+  h.className='fhint ok';
+  h.textContent='EGA: '+sem+'+'+rem+' sem · Parto estimado: '+pepStr;
+}
+function calcRisk(){
+  const chks=document.querySelectorAll('#sc-nueva .chk[data-w] input:checked');
+  let hi=0,mo=0;
+  chks.forEach(c=>{
+    const w=c.closest('[data-w]').dataset.w;
+    if(w==='h')hi++;else mo++;
+  });
+  const rv=document.getElementById('np-rr-val');
+  const rs=document.getElementById('np-rr-sub');
+  const rr=document.getElementById('np-risk-result');
+  let lv,cl,sub;
+  if(hi>=1){
+    lv='Alto';cl='rr-high';
+    sub=hi+' factor'+(hi>1?'es mayores':' mayor')+(mo>0?', '+mo+' moderado'+(mo>1?'s':''):'');
+  }else if(mo>=2){
+    lv='Alto';cl='rr-high';
+    sub=mo+' factores moderados = riesgo alto (ISSHP 2018)';
+  }else if(mo===1){
+    lv='Moderado';cl='rr-mod';
+    sub='1 factor moderado — monitoreo reforzado';
+  }else{
+    lv='Bajo';cl='rr-low';
+    sub='Sin factores de riesgo identificados';
+  }
+  rv.textContent=lv;
+  rs.textContent=sub;
+  rr.className='risk-result '+cl;
+}
+function savePatient(){
+  const nom=document.getElementById('np-nombre').value.trim();
+  const ape=document.getElementById('np-apellido').value.trim();
+  const fum=document.getElementById('np-fum').value;
+  if(!nom||!ape){
+    document.getElementById('np-nombre').classList.add('ferr');
+    document.getElementById('np-apellido').classList.add('ferr');
+    return;
+  }
+  if(!fum){document.getElementById('np-fum').classList.add('ferr');return;}
+  const rv=document.getElementById('np-rr-val').textContent;
+  const hEga=document.getElementById('h-ega').textContent;
+  document.getElementById('np-sname').textContent=ape+', '+nom;
+  document.getElementById('np-ssub').textContent=(hEga||'FUM registrada')+'\nClasificación de riesgo: '+(rv==='—'?'no evaluada':rv);
+  document.getElementById('np-success').classList.add('show');
+}
 function switchChart(btn,id){
   document.querySelectorAll('.hctab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
