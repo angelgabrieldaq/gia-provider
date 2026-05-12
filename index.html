@@ -10,374 +10,248 @@
   <style>
     :root {
       --p:#2B57D9;--p-dark:#1A3FAA;--p-light:#EBF2FF;--p-mid:#A3C0F8;
-      --bg:#ffffff;--bg2:#f5f4f0;--bg3:#f0efea;
+      --bg:#ffffff;--bg2:#f5f4f0;
       --txt:#1a1a18;--txt2:#5f5e5a;--txt3:#888780;
-      --brd:rgba(0,0,0,0.10);--brd2:rgba(0,0,0,0.18);
-      --s-ok:#0F6E56;--s-ok-l:#E1F5EE;--s-ok-m:#9FE1CB;
-      --s-warn:#633806;--s-warn-l:#FAEEDA;--s-warn-m:#EF9F27;
-      --s-err:#791F1F;--s-err-l:#FCEBEB;--s-err-m:#E24B4A;
-      --r:8px;--r-lg:12px;
+      --brd2:rgba(0,0,0,0.18);
+      --s-ok-m:#9FE1CB;
+      --r:8px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:'DM Sans',sans-serif;color:var(--txt);overflow:hidden}
+    html,body{height:100%;font-family:'DM Sans',sans-serif;overflow:hidden}
 
-    .page{display:grid;grid-template-columns:1fr 1fr;height:100vh}
-
-    /* ── LEFT — dark panel ── */
-    .left{
-      position:relative;overflow:hidden;
+    /* ── FONDO ── */
+    .scene{
+      position:fixed;inset:0;
       background:#091525;
-      display:flex;flex-direction:column;justify-content:space-between;
-      padding:44px 52px;
-      animation:fadeSlideLeft .65s ease both;
+      overflow:hidden;
     }
 
-    /* gradient orbs */
-    .left::before{
-      content:'';position:absolute;
-      width:700px;height:700px;border-radius:50%;
-      background:radial-gradient(circle,rgba(43,87,217,.22) 0%,transparent 65%);
-      top:-280px;right:-220px;pointer-events:none;
+    /* orbs de luz */
+    .orb{position:absolute;border-radius:50%;pointer-events:none}
+    .orb-1{
+      width:900px;height:900px;
+      background:radial-gradient(circle,rgba(43,87,217,.18) 0%,transparent 60%);
+      top:-350px;left:-200px;
     }
-    .left::after{
-      content:'';position:absolute;
-      width:500px;height:500px;border-radius:50%;
-      background:radial-gradient(circle,rgba(15,110,86,.14) 0%,transparent 65%);
-      bottom:-180px;left:-120px;pointer-events:none;
+    .orb-2{
+      width:700px;height:700px;
+      background:radial-gradient(circle,rgba(43,87,217,.12) 0%,transparent 60%);
+      bottom:-300px;right:-150px;
     }
-
-    /* dot grid */
-    .dk-grid{
-      position:absolute;inset:0;pointer-events:none;z-index:0;
-      background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);
-      background-size:28px 28px;
+    .orb-3{
+      width:400px;height:400px;
+      background:radial-gradient(circle,rgba(15,110,86,.10) 0%,transparent 65%);
+      top:40%;left:40%;transform:translate(-50%,-50%);
     }
 
-    /* brand */
-    .brand{position:relative;z-index:1;display:flex;align-items:baseline;gap:8px}
-    .brand-name{font-family:'DM Serif Display',serif;font-size:36px;color:white;letter-spacing:-1px;line-height:1}
-    .brand-name em{font-style:normal;color:var(--p-mid)}
-    .brand-sep{width:1px;height:20px;background:rgba(255,255,255,.15);margin:0 4px}
-    .brand-by{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.8px;text-transform:uppercase;align-self:center}
-
-    /* hero */
-    .hero{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:28px 0}
-
-    .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(15,110,86,.18);border:1px solid rgba(159,225,203,.25);border-radius:20px;padding:4px 12px;width:fit-content}
-    .hero-tag-dot{width:6px;height:6px;border-radius:50%;background:#9FE1CB;animation:pulse 2s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-    .hero-tag span{font-size:11px;font-weight:600;color:#9FE1CB;text-transform:uppercase;letter-spacing:.4px}
-
-    .hero-title{font-family:'DM Serif Display',serif;font-size:36px;line-height:1.18;color:white;letter-spacing:-.5px}
-    .hero-title em{font-style:italic;color:var(--p-mid)}
-
-    /* PRODUCT PREVIEW CARD */
-    .preview{
-      background:rgba(255,255,255,.055);
-      border:1px solid rgba(255,255,255,.11);
-      border-radius:14px;padding:14px 16px;
-      display:flex;flex-direction:column;gap:12px;
-      animation:float 5s ease-in-out infinite;
+    /* dot grid sutil */
+    .scene::after{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background-image:radial-gradient(rgba(255,255,255,0.045) 1px,transparent 1px);
+      background-size:32px 32px;
     }
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-    .prev-hd{display:flex;align-items:center;gap:8px}
-    .prev-dot{width:8px;height:8px;border-radius:50%;background:#E24B4A;flex-shrink:0;animation:blink 1.4s ease-in-out infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-    .prev-patient{font-size:12px;font-weight:600;color:rgba(255,255,255,.85)}
-    .prev-badge{margin-left:auto;font-size:10px;font-weight:700;background:rgba(226,75,74,.22);border:1px solid rgba(226,75,74,.35);color:#f87171;padding:2px 9px;border-radius:20px;white-space:nowrap}
-
-    .prev-chart{position:relative}
-    .prev-chart svg{width:100%;height:48px;overflow:visible;display:block}
-
-    .prev-vitals{display:flex;gap:7px}
-    .pv{flex:1;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:7px 10px}
-    .pv.danger{background:rgba(226,75,74,.12);border-color:rgba(226,75,74,.28)}
-    .pv-val{font-size:15px;font-weight:700;color:rgba(255,255,255,.9);line-height:1;font-family:'DM Serif Display',serif}
-    .pv.danger .pv-val{color:#fca5a5}
-    .pv-lbl{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;font-weight:600}
-
-    /* stats */
-    .feats{display:flex;flex-direction:column;gap:9px}
-    .feat{display:flex;align-items:flex-start;gap:10px}
-    .feat-ico{
-      width:24px;height:24px;border-radius:6px;flex-shrink:0;margin-top:1px;
-      background:rgba(163,192,248,.1);border:1px solid rgba(163,192,248,.18);
-      display:flex;align-items:center;justify-content:center;
-      font-size:11px;color:var(--p-mid);
+    /* línea de datos / waveform decorativa */
+    .waveline{
+      position:absolute;bottom:0;left:0;right:0;
+      height:180px;pointer-events:none;opacity:.07;
     }
-    .feat-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.78);line-height:1.3}
-    .feat-desc{font-size:11px;color:rgba(255,255,255,.32);line-height:1.45;margin-top:1px}
 
-    /* testimonial glass card */
-    .testimonial{
+    /* ── LAYOUT ── */
+    .page{
       position:relative;z-index:1;
-      background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);
-      border-radius:var(--r-lg);padding:15px 18px;
-      display:flex;flex-direction:column;gap:9px;
-      animation:fadeSlideLeft .9s ease both;
+      height:100vh;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:0;
+      animation:fadeUp .55s ease both;
     }
-    .testimonial-text{font-size:12px;font-style:italic;color:rgba(255,255,255,.45);line-height:1.65}
-    .testimonial-text::before{content:'\201C';color:var(--p-mid);font-size:17px;font-family:'DM Serif Display',serif;font-style:normal}
-    .testimonial-text::after{content:'\201D';color:var(--p-mid);font-size:17px;font-family:'DM Serif Display',serif;font-style:normal}
-    .testimonial-author{display:flex;align-items:center;gap:9px}
-    .author-av{width:27px;height:27px;border-radius:50%;background:rgba(163,192,248,.12);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--p-mid);flex-shrink:0;border:1px solid rgba(163,192,248,.2)}
-    .author-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
-    .author-role{font-size:10px;color:rgba(255,255,255,.3)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ── RIGHT — login ── */
-    .right{
-      display:flex;align-items:center;justify-content:center;
-      padding:48px;background:var(--bg3);
-      animation:fadeSlideRight .65s ease both;
+    /* ── MARCA ── */
+    .brand{
+      display:flex;flex-direction:column;align-items:center;
+      gap:6px;margin-bottom:32px;
     }
-    .login-card{
-      background:var(--bg);border:1px solid var(--brd2);
-      border-radius:20px;padding:44px 40px;
-      width:100%;max-width:400px;
-      box-shadow:0 4px 32px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
+    .brand-name{
+      font-family:'DM Serif Display',serif;
+      font-size:64px;color:white;letter-spacing:-2px;line-height:1;
+    }
+    .brand-name em{font-style:normal;color:var(--p-mid)}
+    .brand-tag{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;padding:4px 14px;
+    }
+    .brand-tag-dot{
+      width:5px;height:5px;border-radius:50%;
+      background:var(--s-ok-m);
+      animation:pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .brand-tag span{
+      font-size:11px;font-weight:500;
+      color:rgba(255,255,255,.5);
+      letter-spacing:.3px;
     }
 
-    .card-logo{display:flex;align-items:baseline;gap:5px;margin-bottom:18px}
-    .card-logo-name{font-family:'DM Serif Display',serif;font-size:22px;color:var(--p-dark);letter-spacing:-.3px}
-    .card-logo-by{font-size:10px;color:var(--txt3);font-weight:500;letter-spacing:.3px}
+    /* ── CARD ── */
+    .card{
+      background:var(--bg);
+      border-radius:20px;
+      padding:40px 40px 32px;
+      width:100%;max-width:380px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.06),
+        0 24px 64px rgba(0,0,0,.45),
+        0 4px 16px rgba(0,0,0,.3);
+    }
 
-    .card-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--txt);letter-spacing:-.3px;margin-bottom:5px}
-    .card-sub{font-size:13px;color:var(--txt3);line-height:1.5;margin-bottom:28px}
+    .card-title{
+      font-family:'DM Serif Display',serif;
+      font-size:22px;color:var(--txt);
+      letter-spacing:-.3px;margin-bottom:4px;
+    }
+    .card-sub{font-size:13px;color:var(--txt3);margin-bottom:28px;line-height:1.5}
 
-    .form{display:flex;flex-direction:column;gap:18px}
-    .field{display:flex;flex-direction:column;gap:6px}
+    /* form */
+    .form{display:flex;flex-direction:column;gap:16px}
+    .field{display:flex;flex-direction:column;gap:5px}
     .field label{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
     .field input{
       padding:11px 14px;border:1px solid var(--brd2);border-radius:var(--r);
       background:var(--bg2);color:var(--txt);font-size:14px;
       font-family:'DM Sans',sans-serif;outline:none;
-      transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;
+      transition:border-color .15s,box-shadow .15s;
     }
     .field input::placeholder{color:var(--txt3)}
     .field input:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--p-light);background:var(--bg)}
 
-    .forgot{text-align:right;margin-top:-10px}
-    .forgot a{font-size:12px;color:var(--p);text-decoration:none;font-weight:500}
-    .forgot a:hover{text-decoration:underline}
+    .row-pass{display:flex;justify-content:flex-end;margin-top:-8px}
+    .row-pass a{font-size:12px;color:var(--p);text-decoration:none;font-weight:500}
+    .row-pass a:hover{text-decoration:underline}
 
     .btn-login{
+      margin-top:4px;
       width:100%;padding:13px;border-radius:var(--r);
       background:var(--p);color:white;border:none;
       font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;
-      cursor:pointer;transition:background .15s,transform .1s;letter-spacing:.2px;
+      cursor:pointer;letter-spacing:.2px;
+      transition:background .15s,transform .1s;
     }
     .btn-login:hover{background:var(--p-dark)}
     .btn-login:active{transform:scale(.99)}
     .btn-login.loading{background:var(--p-dark);cursor:not-allowed}
 
-    .divider{display:flex;align-items:center;gap:12px;margin:4px 0}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--brd2)}
-    .divider span{font-size:11px;color:var(--txt3);font-weight:500}
-
-    .demo-note{background:var(--p-light);border:1px solid var(--p-mid);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--p-dark);line-height:1.5;text-align:center}
-    .demo-note strong{font-weight:700}
-
-    .card-footer{margin-top:22px;text-align:center;font-size:11px;color:var(--txt3);line-height:1.7}
-    .card-footer a{color:var(--p);text-decoration:none;font-weight:500}
-
-    /* loading overlay */
-    .loading-overlay{
-      position:fixed;inset:0;background:rgba(9,21,37,.88);
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-      z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;
+    .demo-note{
+      margin-top:14px;
+      padding:10px 14px;border-radius:var(--r);
+      background:var(--p-light);border:1px solid var(--p-mid);
+      font-size:12px;color:var(--p-dark);text-align:center;line-height:1.5;
     }
-    .loading-overlay.show{opacity:1;pointer-events:all}
-    .loader{width:38px;height:38px;border:3px solid rgba(163,192,248,.25);border-top-color:var(--p-mid);border-radius:50%;animation:spin .75s linear infinite}
+
+    /* ── FOOTER ── */
+    .foot{
+      margin-top:24px;
+      display:flex;align-items:center;gap:16px;
+    }
+    .foot-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+      border-radius:6px;padding:4px 10px;
+    }
+    .foot-badge span{font-size:10px;color:rgba(255,255,255,.35);font-weight:500;letter-spacing:.2px}
+    .foot-sep{width:1px;height:12px;background:rgba(255,255,255,.1)}
+    .foot a{font-size:11px;color:rgba(255,255,255,.3);text-decoration:none}
+    .foot a:hover{color:rgba(255,255,255,.55)}
+
+    /* ── LOADING ── */
+    .overlay{
+      position:fixed;inset:0;z-index:100;
+      background:#091525;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+      opacity:0;pointer-events:none;transition:opacity .25s;
+    }
+    .overlay.show{opacity:1;pointer-events:all}
+    .ov-name{font-family:'DM Serif Display',serif;font-size:36px;color:white;letter-spacing:-1px}
+    .ov-name em{font-style:normal;color:var(--p-mid)}
+    .loader{width:32px;height:32px;border:2.5px solid rgba(163,192,248,.2);border-top-color:var(--p-mid);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loader-text{font-size:14px;font-weight:500;color:rgba(255,255,255,.6)}
-    .loader-brand{font-family:'DM Serif Display',serif;font-size:24px;color:white;margin-bottom:4px;letter-spacing:-.3px}
-
-    @keyframes fadeSlideLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes fadeSlideRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-
-    @media(max-width:900px){
-      .page{grid-template-columns:1fr}
-      .left{display:none}
-      .right{padding:24px}
-    }
+    .ov-txt{font-size:13px;color:rgba(255,255,255,.4);font-weight:400}
   </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
-  <div class="loader-brand">Gia</div>
+<div class="overlay" id="overlay">
+  <div class="ov-name">G<em>ia</em></div>
   <div class="loader"></div>
-  <div class="loader-text">Verificando credenciales…</div>
+  <div class="ov-txt">Iniciando sesión…</div>
+</div>
+
+<div class="scene">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- waveform decorativa de fondo -->
+  <svg class="waveline" viewBox="0 0 1440 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <polyline
+      points="0,140 80,140 100,140 120,80 140,20 160,140 180,140 220,140 240,100 260,60 280,140 320,140 360,140 380,110 400,50 420,30 440,100 460,140 520,140 560,140 580,90 600,40 620,140 680,140 720,140 740,105 760,55 780,140 840,140 880,140 900,95 920,45 940,140 1000,140 1040,140 1060,100 1080,55 1100,140 1160,140 1200,140 1220,108 1240,62 1260,140 1320,140 1380,140 1420,130 1440,140"
+      fill="none" stroke="white" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"
+    />
+  </svg>
 </div>
 
 <div class="page">
-
-  <!-- LEFT — dark panel with product preview -->
-  <div class="left">
-    <div class="dk-grid"></div>
-
-    <div class="brand">
-      <div class="brand-name">G<em>ia</em></div>
-      <div class="brand-sep"></div>
-      <div class="brand-by">by Zenoxia</div>
-    </div>
-
-    <div class="hero">
-      <div class="hero-tag">
-        <div class="hero-tag-dot"></div>
-        <span>Módulo Obstétrico Inteligente</span>
-      </div>
-
-      <h1 class="hero-title">
-        La evolución clínica<br>
-        de tus pacientes,<br>
-        <em>siempre visible</em>
-      </h1>
-
-      <!-- live product preview -->
-      <div class="preview">
-        <div class="prev-hd">
-          <div class="prev-dot"></div>
-          <div class="prev-patient">Ramírez, L. · 34 semanas · Preeclampsia</div>
-          <div class="prev-badge">● Crítico</div>
-        </div>
-
-        <div class="prev-chart">
-          <svg viewBox="0 0 300 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <!-- danger zone -->
-            <rect x="0" y="0" width="300" height="10" fill="rgba(226,75,74,0.18)" rx="2"/>
-            <!-- threshold at 140 -->
-            <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(239,159,39,0.4)" stroke-width="1" stroke-dasharray="5,3"/>
-            <!-- area fill -->
-            <path d="M0,42 L43,36 L86,30 L129,24 L171,20 L214,16 L257,13 L300,6 L300,48 L0,48 Z" fill="rgba(226,75,74,0.1)"/>
-            <!-- line -->
-            <polyline points="0,42 43,36 86,30 129,24 171,20 214,16 257,13 300,6" fill="none" stroke="#E24B4A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <!-- dots -->
-            <circle cx="0"   cy="42" r="3" fill="#9FE1CB"/>
-            <circle cx="43"  cy="36" r="3" fill="#9FE1CB"/>
-            <circle cx="86"  cy="30" r="3" fill="#9FE1CB"/>
-            <circle cx="129" cy="24" r="3" fill="#9FE1CB"/>
-            <circle cx="171" cy="20" r="3" fill="#EF9F27"/>
-            <circle cx="214" cy="16" r="3" fill="#EF9F27"/>
-            <circle cx="257" cy="13" r="3" fill="#E24B4A"/>
-            <circle cx="300" cy="6"  r="4" fill="#E24B4A" stroke="rgba(226,75,74,0.3)" stroke-width="5"/>
-          </svg>
-        </div>
-
-        <div class="prev-vitals">
-          <div class="pv danger">
-            <div class="pv-val">158/102</div>
-            <div class="pv-lbl">TA · mmHg</div>
-          </div>
-          <div class="pv danger">
-            <div class="pv-val">2+</div>
-            <div class="pv-lbl">Proteínas</div>
-          </div>
-          <div class="pv">
-            <div class="pv-val">144</div>
-            <div class="pv-lbl">FCF · lpm</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="feats">
-        <div class="feat">
-          <div class="feat-ico">◎</div>
-          <div>
-            <div class="feat-title">Historia perinatal longitudinal</div>
-            <div class="feat-desc">Evolución continua desde la primera consulta hasta el puerperio, por paciente</div>
-          </div>
-        </div>
-        <div class="feat">
-          <div class="feat-ico">⚡</div>
-          <div>
-            <div class="feat-title">Alertas por umbrales clínicos</div>
-            <div class="feat-desc">Criterios ISSHP 2018 para preeclampsia, HTA gestacional y signos de severidad</div>
-          </div>
-        </div>
-        <div class="feat">
-          <div class="feat-ico">⊕</div>
-          <div>
-            <div class="feat-title">Clasificación de riesgo automatizada</div>
-            <div class="feat-desc">Estratificación por consulta: alto, moderado y bajo riesgo sin carga manual</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="testimonial">
-      <div class="testimonial-text">
-        Gia cambió la forma en que hago el seguimiento. Ver la presión, el peso y la proteinuria en una sola vista longitudinal me permite tomar decisiones clínicas más rápido y con mayor seguridad.
-      </div>
-      <div class="testimonial-author">
-        <div class="author-av">CR</div>
-        <div>
-          <div class="author-name">Dra. Carolina R.</div>
-          <div class="author-role">Especialista en Medicina Materno-Fetal · CEMIC · CABA</div>
-        </div>
-      </div>
+  <div class="brand">
+    <div class="brand-name">G<em>ia</em></div>
+    <div class="brand-tag">
+      <div class="brand-tag-dot"></div>
+      <span>Módulo Obstétrico Inteligente · by Zenoxia</span>
     </div>
   </div>
 
-  <!-- RIGHT — login -->
-  <div class="right">
-    <div class="login-card">
+  <div class="card">
+    <div class="card-title">Bienvenida</div>
+    <div class="card-sub">Accedé con tu cuenta para continuar.</div>
 
-      <div class="card-logo">
-        <span class="card-logo-name">Gia</span>
-        <span class="card-logo-by">by Zenoxia</span>
+    <form class="form" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="dra@consultorio.com" autocomplete="email" required/>
       </div>
-
-      <div class="card-title">Bienvenida</div>
-      <div class="card-sub">Ingresá con tu cuenta para acceder al dashboard clínico.</div>
-
-      <form class="form" onsubmit="handleLogin(event)">
-        <div class="field">
-          <label for="email">Correo electrónico</label>
-          <input type="email" id="email" placeholder="dra@consultorio.com" autocomplete="email" required/>
-        </div>
-
-        <div class="field">
-          <label for="password">Contraseña</label>
-          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required/>
-        </div>
-
-        <div class="forgot">
-          <a href="#">¿Olvidaste tu contraseña?</a>
-        </div>
-
-        <button type="submit" class="btn-login" id="btn-login">
-          Ingresar al sistema
-        </button>
-
-        <div class="divider"><span>o</span></div>
-
-        <div class="demo-note">
-          <strong>Modo demo —</strong> ingresá cualquier correo y contraseña para explorar el dashboard.
-        </div>
-      </form>
-
-      <div class="card-footer">
-        ¿Problemas para acceder? <a href="#">Contactar soporte</a><br><br>
-        Gia es un Software as a Medical Device (SaMD)<br>
-        bajo normativa ANMAT Argentina · <a href="#">Política de privacidad</a>
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required/>
       </div>
+      <div class="row-pass"><a href="#">¿Olvidaste tu contraseña?</a></div>
+      <button type="submit" class="btn-login" id="btn-login">Ingresar</button>
+    </form>
+
+    <div class="demo-note">
+      <strong>Modo demo —</strong> ingresá cualquier correo y contraseña.
     </div>
   </div>
 
+  <div class="foot">
+    <div class="foot-badge"><span>SaMD · ANMAT Argentina</span></div>
+    <div class="foot-sep"></div>
+    <a href="#">Soporte</a>
+    <div class="foot-sep"></div>
+    <a href="#">Privacidad</a>
+  </div>
 </div>
 
 <script>
   function handleLogin(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-login');
-    const overlay = document.getElementById('loading');
     btn.textContent = 'Verificando…';
     btn.classList.add('loading');
     btn.disabled = true;
-    overlay.classList.add('show');
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+    document.getElementById('overlay').classList.add('show');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1600);
   }
 </script>
 </body>
