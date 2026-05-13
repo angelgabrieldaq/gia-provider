@@ -296,6 +296,28 @@
     .copt.sel{border-color:var(--p);background:var(--p-light);color:var(--p-dark);font-weight:600}
     .mft{padding:12px 20px;border-top:1px solid var(--brd);display:flex;justify-content:flex-end;gap:8px}
     .mnote{font-size:10px;color:var(--txt3);padding:0 20px 14px;line-height:1.6}
+
+    /* LABORATORIOS */
+    .labo-tabs{display:flex;gap:0;border-bottom:1px solid var(--brd2);padding:0 20px;background:var(--bg);margin-bottom:0}
+    .labo-tab{font-size:12px;font-weight:600;padding:10px 18px;cursor:pointer;border:none;background:transparent;color:var(--txt3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'DM Sans',sans-serif;transition:all .12s}
+    .labo-tab:hover{color:var(--txt)}
+    .labo-tab.on{color:var(--p);border-bottom-color:var(--p)}
+    .labo-panel{display:none}.labo-panel.active{display:block}
+    .labo-section{margin:12px 20px;border:1px solid var(--brd);border-radius:var(--r-lg);background:var(--bg);overflow:hidden}
+    .labo-section-hd{padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--brd);font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
+    .fhint.warn{color:var(--s-warn)}
+
+    /* HÁBITOS Y PREVENTIVO */
+    .hab-sub{padding:0 16px 10px}
+    .hab-sub-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:12px 0 8px;border-bottom:1px solid var(--brd);margin-bottom:8px}
+    .hab-row{display:flex;align-items:flex-start;gap:10px;padding:5px 0;font-size:12px;color:var(--txt)}
+    .hab-detail{margin:6px 0 2px 22px;padding:8px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--brd);display:none}
+    .vac-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12px;color:var(--txt);flex-wrap:wrap}
+    .vac-date{display:none;align-items:center;gap:6px;margin-left:22px;flex-wrap:wrap}
+    .vac-date label{font-size:10px;color:var(--txt3);font-weight:600}
+    .prev-row{display:flex;flex-direction:column;gap:4px;padding:5px 0}
+    .prev-row-top{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--txt)}
+    .prev-detail{margin-left:22px;padding:8px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--brd);display:none}
   </style>
 </head>
 <body>
@@ -309,6 +331,7 @@
     </div>
     <div class="nav">
       <button class="npill active" onclick="showDash()">Dashboard</button>
+      <button class="npill" onclick="showLaboratorios()">Laboratorios</button>
       <button class="npill">Agenda</button>
       <button class="npill">Reportes</button>
     </div>
@@ -997,7 +1020,7 @@
         <div class="fhead">
           <div>
             <div class="ftitle">Nueva paciente</div>
-            <div class="fsub">Completá los datos para registrar una paciente en el sistema</div>
+            <div class="fsub">Completá los datos para registrar una paciente en el sistema · Ficha perinatal CLAP/MINSAL</div>
           </div>
           <div class="fhead-r">
             <button class="btn-s" onclick="showDash()">Cancelar</button>
@@ -1044,11 +1067,11 @@
           </div>
         </div>
 
-        <!-- Historia obstétrica -->
+        <!-- Historia obstétrica + EGA -->
         <div class="tier">
           <div class="tier-hd">
             <span class="tier-pill tp-a">Obligatorio</span>
-            <span class="tier-title">Historia obstétrica</span>
+            <span class="tier-title">Historia obstétrica y edad gestacional</span>
           </div>
           <div class="fields">
             <div class="fld">
@@ -1082,31 +1105,87 @@
               </select>
             </div>
           </div>
+          <!-- Sec 1: EGA por ecografía 1er trimestre -->
+          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
+            <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:10px 0 8px">EGA por ecografía · 1er trimestre (corrección de FPP)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+              <div class="fld">
+                <label class="flbl">Fecha de la eco</label>
+                <input type="date" class="fld-input" id="np-eco1-fecha" oninput="calcEcoCorrected()"/>
+              </div>
+              <div class="fld">
+                <label class="flbl">EGA a la eco (sem)</label>
+                <input type="number" class="fld-input" id="np-eco1-sem" min="6" max="13" placeholder="ej. 11" oninput="calcEcoCorrected()"/>
+              </div>
+              <div class="fld">
+                <label class="flbl">Días adicionales</label>
+                <input type="number" class="fld-input" id="np-eco1-dias" min="0" max="6" placeholder="ej. 4" oninput="calcEcoCorrected()"/>
+              </div>
+            </div>
+            <div class="fhint" id="h-eco1" style="margin-top:6px"></div>
+          </div>
         </div>
 
-        <!-- Factores de riesgo + clasificación live -->
+        <!-- Sec 2: Medidas antropométricas (obligatorio) -->
         <div class="tier">
           <div class="tier-hd">
             <span class="tier-pill tp-a">Obligatorio</span>
-            <span class="tier-title">Factores de riesgo para preeclampsia</span>
+            <span class="tier-title">Medidas antropométricas</span>
+            <span class="tier-note">Para clasificación de riesgo por IMC</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label class="flbl">Peso pre-gestacional (kg)</label>
+              <input type="number" class="fld-input" id="np-peso" placeholder="ej. 62.5" step="0.1" oninput="calcIMC()"/>
+            </div>
+            <div class="fld">
+              <label class="flbl">Talla (cm)</label>
+              <input type="number" class="fld-input" id="np-talla" placeholder="ej. 165" oninput="calcIMC()"/>
+              <div class="fhint" id="h-imc"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Factores de riesgo CLAP — 5 subsecciones + clasificación live -->
+        <div class="tier">
+          <div class="tier-hd">
+            <span class="tier-pill tp-a">Obligatorio</span>
+            <span class="tier-title">Factores de riesgo — Ficha CLAP</span>
             <span class="tier-note">Criterios ISSHP 2018 · determina la clasificación inicial</span>
           </div>
           <div style="padding:14px 16px">
             <div class="risk-widget">
               <div class="risk-chks">
-                <div class="risk-sep">Factores mayores — riesgo alto por sí solos</div>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
+
+                <!-- 1. Antecedentes personales -->
+                <div class="risk-sep">1 · Antecedentes personales</div>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> HTA crónica diagnosticada</label>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Diabetes pregestacional (tipo 1 o 2)</label>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Enfermedad renal crónica</label>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Síndrome antifosfolípido (SAF)</label>
-                <div class="risk-sep" style="margin-top:4px">Factores moderados — alto riesgo si hay 2 o más</div>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Embarazo múltiple</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Obesidad pregestacional (IMC ≥ 30)</label>
+                <label class="chk" data-w="m"><input type="checkbox" id="cb-obesidad" onchange="calcRisk()"/> Obesidad pregestacional (IMC ≥ 30)</label>
+
+                <!-- 2. Antecedentes obstétricos -->
+                <div class="risk-sep" style="margin-top:6px">2 · Antecedentes obstétricos</div>
+                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Antecedente familiar de preeclampsia</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Intervalo intergenésico > 10 años</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Intervalo intergenésico &gt; 10 años</label>
+
+                <!-- 3. Condición actual del embarazo -->
+                <div class="risk-sep" style="margin-top:6px">3 · Condición actual del embarazo</div>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Embarazo múltiple</label>
+                <label class="chk" data-w="m"><input type="checkbox" id="cb-edad35" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
+
+                <!-- 4. Condición socioeconómica -->
+                <div class="risk-sep" style="margin-top:6px">4 · Condición socioeconómica</div>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Nivel socioeconómico bajo</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Sin acceso a red de apoyo</label>
+
+                <!-- 5. Otros factores de riesgo -->
+                <div class="risk-sep" style="margin-top:6px">5 · Otros factores relevantes</div>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Tabaquismo activo</label>
+                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Exposición a violencia / estrés severo</label>
               </div>
               <div class="risk-result" id="np-risk-result">
                 <div class="rr-lbl">Clasificación inicial</div>
@@ -1118,23 +1197,227 @@
           </div>
         </div>
 
+        <!-- Sec 6: Hábitos y preventivo (colapsable) -->
+        <div class="tier">
+          <button class="coll-btn" onclick="togTier(this)">
+            <span class="tier-pill tp-b">Preventivo</span>
+            <span style="font-size:12px;font-weight:600;color:var(--txt)">Hábitos y seguimiento preventivo</span>
+            <span class="coll-arrow" style="margin-left:auto;font-size:11px;color:var(--txt3)">▼</span>
+          </button>
+          <div class="coll-body" id="tb-habitos">
+
+            <!-- 6.2 Hábitos tóxicos -->
+            <div class="hab-sub">
+              <div class="hab-sub-title">Hábitos tóxicos</div>
+              <div class="hab-row">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                  <input type="checkbox" onchange="togHabit(this,'hab-tabaco-det')"/> Tabaquismo
+                </label>
+              </div>
+              <div class="hab-detail" id="hab-tabaco-det">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <div class="fld"><label class="flbl">Cigarrillos / día</label><input type="number" class="fld-input" placeholder="ej. 5" min="0"/></div>
+                  <div class="fld"><label class="flbl">¿Desea dejar?</label><select class="fld-input"><option>Sí</option><option>No</option><option>Ya lo intentó</option></select></div>
+                </div>
+              </div>
+              <div class="hab-row">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                  <input type="checkbox" onchange="togHabit(this,'hab-alcohol-det')"/> Consumo de alcohol
+                </label>
+              </div>
+              <div class="hab-detail" id="hab-alcohol-det">
+                <div class="fld"><label class="flbl">Frecuencia</label><select class="fld-input"><option>Ocasional</option><option>Semanal</option><option>Diario</option></select></div>
+              </div>
+              <div class="hab-row">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                  <input type="checkbox" onchange="togHabit(this,'hab-drogas-det')"/> Consumo de sustancias
+                </label>
+              </div>
+              <div class="hab-detail" id="hab-drogas-det">
+                <div class="fld"><label class="flbl">Descripción</label><input type="text" class="fld-input" placeholder="ej. marihuana, cocaína…"/></div>
+              </div>
+            </div>
+
+            <!-- 6.3 Actividad física -->
+            <div class="hab-sub" style="border-top:1px solid var(--brd)">
+              <div class="hab-sub-title">Actividad física</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="fld">
+                  <label class="flbl">Nivel de actividad</label>
+                  <select class="fld-input">
+                    <option>Sedentaria</option>
+                    <option>Leve (caminatas)</option>
+                    <option>Moderada</option>
+                    <option>Intensa</option>
+                  </select>
+                </div>
+                <div class="fld">
+                  <label class="flbl">Frecuencia semanal</label>
+                  <select class="fld-input">
+                    <option>Ninguna</option>
+                    <option>1–2 veces</option>
+                    <option>3–4 veces</option>
+                    <option>5 o más veces</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6.4 Alimentación -->
+            <div class="hab-sub" style="border-top:1px solid var(--brd)">
+              <div class="hab-sub-title">Alimentación</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="fld">
+                  <label class="flbl">Patrón alimentario</label>
+                  <select class="fld-input">
+                    <option>Sin restricciones</option>
+                    <option>Vegetariana</option>
+                    <option>Vegana</option>
+                    <option>Sin gluten / celiaca</option>
+                    <option>Dieta baja en sodio</option>
+                    <option>Otra</option>
+                  </select>
+                </div>
+                <div class="fld">
+                  <label class="flbl">Suplementos actuales</label>
+                  <input type="text" class="fld-input" placeholder="ej. ácido fólico, hierro…"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6.5 Vacunas (calendario ANMAT Argentina) -->
+            <div class="hab-sub" style="border-top:1px solid var(--brd)">
+              <div class="hab-sub-title">Vacunas — Calendario Nacional Argentina</div>
+
+              <div class="vac-row">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="vac-gripal-chk" onchange="togVacDate(this,'vac-gripal-d')"/> Antigripal (anual)
+                </label>
+                <span style="font-size:10px;color:var(--txt3);margin-left:4px">Recomendada en cualquier trimestre</span>
+              </div>
+              <div class="vac-date" id="vac-gripal-d">
+                <label>Fecha de aplicación</label>
+                <input type="date" class="fld-input" style="width:160px"/>
+              </div>
+
+              <div class="vac-row" style="margin-top:6px">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="vac-dtpa-chk" onchange="togVacDate(this,'vac-dtpa-d')"/> dTpa (difteria-tétanos-pertussis)
+                </label>
+                <span style="font-size:10px;color:var(--txt3);margin-left:4px">2do trimestre · 20–33 sem</span>
+              </div>
+              <div class="vac-date" id="vac-dtpa-d">
+                <label>Fecha de aplicación</label>
+                <input type="date" class="fld-input" style="width:160px"/>
+              </div>
+
+              <div class="vac-row" style="margin-top:6px">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="vac-vhb-chk" onchange="togVacDate(this,'vac-vhb-d')"/> Hepatitis B (VHB)
+                </label>
+                <span style="font-size:10px;color:var(--txt3);margin-left:4px">Si no tiene esquema completo</span>
+              </div>
+              <div class="vac-date" id="vac-vhb-d">
+                <label>Fecha última dosis</label>
+                <input type="date" class="fld-input" style="width:160px"/>
+                <label style="margin-left:8px">Dosis N°</label>
+                <select class="fld-input" style="width:80px"><option>1</option><option>2</option><option>3</option></select>
+              </div>
+
+              <div class="vac-row" style="margin-top:6px">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+                  <input type="checkbox" id="vac-covid-chk" onchange="togVacDate(this,'vac-covid-d')"/> COVID-19
+                </label>
+                <span style="font-size:10px;color:var(--txt3);margin-left:4px">Según disponibilidad de campaña</span>
+              </div>
+              <div class="vac-date" id="vac-covid-d">
+                <label>Fecha última dosis</label>
+                <input type="date" class="fld-input" style="width:160px"/>
+              </div>
+            </div>
+
+            <!-- 6.6 Exámenes preventivos -->
+            <div class="hab-sub" style="border-top:1px solid var(--brd)">
+              <div class="hab-sub-title">Exámenes preventivos</div>
+
+              <div class="prev-row">
+                <div class="prev-row-top">
+                  <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                    <input type="checkbox" onchange="togMamEstudio(this)"/> Mamografía / ecografía mamaria
+                  </label>
+                </div>
+                <div class="prev-detail" id="mam-estudio-det">
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                    <div class="fld"><label class="flbl">Tipo de estudio</label><select class="fld-input"><option>Mamografía</option><option>Eco mamaria</option><option>Ambas</option></select></div>
+                    <div class="fld"><label class="flbl">Fecha del estudio</label><input type="date" class="fld-input"/></div>
+                    <div class="fld"><label class="flbl">Resultado BIRADS</label><select class="fld-input"><option>— s/d —</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4A</option><option>4B</option><option>4C</option><option>5</option><option>6</option></select></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="prev-row">
+                <div class="prev-row-top">
+                  <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                    <input type="checkbox" onchange="this.closest('.prev-row').querySelector('.prev-detail').style.display=this.checked?'block':'none'"/> PAP / Citología cervical
+                  </label>
+                </div>
+                <div class="prev-detail">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div class="fld"><label class="flbl">Fecha del PAP</label><input type="date" class="fld-input"/></div>
+                    <div class="fld"><label class="flbl">Resultado</label><select class="fld-input"><option>Normal (NILM)</option><option>ASC-US</option><option>ASC-H</option><option>LSIL</option><option>HSIL</option><option>Carcinoma</option><option>Pendiente</option></select></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="prev-row">
+                <div class="prev-row-top">
+                  <span style="font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px">Serología obligatoria en embarazo</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+                  <div class="fld">
+                    <label class="flbl">HIV / SIDA</label>
+                    <select class="fld-input">
+                      <option>Sin datos</option><option>No realizado</option>
+                      <option>Negativo</option><option>Positivo</option><option>Pendiente</option>
+                    </select>
+                  </div>
+                  <div class="fld">
+                    <label class="flbl">Chagas</label>
+                    <select class="fld-input">
+                      <option>Sin datos</option><option>No realizado</option>
+                      <option>No reactivo</option><option>Reactivo</option><option>Pendiente</option>
+                    </select>
+                  </div>
+                  <div class="fld">
+                    <label class="flbl">Rubéola (IgG)</label>
+                    <select class="fld-input">
+                      <option>Sin datos</option><option>No realizado</option>
+                      <option>Inmune</option><option>No inmune</option><option>Pendiente</option>
+                    </select>
+                  </div>
+                  <div class="fld">
+                    <label class="flbl">Toxoplasma</label>
+                    <select class="fld-input">
+                      <option>Sin datos</option><option>No realizado</option>
+                      <option>IgG+ / IgM-</option><option>IgM+</option><option>Pendiente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /exámenes preventivos -->
+          </div><!-- /coll-body tb-habitos -->
+        </div><!-- /tier hábitos -->
+
         <!-- Datos adicionales (colapsable) -->
         <div class="tier">
           <button class="coll-btn" onclick="togNP(this)">
             <span class="tier-pill tp-b">Opcional</span>
-            <span style="font-size:12px;font-weight:600;color:var(--txt)">Datos adicionales</span>
+            <span style="font-size:12px;font-weight:600;color:var(--txt)">Datos adicionales y observaciones</span>
             <span style="margin-left:auto;font-size:11px;color:var(--txt3)">Expandir ▼</span>
           </button>
           <div class="coll-body" id="tb-np">
             <div class="fields">
-              <div class="fld">
-                <label class="flbl">Peso pre-gestacional (kg)</label>
-                <input type="number" class="fld-input" placeholder="ej. 62"/>
-              </div>
-              <div class="fld">
-                <label class="flbl">Talla (cm)</label>
-                <input type="number" class="fld-input" placeholder="ej. 165"/>
-              </div>
               <div class="fld">
                 <label class="flbl">Grupo sanguíneo</label>
                 <select class="fld-input">
@@ -1149,13 +1432,289 @@
               </div>
             </div>
             <div style="padding:0 16px 14px">
-              <div class="flbl" style="margin-bottom:5px">Antecedentes y observaciones</div>
+              <div class="flbl" style="margin-bottom:5px">Antecedentes y observaciones adicionales</div>
               <textarea class="fld-input" rows="2" placeholder="Medicación actual, alergias, comorbilidades…"></textarea>
             </div>
           </div>
         </div>
         <div style="height:20px"></div>
       </div>
+
+      <!-- LABORATORIOS -->
+      <div class="screen" id="sc-laboratorios">
+        <div class="fhead">
+          <div>
+            <div class="ftitle">Laboratorios</div>
+            <div class="fsub">Ramírez, Laura · 34 semanas · Umbrales IADPSG/ADA · Hb, PTOG, perfil metabólico</div>
+          </div>
+          <div class="fhead-r">
+            <button class="btn-s" onclick="showPatient()">Volver a paciente</button>
+            <button class="btn-p">Guardar resultados</button>
+          </div>
+        </div>
+        <div class="labo-tabs">
+          <button class="labo-tab on" id="ltab-1" onclick="showLabo(1)">1er Trimestre</button>
+          <button class="labo-tab" id="ltab-2" onclick="showLabo(2)">2do Trimestre</button>
+          <button class="labo-tab" id="ltab-3" onclick="showLabo(3)">3er Trimestre</button>
+        </div>
+
+        <!-- PANEL 1er TRIMESTRE -->
+        <div class="labo-panel active" id="lp-1">
+          <div class="labo-section">
+            <div class="labo-section-hd">Hemograma</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Hemoglobina (g/dL)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab1-hb"
+                  data-alert-threshold="11"
+                  data-alert-direction="below"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Hb &lt; 11 g/dL — anemia gestacional. Valorar hierro oral."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-hb-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Hematocrito (%)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab1-hto"
+                  data-alert-threshold="33"
+                  data-alert-direction="below"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Hematocrito &lt; 33% — posible anemia. Correlacionar con Hb."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-hto-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Plaquetas (×10³/µL)</label>
+                <input type="number" class="fld-input" id="lab1-plt"
+                  data-alert-threshold="100"
+                  data-alert-direction="below"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ Plaquetas &lt; 100.000 — trombocitopenia. Evaluar HELLP."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-plt-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Leucocitos (×10³/µL)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab1-leu"/>
+              </div>
+            </div>
+          </div>
+          <div class="labo-section">
+            <div class="labo-section-hd">Glucemia y metabolismo</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Glucemia en ayunas (mg/dL)</label>
+                <input type="number" class="fld-input" id="lab1-glu"
+                  data-alert-threshold="92"
+                  data-alert-direction="above"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ Glucemia ≥ 92 mg/dL en ayunas — criterio diagnóstico DMG (IADPSG). Solicitar PTOG."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-glu-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Urea (mg/dL)</label>
+                <input type="number" class="fld-input" id="lab1-urea"/>
+              </div>
+              <div class="fld">
+                <label class="flbl">Creatinina (mg/dL)</label>
+                <input type="number" step="0.01" class="fld-input" id="lab1-creat"
+                  data-alert-threshold="0.9"
+                  data-alert-direction="above"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Creatinina &gt; 0,9 mg/dL — evaluar función renal."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-creat-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Ácido úrico (mg/dL)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab1-au"
+                  data-alert-threshold="5.5"
+                  data-alert-direction="above"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Ácido úrico elevado — marcador precoz de PE. Correlacionar con TA."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-au-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div class="labo-section">
+            <div class="labo-section-hd">Orina y serología</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Proteinuria (mg/24h)</label>
+                <input type="number" class="fld-input" id="lab1-prot"
+                  data-alert-threshold="300"
+                  data-alert-direction="above"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 Proteinuria ≥ 300 mg/24h — criterio diagnóstico de preeclampsia."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-prot-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">TSH (mUI/L)</label>
+                <input type="number" step="0.01" class="fld-input" id="lab1-tsh"
+                  data-alert-threshold="2.5"
+                  data-alert-direction="above"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ TSH &gt; 2,5 en 1er trim — hipotiroidismo subclínico. Valorar levotiroxina."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab1-tsh-hint"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2do TRIMESTRE -->
+        <div class="labo-panel" id="lp-2">
+          <div class="labo-section">
+            <div class="labo-section-hd">PTOG 75g (24–28 semanas) · Criterios IADPSG/ADA</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Glucemia basal 0 min (mg/dL)</label>
+                <input type="number" class="fld-input" id="lab2-ptog0"
+                  data-alert-threshold="92"
+                  data-alert-direction="above"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ Basal ≥ 92 mg/dL — diagnóstico de DMG (IADPSG)."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-ptog0-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Glucemia 60 min (mg/dL)</label>
+                <input type="number" class="fld-input" id="lab2-ptog60"
+                  data-alert-threshold="180"
+                  data-alert-direction="above"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ 60 min ≥ 180 mg/dL — diagnóstico de DMG (IADPSG)."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-ptog60-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Glucemia 120 min (mg/dL)</label>
+                <input type="number" class="fld-input" id="lab2-ptog120"
+                  data-alert-threshold="140"
+                  data-alert-direction="above"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 PTOG 120 min ≥ 140 mg/dL — criterio diagnóstico DMG (IADPSG 2010 / ADA). Iniciar manejo multidisciplinario."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-ptog120-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">HbA1c (%)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab2-hba1c"
+                  data-alert-threshold="5.7"
+                  data-alert-direction="above"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ HbA1c ≥ 5,7% — prediabetes. Correlacionar con PTOG."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-hba1c-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div class="labo-section">
+            <div class="labo-section-hd">Hemograma 2do trimestre</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Hemoglobina (g/dL)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab2-hb"
+                  data-alert-threshold="10.5"
+                  data-alert-direction="below"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Hb &lt; 10,5 g/dL en 2do trim — anemia moderada. Evaluar ferritina."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-hb-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Ferritina (ng/mL)</label>
+                <input type="number" class="fld-input" id="lab2-ferr"
+                  data-alert-threshold="15"
+                  data-alert-direction="below"
+                  data-alert-level="warn"
+                  data-alert-message="⚠ Ferritina &lt; 15 ng/mL — déficit de hierro. Iniciar suplementación."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab2-ferr-hint"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3er TRIMESTRE -->
+        <div class="labo-panel" id="lp-3">
+          <div class="labo-section">
+            <div class="labo-section-hd">Perfil hepático y renal</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">TGO / AST (U/L)</label>
+                <input type="number" class="fld-input" id="lab3-ast"
+                  data-alert-threshold="40"
+                  data-alert-direction="above"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ AST &gt; 40 U/L — posible compromiso hepático. Evaluar HELLP."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-ast-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">TGP / ALT (U/L)</label>
+                <input type="number" class="fld-input" id="lab3-alt"
+                  data-alert-threshold="40"
+                  data-alert-direction="above"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ ALT &gt; 40 U/L — hepatotoxicidad. Evaluar contexto clínico."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-alt-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">LDH (U/L)</label>
+                <input type="number" class="fld-input" id="lab3-ldh"
+                  data-alert-threshold="600"
+                  data-alert-direction="above"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 LDH &gt; 600 U/L — criterio diagnóstico de síndrome HELLP."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-ldh-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Plaquetas (×10³/µL)</label>
+                <input type="number" class="fld-input" id="lab3-plt"
+                  data-alert-threshold="100"
+                  data-alert-direction="below"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 Plaquetas &lt; 100.000 — trombocitopenia severa. Criterio HELLP."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-plt-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div class="labo-section">
+            <div class="labo-section-hd">Hemograma 3er trimestre</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">Hemoglobina (g/dL)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab3-hb"
+                  data-alert-threshold="10"
+                  data-alert-direction="below"
+                  data-alert-level="danger"
+                  data-alert-message="⚠ Hb &lt; 10 g/dL — anemia moderada-severa. Riesgo periparto elevado."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-hb-hint"></div>
+              </div>
+              <div class="fld">
+                <label class="flbl">Proteinuria (mg/24h)</label>
+                <input type="number" class="fld-input" id="lab3-prot"
+                  data-alert-threshold="300"
+                  data-alert-direction="above"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 Proteinuria ≥ 300 mg/24h — criterio diagnóstico de preeclampsia."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-prot-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+        </div>
+
+      </div><!-- /sc-laboratorios -->
 
       <!-- SUCCESS OVERLAY -->
       <div class="np-success" id="np-success">
@@ -1207,153 +1766,50 @@
   </div>
 </div>
 
+<script src="clinical-rules.js"></script>
+<script src="ui-helpers.js"></script>
 <script>
-function setBB(p){
-  document.getElementById('bbar').innerHTML=p.map((x,i)=>
-    i<p.length-1?`<button class="bc" onclick="${x.f||''}">${x.l}</button><span class="bc-sep">›</span>`
-    :`<span class="bc-act">${x.l}</span>`).join('');
-}
-function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function showDash(){go('sc-dash');setBB([{l:'Dashboard'}]);document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));}
-function showPatient(){
-  go('sc-patient');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura'}]);
-  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
-  document.getElementById('si-l').classList.add('active');
-}
-function showForm(){go('sc-form');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Nueva consulta'}]);}
-function showModal(){go('sc-modal');setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Alerta crítica'}]);}
-function showNueva(){
-  go('sc-nueva');
-  setBB([{l:'Dashboard',f:'showDash()'},{l:'Nueva paciente'}]);
-  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
-}
-function togNP(btn){
-  const b=document.getElementById('tb-np');
-  b.classList.toggle('open');
-  btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'Colapsar ▲':'Expandir ▼';
-}
-function updateNPHeader(){}
-function calcEdad(){
-  const v=document.getElementById('np-fnac').value;
-  const h=document.getElementById('h-edad');
-  if(!v){h.textContent='';return;}
-  const d=new Date(v),t=new Date();
-  let age=t.getFullYear()-d.getFullYear();
-  if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate()))age--;
-  if(age<12||age>55){h.className='fhint err';h.textContent='✗ Verificar fecha';return;}
-  h.className='fhint ok';h.textContent=age+' años';
-  calcRisk();
-}
-function calcEGA(){
-  const v=document.getElementById('np-fum').value;
-  const h=document.getElementById('h-ega');
-  if(!v){h.textContent='';return;}
-  const fum=new Date(v),hoy=new Date();
-  const dias=Math.floor((hoy-fum)/(86400000));
-  if(dias<0||dias>294){h.className='fhint err';h.textContent='✗ Verificar fecha de FUM';return;}
-  const sem=Math.floor(dias/7),rem=dias%7;
-  const pep=new Date(fum);pep.setDate(pep.getDate()+280);
-  const pepStr=pep.toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
-  h.className='fhint ok';
-  h.textContent='EGA: '+sem+'+'+rem+' sem · Parto estimado: '+pepStr;
-}
-function calcRisk(){
-  const chks=document.querySelectorAll('#sc-nueva .chk[data-w] input:checked');
-  let hi=0,mo=0;
-  chks.forEach(c=>{
-    const w=c.closest('[data-w]').dataset.w;
-    if(w==='h')hi++;else mo++;
-  });
-  const rv=document.getElementById('np-rr-val');
-  const rs=document.getElementById('np-rr-sub');
-  const rr=document.getElementById('np-risk-result');
-  let lv,cl,sub;
-  if(hi>=1){
-    lv='Alto';cl='rr-high';
-    sub=hi+' factor'+(hi>1?'es mayores':' mayor')+(mo>0?', '+mo+' moderado'+(mo>1?'s':''):'');
-  }else if(mo>=2){
-    lv='Alto';cl='rr-high';
-    sub=mo+' factores moderados = riesgo alto (ISSHP 2018)';
-  }else if(mo===1){
-    lv='Moderado';cl='rr-mod';
-    sub='1 factor moderado — monitoreo reforzado';
-  }else{
-    lv='Bajo';cl='rr-low';
-    sub='Sin factores de riesgo identificados';
-  }
-  rv.textContent=lv;
-  rs.textContent=sub;
-  rr.className='risk-result '+cl;
-}
-function savePatient(){
-  const nom=document.getElementById('np-nombre').value.trim();
-  const ape=document.getElementById('np-apellido').value.trim();
-  const fum=document.getElementById('np-fum').value;
-  if(!nom||!ape){
-    document.getElementById('np-nombre').classList.add('ferr');
-    document.getElementById('np-apellido').classList.add('ferr');
+function updateNPHeader() {}
+
+/* Sec 5: savePatient con validación peso/talla */
+function savePatient() {
+  const nom  = document.getElementById('np-nombre').value.trim();
+  const ape  = document.getElementById('np-apellido').value.trim();
+  const fum  = document.getElementById('np-fum').value;
+  const peso = document.getElementById('np-peso').value;
+  const talla= document.getElementById('np-talla').value;
+
+  if (!nom || !ape) {
+    if (!nom) { const el=document.getElementById('np-nombre'); el.classList.add('ferr'); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+    if (!ape) { document.getElementById('np-apellido').classList.add('ferr'); }
     return;
   }
-  if(!fum){document.getElementById('np-fum').classList.add('ferr');return;}
-  const rv=document.getElementById('np-rr-val').textContent;
-  const hEga=document.getElementById('h-ega').textContent;
-  document.getElementById('np-sname').textContent=ape+', '+nom;
-  document.getElementById('np-ssub').textContent=(hEga||'FUM registrada')+'\nClasificación de riesgo: '+(rv==='—'?'no evaluada':rv);
+  if (!fum) {
+    const el=document.getElementById('np-fum'); el.classList.add('ferr');
+    el.scrollIntoView({behavior:'smooth',block:'center'}); return;
+  }
+  if (!peso) {
+    const el=document.getElementById('np-peso'); el.classList.add('ferr');
+    el.scrollIntoView({behavior:'smooth',block:'center'}); return;
+  }
+  if (!talla) {
+    const el=document.getElementById('np-talla'); el.classList.add('ferr');
+    el.scrollIntoView({behavior:'smooth',block:'center'}); return;
+  }
+
+  const rv   = document.getElementById('np-rr-val').textContent;
+  const hEga = document.getElementById('h-ega').textContent;
+  const hEco = document.getElementById('h-eco1') ? document.getElementById('h-eco1').textContent : '';
+  const hImc = document.getElementById('h-imc').textContent;
+
+  document.getElementById('np-sname').textContent = ape + ', ' + nom;
+  const lines = [];
+  if (hEga)  lines.push(hEga);
+  if (hEco && hEco.includes('FPP'))  lines.push(hEco);
+  if (hImc)  lines.push(hImc);
+  lines.push('Clasificación de riesgo: ' + (rv === '—' ? 'no evaluada' : rv));
+  document.getElementById('np-ssub').textContent = lines.join('\n');
   document.getElementById('np-success').classList.add('show');
-}
-function switchChart(btn,id){
-  document.querySelectorAll('.hctab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('hc-bp').style.display=id==='bp'?'block':'none';
-  document.getElementById('hc-peso').style.display=id==='peso'?'block':'none';
-}
-function showHistory(){
-  go('sc-history');
-  setBB([{l:'Dashboard',f:'showDash()'},{l:'Ramírez, Laura',f:'showPatient()'},{l:'Historial clínico'}]);
-  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
-  document.getElementById('si-l').classList.add('active');
-}
-function togH(top){
-  const body=top.nextElementSibling;
-  const exp=top.querySelector('.hexp');
-  const open=body.classList.toggle('open');
-  exp.classList.toggle('open',open);
-}
-function filterHist(btn,f){
-  document.querySelectorAll('.htab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  const semMap={t1:[12,19],t2:[20,27],t3:[28,42]};
-  const entries=document.querySelectorAll('#hist-tl .hentry');
-  let vis=0;
-  entries.forEach(e=>{
-    const st=e.dataset.status;
-    const sem=+e.dataset.sem;
-    let show=true;
-    if(f==='alert') show=(st==='c'||st==='a');
-    else if(f==='t1') show=sem>=semMap.t1[0]&&sem<=semMap.t1[1];
-    else if(f==='t2') show=sem>=semMap.t2[0]&&sem<=semMap.t2[1];
-    else if(f==='t3') show=sem>=semMap.t3[0]&&sem<=semMap.t3[1];
-    e.style.display=show?'flex':'none';
-    if(show) vis++;
-  });
-  document.getElementById('hist-empty').classList.toggle('show',vis===0);
-}
-function togB(btn){
-  const b=document.getElementById('tb');b.classList.toggle('open');
-  btn.querySelector('span:last-child').textContent=b.classList.contains('open')?'Colapsar ▲':'Expandir ▼';
-}
-function selC(el){document.querySelectorAll('.copt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
-function chk(){
-  const s=+document.getElementById('f-s').value||0,d=+document.getElementById('f-d').value||0;
-  const si=document.getElementById('f-s'),di=document.getElementById('f-d');
-  const sh=document.getElementById('h-s'),dh=document.getElementById('h-d');
-  if(s>=160){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='⚠ Valor muy elevado (≥160) — alerta crítica al guardar';}
-  else if(s>=140){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='⚠ Valor elevado (≥140) — alerta moderada al guardar';}
-  else if(s<60||s>220){si.className='fld-input ferr';sh.className='fhint err';sh.textContent='✗ Fuera de rango válido (60–220) — verificar medición';}
-  else{si.className='fld-input fok';sh.className='fhint ok';sh.textContent='✓ Dentro del rango normal';}
-  if(d>=110){di.className='fld-input ferr';dh.className='fhint err';dh.textContent='⚠ Valor muy elevado (≥110) — alerta crítica al guardar';}
-  else if(d>=90){di.className='fld-input ferr';dh.className='fhint err';dh.textContent='⚠ Valor elevado (≥90) — alerta moderada al guardar';}
-  else{di.className='fld-input fok';dh.className='fhint ok';dh.textContent='✓ Dentro del rango normal';}
 }
 </script>
 </body>
