@@ -1387,11 +1387,12 @@
           </div>
         </div>
 
-        <!-- Historia obstétrica + EGA -->
+        <!-- Historia obstétrica unificada + EGA (spec v3.1) -->
         <div class="tier">
           <div class="tier-hd">
             <span class="tier-pill tp-a">Obligatorio</span>
-            <span class="tier-title">Historia obstétrica y edad gestacional</span>
+            <span class="tier-title">Historia obstétrica</span>
+            <span class="tier-note">Los datos de paridad actualizan el riesgo automáticamente</span>
           </div>
           <div class="fields">
             <div class="fld">
@@ -1400,32 +1401,52 @@
               <div class="fhint" id="h-ega"></div>
             </div>
             <div class="fld">
-              <label class="flbl">Gestas previas</label>
-              <select class="fld-input" id="np-g" onchange="calcRisk()">
-                <option value="0">Ninguna — primigesta</option>
-                <option value="1">1 gesta previa</option>
-                <option value="2">2 gestas previas</option>
+              <label class="flbl">Gestas (G)</label>
+              <select class="fld-input" id="np-g" onchange="calcFormulaObstetrica()">
+                <option value="1">1 — Primigesta (embarazo actual)</option>
+                <option value="2">2 — 1 embarazo previo</option>
+                <option value="3">3 — 2 embarazos previos</option>
+                <option value="4">4 — 3 o más embarazos previos</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label class="flbl">Partos (P)</label>
+              <select class="fld-input" id="np-p" onchange="calcFormulaObstetrica()">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
                 <option value="3">3 o más</option>
               </select>
             </div>
             <div class="fld">
-              <label class="flbl">Partos</label>
-              <select class="fld-input">
-                <option value="0">Ninguno</option>
-                <option value="1">1 parto</option>
-                <option value="2">2 partos</option>
-                <option value="3">3 o más</option>
+              <label class="flbl">Abortos / pérdidas (A)</label>
+              <select class="fld-input" id="np-a" onchange="calcFormulaObstetrica()">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3 o más — pérdidas recurrentes</option>
               </select>
+              <div class="fhint" id="h-abortos"></div>
             </div>
             <div class="fld">
-              <label class="flbl">Tipo de parto anterior</label>
-              <select class="fld-input">
-                <option>No aplica</option><option>Vaginal</option>
-                <option>Cesárea</option><option>Ambos</option>
+              <label class="flbl">Cesáreas (C)</label>
+              <select class="fld-input" id="np-c" onchange="calcFormulaObstetrica()">
+                <option value="0">0 — Ninguna</option>
+                <option value="1">1 cesárea anterior</option>
+                <option value="2">2 cesáreas anteriores</option>
+                <option value="3">3 o más cesáreas anteriores</option>
               </select>
+              <div class="fhint" id="h-cesareas"></div>
+            </div>
+            <div class="fld" style="grid-column:1/-1">
+              <label class="flbl">Fórmula obstétrica</label>
+              <div id="np-formula-display" style="padding:9px 11px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg2);font-size:13px;color:var(--txt3)">
+                Completá los campos para ver la fórmula
+              </div>
+              <div class="fhint" id="h-formula"></div>
             </div>
           </div>
-          <!-- Sec 1: EGA por ecografía 1er trimestre -->
+          <!-- EGA por ecografía 1er trimestre -->
           <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
             <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:10px 0 8px">EGA por ecografía · 1er trimestre (corrección de FPP)</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -1479,7 +1500,17 @@
 
                 <!-- 1. Antecedentes personales -->
                 <div class="risk-sep">1 · Antecedentes personales</div>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> HTA crónica diagnosticada</label>
+                <!-- HTA expandida a 4 variantes — FASGO 2025 secciones 1 y 5 -->
+                <div class="fld" style="grid-column:1/-1;margin-bottom:2px" data-w="h" id="hta-cronica-group">
+                  <select class="fld-input" id="np-hta-tipo" onchange="evalHTATipo(this)" style="font-size:12px">
+                    <option value="">— Sin antecedente de HTA —</option>
+                    <option value="esencial">HTA crónica esencial (diagnosticada antes del embarazo)</option>
+                    <option value="secundaria">HTA crónica secundaria (causa identificada)</option>
+                    <option value="guardapolvo">HTA de guardapolvo blanco (solo en consultorio)</option>
+                    <option value="enmascarada">HTA enmascarada (normal en consultorio, elevada fuera)</option>
+                  </select>
+                  <div class="fhint" id="h-hta-tipo"></div>
+                </div>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Diabetes pregestacional (tipo 1 o 2)</label>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Enfermedad renal crónica</label>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Síndrome antifosfolípido (SAF)</label>
@@ -1488,12 +1519,13 @@
                 <!-- 2. Antecedentes obstétricos -->
                 <div class="risk-sep" style="margin-top:6px">2 · Antecedentes obstétricos</div>
                 <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
+                <label class="chk" data-w="m"><input type="checkbox" id="cb-perdidas" onchange="calcRisk()"/> Pérdidas gestacionales recurrentes ≥ 3</label>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Antecedente familiar de preeclampsia</label>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Intervalo intergenésico &gt; 10 años</label>
 
                 <!-- 3. Condición actual del embarazo -->
                 <div class="risk-sep" style="margin-top:6px">3 · Condición actual del embarazo</div>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
+                <label class="chk" data-w="m"><input type="checkbox" id="cb-primigesta" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Embarazo múltiple</label>
                 <label class="chk" data-w="m"><input type="checkbox" id="cb-edad35" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
 
