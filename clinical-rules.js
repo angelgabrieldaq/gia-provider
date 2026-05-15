@@ -141,6 +141,112 @@ function calcIMC() {
   if (cbOb) { cbOb.checked = (imc >= 30); calcRisk(); }
 }
 
+/* ── FÓRMULA OBSTÉTRICA — AUTO-CÁLCULO DE RIESGO ────────────────────────────
+ * Lee G/P/A/C y auto-marca los factores de riesgo derivados.
+ * Fuente: ISSHP 2018 / FASGO 2025.
+ * NO modificar la lógica sin revisión médica.
+ */
+function calcFormulaObstetrica() {
+  const g = parseInt(document.getElementById("np-g").value)  || 1;
+  const p = parseInt(document.getElementById("np-p").value)  || 0;
+  const a = parseInt(document.getElementById("np-a").value)  || 0;
+  const c = parseInt(document.getElementById("np-c").value)  || 0;
+
+  const display = document.getElementById("np-formula-display");
+  if (display) {
+    display.textContent  = "G" + g + " P" + p + " A" + a + " C" + c;
+    display.style.color  = "var(--txt)";
+    display.style.fontWeight = "600";
+  }
+
+  /* AUTO-MARCADO: Primigesta (G=1, P=0) — ISSHP 2018 / FASGO 2025 sec 3 */
+  const cbPrimigesta = document.getElementById("cb-primigesta");
+  if (cbPrimigesta) cbPrimigesta.checked = (g === 1 && p === 0);
+
+  /* AUTO-MARCADO: Pérdidas recurrentes (A ≥ 3) — FASGO 2025 / ISSHP 2018 */
+  const cbPerdidas = document.getElementById("cb-perdidas");
+  const hAbortos   = document.getElementById("h-abortos");
+  if (cbPerdidas) cbPerdidas.checked = (a >= 3);
+  if (hAbortos) {
+    if (a >= 3) {
+      hAbortos.className   = "fhint err";
+      hAbortos.textContent = "⚠ Pérdidas recurrentes — factor moderado PE auto-marcado";
+    } else {
+      hAbortos.textContent = "";
+    }
+  }
+
+  /* REGISTRO: Cesárea anterior (C ≥ 1) — FASGO 2025 sección 7.3 */
+  const hCesareas = document.getElementById("h-cesareas");
+  if (hCesareas) {
+    if (c >= 1) {
+      hCesareas.className  = "fhint";
+      hCesareas.style.color = "var(--s-info)";
+      hCesareas.textContent = "ℹ Cesárea anterior registrada — factor de riesgo para HTA de novo en puerperio (FASGO 2025)";
+    } else {
+      hCesareas.textContent = "";
+    }
+  }
+
+  const hFormula = document.getElementById("h-formula");
+  if (hFormula) {
+    const partes = [];
+    if (g === 1 && p === 0) partes.push("primigesta");
+    if (a >= 3)              partes.push("pérdidas recurrentes");
+    if (c >= 1)              partes.push("cesárea anterior");
+    if (partes.length > 0) {
+      hFormula.className  = "fhint";
+      hFormula.style.color = "var(--s-warn)";
+      hFormula.textContent = "Factores detectados: " + partes.join(", ");
+    } else {
+      hFormula.textContent = "";
+    }
+  }
+
+  calcRisk();
+}
+
+/* ── CLASIFICACIÓN HTA — FASGO 2025 ─────────────────────────────────────────
+ * Evalúa el tipo de HTA y actualiza ROB + hint clínico.
+ * Fuente: Consenso FASGO 2025 secciones 1 y 5 / ISSHP 2021.
+ * NO modificar sin revisión médica.
+ */
+function evalHTATipo(select) {
+  const val   = select.value;
+  const hint  = document.getElementById("h-hta-tipo");
+  const group = document.getElementById("hta-cronica-group");
+
+  const msgs = {
+    "":           { rob: null,  color: "",               msg: "" },
+    esencial:     { rob: "h",   color: "var(--s-err)",   msg: "Factor MAYOR PE — ROB alto. 25% riesgo PE sobreimpuesta. Requiere MAPA. (FASGO 2025)" },
+    secundaria:   { rob: "h",   color: "var(--s-err)",   msg: "Factor MAYOR PE — ROB alto. HTA secundaria: evaluar causa (renal, HAP, renovascular). (FASGO 2025)" },
+    guardapolvo:  { rob: "m",   color: "var(--s-warn)",  msg: "Factor moderado PE. 4 de 10 evolucionan a HTAG. Confirmar con MAPA. (FASGO 2025)" },
+    enmascarada:  { rob: "h",   color: "var(--s-err)",   msg: "Factor MAYOR PE. 7x más riesgo PE/eclampsia. Evaluar período nocturno con MAPA 24h. (FASGO 2025)" },
+  };
+
+  const cfg = msgs[val] || msgs[""];
+
+  if (group) {
+    if (cfg.rob) {
+      group.dataset.w = cfg.rob;
+    } else {
+      delete group.dataset.w;
+    }
+  }
+
+  if (hint) {
+    if (cfg.msg) {
+      hint.className   = "fhint";
+      hint.style.color = cfg.color;
+      hint.textContent = cfg.msg;
+    } else {
+      hint.textContent = "";
+    }
+  }
+
+  calcRisk();
+}
+
 /* ── RIESGO PE (ISSHP 2018) ──────────────────────────────────────────────────
  * ≥1 factor mayor → Alto · ≥2 moderados → Alto · 1 moderado → Moderado · 0 → Bajo
  */
@@ -151,6 +257,16 @@ function calcRisk() {
     const w = c.closest("[data-w]").dataset.w;
     if (w === "h") hi++; else mo++;
   });
+
+  /* HTA group — select con data-w dinámico (FASGO 2025) */
+  const htaGroup = document.getElementById("hta-cronica-group");
+  if (htaGroup && htaGroup.dataset.w) {
+    const htaSelect = document.getElementById("np-hta-tipo");
+    if (htaSelect && htaSelect.value !== "") {
+      if (htaGroup.dataset.w === "h") hi++;
+      else mo++;
+    }
+  }
 
   const rv  = document.getElementById("np-rr-val");
   const rs  = document.getElementById("np-rr-sub");
