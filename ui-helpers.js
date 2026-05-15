@@ -146,6 +146,34 @@ function selC(el) {
   el.classList.add("sel");
 }
 
+/* ── SPEC v3.0 — CONSULTA ────────────────────────────────────────────────────*/
+
+function togMed(name) {
+  const cb  = document.getElementById("mc-" + name);
+  const det = document.getElementById("med-" + name + "-det");
+  if (det) det.style.display = cb.checked ? "flex" : "none";
+}
+
+function selEstado(label) {
+  document.querySelectorAll(".estado-opt").forEach(l => l.classList.remove("sel"));
+  label.classList.add("sel");
+  label.querySelector("input").checked = true;
+}
+
+function togCierre(label) {
+  label.classList.toggle("sel");
+  const cb = label.querySelector("input");
+  if (cb) cb.checked = label.classList.contains("sel");
+}
+
+function switchResumenChart(btn, id) {
+  document.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  btn.classList.add("on");
+  document.getElementById("rc-bp").style.display    = id === "bp"   ? "block" : "none";
+  document.getElementById("rc-peso").style.display  = id === "peso" ? "block" : "none";
+  document.getElementById("rc-labo").style.display  = id === "labo" ? "block" : "none";
+}
+
 /* ── CONSULTA — validación TA ────────────────────────────────────────────────*/
 function chk() {
   const s = +document.getElementById("f-s").value || 0;

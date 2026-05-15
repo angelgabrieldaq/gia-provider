@@ -307,6 +307,33 @@
     .labo-section-hd{padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--brd);font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
     .fhint.warn{color:var(--s-warn)}
 
+    /* ── RESUMEN CLÍNICO (spec v3.0) ──────────────────────────────────────────*/
+    .agenda-box{margin:10px 20px;background:var(--s-info-l);border:1px solid var(--s-info-m);border-radius:var(--r);padding:10px 14px}
+    .agenda-title{font-size:10px;font-weight:700;color:var(--s-info);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+    .agenda-item{font-size:11px;color:var(--s-info);padding:2px 0;display:flex;align-items:flex-start;gap:6px}
+    .agenda-item::before{content:"→";font-size:10px;flex-shrink:0;margin-top:1px}
+    .labo-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin:0 20px 10px}
+    .lcard{background:var(--bg);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px}
+    .lcard.warn{border-color:var(--s-warn-m);background:var(--s-warn-l)}
+    .llbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .lval{font-size:18px;font-family:'DM Serif Display',serif;color:var(--txt);margin:3px 0 1px;line-height:1}
+    .lval.warn{color:var(--s-warn)}.lval.err{color:var(--s-err)}.lval.ok{color:var(--s-ok)}
+    .lunit{font-size:9px;color:var(--txt3)}
+    .med-pills{padding:0 20px 10px;display:flex;flex-wrap:wrap;gap:5px}
+    .med-pill{background:var(--bg2);border:1px solid var(--brd2);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--txt)}
+    .next-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 10px}
+    .next-label{font-size:11px;color:var(--txt2)}.next-date{font-size:12px;font-weight:700;color:var(--txt)}.next-dias{font-size:11px;color:var(--s-ok)}
+    /* Medicación activa en formulario */
+    .med-row{display:flex;flex-direction:column;gap:4px}
+    /* Estado anímico */
+    .estado-opt{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--txt);transition:all .1s}
+    .estado-opt.sel{background:var(--p-light);border-color:var(--p);color:var(--p-dark);font-weight:600}
+    .edo-ico{font-size:14px}
+    /* Cierre de consulta */
+    .cierre-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--brd);border-radius:var(--r);background:var(--bg2);cursor:pointer;font-size:11px;color:var(--txt);transition:all .1s}
+    .cierre-opt:hover{background:var(--p-light);border-color:var(--p-mid)}
+    .cierre-opt.sel{background:var(--p-light);border-color:var(--p);color:var(--p-dark);font-weight:600}
+
     /* HÁBITOS Y PREVENTIVO */
     .hab-sub{padding:0 16px 10px}
     .hab-sub-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:12px 0 8px;border-bottom:1px solid var(--brd);margin-bottom:8px}
@@ -443,14 +470,16 @@
         </div>
       </div>
 
-      <!-- PATIENT DETAIL -->
+      <!-- PATIENT DETAIL — Resumen clínico completo (spec v3.0) -->
       <div class="screen" id="sc-patient">
+
+        <!-- HEADER PACIENTE -->
         <div class="ph">
           <div class="ph-top">
             <div class="ph-av av-r">LR</div>
             <div style="flex:1">
               <div class="ph-name">Ramírez, Laura Beatriz</div>
-              <div class="ph-meta">29 años · G2P1 · Última menstruación: 15/08/2025 · Parto estimado: 22/05/2026</div>
+              <div class="ph-meta">29 años · G2P1 · FUM: 15/08/2025 · FPP: 22/05/2026</div>
               <div class="ph-tags">
                 <span class="badge b-err">Riesgo alto</span>
                 <span class="estado e-c">● Estado crítico</span>
@@ -459,40 +488,218 @@
             </div>
             <div class="ph-r">
               <div class="ph-ega">34+2</div>
-              <div class="ph-ega-s">18 días para el parto estimado</div>
+              <div class="ph-ega-s">18 días para parto estimado</div>
             </div>
           </div>
         </div>
-        <div class="strip" style="margin:12px 20px 0;border-radius:var(--r)">
+
+        <!-- ALERTA ACTIVA -->
+        <div class="strip" style="margin:10px 20px 0;border-radius:var(--r)" onclick="showModal()">
           <div class="sdot"></div>
-          <div class="stxt"><strong>Alerta crítica activa:</strong> Presión 158/102 + proteínas en orina 2+. Se requiere registrar la conducta tomada.</div>
+          <div class="stxt"><strong>Alerta crítica activa:</strong> PA 158/102 + proteínas 2+. Registrar conducta.</div>
           <div class="scta">Registrar →</div>
         </div>
-        <div class="sec-title">Evolución de la presión arterial — últimas 4 consultas</div>
-        <div class="trend">
-          <div class="trend-top">
-            <span class="trend-lbl">Sistólica</span>
-            <span class="trend-val">158 mmHg</span>
-            <span class="trend-delta">↑ +18 en 3 semanas</span>
-          </div>
-          <div class="bars">
-            <div class="bw"><div class="bar" style="height:32px;background:var(--s-warn-m)"></div><div class="blbl">140<br>sem 31</div></div>
-            <div class="bw"><div class="bar" style="height:36px;background:var(--s-warn-m)"></div><div class="blbl">144<br>sem 32</div></div>
-            <div class="bw"><div class="bar" style="height:40px;background:var(--s-err-m)"></div><div class="blbl">148<br>sem 33</div></div>
-            <div class="bw"><div class="bar" style="height:52px;background:#6B1010"></div><div class="blbl">158<br>sem 34</div></div>
-          </div>
+
+        <!-- AGENDA DE ESTA CONSULTA — handoff de la consulta anterior -->
+        <div class="agenda-box">
+          <div class="agenda-title">Agenda de esta consulta — indicado en consulta anterior</div>
+          <div class="agenda-item">Verificar resultado Doppler feto-placentario (solicitado sem 33)</div>
+          <div class="agenda-item">Repetir NST si PA sigue elevada</div>
+          <div class="agenda-item">Evaluar inicio de corticoides si EGA ≥ 34 con deterioro clínico</div>
         </div>
-        <div class="sec-title">Signos vitales — última consulta</div>
+
+        <!-- VITALES ÚLTIMA CONSULTA -->
+        <div class="sec-title">Vitales — última consulta (hace 2 días)</div>
         <div class="vitals">
-          <div class="vcard danger"><div class="vlbl">Presión arterial</div><div class="vval err">158 / 102</div><div class="vunit">mmHg · hace 2 días</div></div>
-          <div class="vcard danger"><div class="vlbl">Proteínas en orina</div><div class="vval err">2+</div><div class="vunit">Tira reactiva</div></div>
-          <div class="vcard warn"><div class="vlbl">Peso</div><div class="vval warn">68 kg</div><div class="vunit">+1.2 kg en 7 días</div></div>
-          <div class="vcard"><div class="vlbl">Frecuencia cardíaca fetal</div><div class="vval ok">144 lpm</div><div class="vunit">Doppler · normal</div></div>
+          <div class="vcard danger">
+            <div class="vlbl">Presión arterial</div>
+            <div class="vval err">158 / 102</div>
+            <div class="vunit">mmHg · <span style="color:var(--s-err)">↑ +18 sis. en 3 sem.</span></div>
+          </div>
+          <div class="vcard warn">
+            <div class="vlbl">Peso</div>
+            <div class="vval warn">68 kg</div>
+            <div class="vunit">+1.2 kg en 7 días</div>
+          </div>
+          <div class="vcard">
+            <div class="vlbl">Altura uterina</div>
+            <div class="vval ok">32 cm</div>
+            <div class="vunit">Concordante con EGA</div>
+          </div>
+          <div class="vcard">
+            <div class="vlbl">FCF</div>
+            <div class="vval ok">144 lpm</div>
+            <div class="vunit">Doppler · normal</div>
+          </div>
         </div>
+
+        <!-- LABORATORIO RECIENTE -->
+        <div class="sec-title">Laboratorio reciente</div>
+        <div class="labo-grid">
+          <div class="lcard warn"><div class="llbl">Hematocrito</div><div class="lval warn">31%</div><div class="lunit">↓ sem 32</div></div>
+          <div class="lcard warn"><div class="llbl">Hemoglobina</div><div class="lval warn">10.4 g/dL</div><div class="lunit">⚠ &lt; 11</div></div>
+          <div class="lcard"><div class="llbl">Glucemia ayunas</div><div class="lval">88 mg/dL</div><div class="lunit">Normal</div></div>
+          <div class="lcard"><div class="llbl">TSH</div><div class="lval">1.8 mUI/L</div><div class="lunit">Normal</div></div>
+        </div>
+
+        <!-- MEDICACIÓN ACTIVA -->
+        <div class="sec-title">Medicación activa</div>
+        <div class="med-pills">
+          <span class="med-pill">Labetalol 200 mg c/8h</span>
+          <span class="med-pill">AAS 100 mg/día</span>
+          <span class="med-pill">Hierro 80 mg/día</span>
+          <span class="med-pill">Calcio 1 g/día</span>
+        </div>
+
+        <!-- GRÁFICOS DE TENDENCIA -->
+        <div class="sec-title">Evolución durante el embarazo</div>
+        <div class="hcharts">
+          <div class="hchart-hd">
+            <span class="hchart-title">Tendencias longitudinales</span>
+            <div class="hctabs">
+              <button class="hctab on" onclick="switchResumenChart(this,'bp')">Presión</button>
+              <button class="hctab" onclick="switchResumenChart(this,'peso')">Peso · AU</button>
+              <button class="hctab" onclick="switchResumenChart(this,'labo')">Laboratorio</button>
+            </div>
+          </div>
+
+          <!-- Presión arterial -->
+          <div id="rc-bp" class="hchart-wrap">
+            <div class="hchart-legend">
+              <span class="hcl hcl-s">Sistólica</span>
+              <span class="hcl hcl-d">Diastólica</span>
+              <span class="hcl-ref">⋯ umbrales clínicos</span>
+            </div>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+              <rect x="50" y="14" width="570" height="21" fill="rgba(226,75,74,0.07)" rx="2"/>
+              <rect x="50" y="35" width="570" height="20" fill="rgba(239,159,39,0.06)" rx="2"/>
+              <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <line x1="50" y1="34" x2="620" y2="34" stroke="#E24B4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+              <text x="45" y="37" font-size="9" fill="#E24B4A" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">160</text>
+              <line x1="50" y1="55" x2="620" y2="55" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+              <text x="45" y="58" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">140</text>
+              <line x1="50" y1="106" x2="620" y2="106" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.35"/>
+              <text x="45" y="109" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">90</text>
+              <text x="45" y="84" font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">120</text>
+              <path d="M50,83 L154,80 L257,75 L361,67 L465,60 L542,55 L568,51 L594,47 L620,36 L620,136 L50,136 Z" fill="rgba(226,75,74,0.06)"/>
+              <path d="M50,124 L154,121 L257,118 L361,114 L465,108 L542,106 L568,102 L594,97 L620,93 L620,136 L50,136 Z" fill="rgba(239,159,39,0.05)"/>
+              <polyline points="50,124 154,121 257,118 361,114 465,108 542,106 568,102 594,97 620,93" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+              <polyline points="50,83 154,80 257,75 361,67 465,60 542,55 568,51 594,47 620,36" fill="none" stroke="#E24B4A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+              <circle cx="50"  cy="83"  r="3.5" fill="#0F6E56"/><circle cx="154" cy="80"  r="3.5" fill="#0F6E56"/>
+              <circle cx="257" cy="75"  r="3.5" fill="#0F6E56"/><circle cx="361" cy="67"  r="3.5" fill="#0F6E56"/>
+              <circle cx="465" cy="60"  r="3.5" fill="#EF9F27"/><circle cx="542" cy="55"  r="3.5" fill="#EF9F27"/>
+              <circle cx="568" cy="51"  r="3.5" fill="#EF9F27"/><circle cx="594" cy="47"  r="3.5" fill="#E24B4A"/>
+              <circle cx="620" cy="36"  r="4.5" fill="#E24B4A" stroke="rgba(226,75,74,0.25)" stroke-width="6"/>
+              <circle cx="50"  cy="124" r="2.5" fill="#EF9F27" opacity="0.55"/><circle cx="154" cy="121" r="2.5" fill="#EF9F27" opacity="0.55"/>
+              <circle cx="257" cy="118" r="2.5" fill="#EF9F27" opacity="0.55"/><circle cx="361" cy="114" r="2.5" fill="#EF9F27" opacity="0.55"/>
+              <circle cx="465" cy="108" r="2.5" fill="#EF9F27" opacity="0.55"/><circle cx="542" cy="106" r="2.5" fill="#EF9F27" opacity="0.55"/>
+              <circle cx="568" cy="102" r="2.5" fill="#EF9F27" opacity="0.55"/><circle cx="594" cy="97"  r="2.5" fill="#E24B4A" opacity="0.7"/>
+              <circle cx="620" cy="93"  r="3.5" fill="#E24B4A" opacity="0.85"/>
+              <text x="620" y="30" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">158</text>
+              <text x="620" y="88" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">102</text>
+              <text x="50"  y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="154" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
+              <text x="257" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
+              <text x="361" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="542" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
+              <text x="620" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S34</text>
+            </svg>
+          </div>
+
+          <!-- Peso + AU -->
+          <div id="rc-peso" class="hchart-wrap" style="display:none">
+            <div class="hchart-legend">
+              <span class="hcl hcl-p">Peso corporal</span>
+              <span class="hcl-ref">Ganancia normal: 0.3–0.5 kg/semana en 3er trim.</span>
+            </div>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+              <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <text x="45" y="18"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">75 kg</text>
+              <text x="45" y="57"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">65 kg</text>
+              <text x="45" y="96"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">55 kg</text>
+              <text x="45" y="136" font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">50 kg</text>
+              <path d="M50,121 L154,111 L257,98 L361,85 L465,73 L542,61 L568,56 L594,49 L620,48 L620,136 L50,136 Z" fill="rgba(43,87,217,0.07)"/>
+              <polyline points="50,121 154,111 257,98 361,85 465,73 542,61 568,56 594,49 620,48" fill="none" stroke="#2B57D9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+              <circle cx="50"  cy="121" r="3.5" fill="#0F6E56"/><circle cx="154" cy="111" r="3.5" fill="#0F6E56"/>
+              <circle cx="257" cy="98"  r="3.5" fill="#0F6E56"/><circle cx="361" cy="85"  r="3.5" fill="#0F6E56"/>
+              <circle cx="465" cy="73"  r="3.5" fill="#2B57D9"/><circle cx="542" cy="61"  r="3.5" fill="#2B57D9"/>
+              <circle cx="568" cy="56"  r="3.5" fill="#EF9F27"/><circle cx="594" cy="49"  r="3.5" fill="#EF9F27"/>
+              <circle cx="620" cy="48"  r="4.5" fill="#EF9F27" stroke="rgba(239,159,39,0.25)" stroke-width="6"/>
+              <text x="50"  y="116" font-size="9" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">53</text>
+              <text x="620" y="42"  font-size="9" fill="#EF9F27" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">68 kg</text>
+              <text x="50"  y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="154" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
+              <text x="257" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
+              <text x="361" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="542" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
+              <text x="620" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S34</text>
+            </svg>
+          </div>
+
+          <!-- Laboratorio -->
+          <div id="rc-labo" class="hchart-wrap" style="display:none">
+            <div class="hchart-legend">
+              <span class="hcl hcl-s">Hemoglobina (g/dL)</span>
+              <span class="hcl hcl-d">Glucemia ayunas (mg/dL)</span>
+              <span class="hcl-ref">⋯ umbrales Hb &lt;11 · glucemia ≥100</span>
+            </div>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+              <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <!-- Y labels Hb (izq) -->
+              <text x="45" y="18"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">13</text>
+              <text x="45" y="57"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">12</text>
+              <text x="45" y="96"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">11</text>
+              <text x="45" y="136" font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">10</text>
+              <!-- Umbral Hb <11 punteado naranja -->
+              <line x1="50" y1="96" x2="620" y2="96" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>
+              <text x="625" y="99" font-size="8" fill="#EF9F27" font-family="DM Sans,sans-serif">Hb 11</text>
+              <!-- Umbral glucemia ≥100 punteado rojo -->
+              <line x1="50" y1="55" x2="620" y2="55" stroke="#E24B4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+              <text x="625" y="58" font-size="8" fill="#E24B4A" font-family="DM Sans,sans-serif">Glu 100</text>
+              <!-- Hb — datos 3 trimestres (S12, S20, S28, S32) -->
+              <polyline points="154,40 361,50 465,72 620,88" fill="none" stroke="#E24B4A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+              <circle cx="154" cy="40" r="3.5" fill="#0F6E56"/>
+              <circle cx="361" cy="50" r="3.5" fill="#0F6E56"/>
+              <circle cx="465" cy="72" r="3.5" fill="#EF9F27"/>
+              <circle cx="620" cy="88" r="4.5" fill="#E24B4A" stroke="rgba(226,75,74,0.25)" stroke-width="6"/>
+              <text x="154" y="35" font-size="9" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">12.8</text>
+              <text x="620" y="82" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">10.4</text>
+              <!-- Glucemia ayunas -->
+              <polyline points="154,90 361,85 465,82 620,80" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+              <circle cx="154" cy="90" r="2.5" fill="#0F6E56" opacity="0.7"/>
+              <circle cx="361" cy="85" r="2.5" fill="#0F6E56" opacity="0.7"/>
+              <circle cx="465" cy="82" r="2.5" fill="#0F6E56" opacity="0.7"/>
+              <circle cx="620" cy="80" r="3.5" fill="#0F6E56" opacity="0.85"/>
+              <text x="620" y="74" font-size="9" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">88</text>
+              <!-- X labels -->
+              <text x="154" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="361" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="620" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S32</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- PRÓXIMO CONTROL -->
+        <div class="next-bar">
+          <div>
+            <div class="next-label">Próximo control</div>
+            <div class="next-date">Martes 20 mayo 2026</div>
+          </div>
+          <div class="next-dias">en 6 días</div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
         <div class="act-bar">
           <button class="btn-p" onclick="showForm()">+ Nueva consulta</button>
-          <button class="btn-s">Exportar PDF</button>
+          <button class="btn-s" onclick="showLaboratorios()">🔬 Laboratorios</button>
           <button class="btn-s" onclick="showHistory()">Historial completo</button>
+          <button class="btn-s">Exportar PDF</button>
         </div>
       </div>
 
@@ -559,7 +766,81 @@
               <label class="chk"><input type="checkbox"/> Ninguno</label>
             </div>
           </div>
-          <div style="padding:0 16px 14px">
+          <!-- MEDICACIÓN ACTIVA — spec v3.0 sec 1.1 -->
+          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
+            <div class="flbl" style="margin-bottom:8px">Medicación activa</div>
+            <div style="display:flex;flex-direction:column;gap:6px" id="med-list">
+              <div class="med-row" id="med-labetalol">
+                <label class="chk"><input type="checkbox" id="mc-labetalol" onchange="togMed('labetalol')"/> Labetalol</label>
+                <div id="med-labetalol-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:120px"><option>100 mg</option><option selected>200 mg</option></select>
+                  <select class="fld-input" style="width:120px"><option selected>c/8h</option><option>c/12h</option></select>
+                </div>
+              </div>
+              <div class="med-row" id="med-metildopa">
+                <label class="chk"><input type="checkbox" id="mc-metildopa" onchange="togMed('metildopa')"/> Metildopa</label>
+                <div id="med-metildopa-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:120px"><option>250 mg</option><option>500 mg</option></select>
+                  <select class="fld-input" style="width:120px"><option>c/8h</option><option>c/12h</option></select>
+                </div>
+              </div>
+              <div class="med-row" id="med-nifedipina">
+                <label class="chk"><input type="checkbox" id="mc-nifedipina" onchange="togMed('nifedipina')"/> Nifedipina retard</label>
+                <div id="med-nifedipina-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:120px"><option>10 mg</option><option>20 mg</option></select>
+                  <select class="fld-input" style="width:120px"><option>c/8h</option><option>c/12h</option><option>c/24h</option></select>
+                </div>
+              </div>
+              <label class="chk"><input type="checkbox"/> AAS 100 mg — 1 vez/día</label>
+              <div class="med-row">
+                <label class="chk"><input type="checkbox" id="mc-hierro" onchange="togMed('hierro')"/> Hierro</label>
+                <div id="med-hierro-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:140px"><option>80 mg/día</option><option>160 mg/día</option></select>
+                </div>
+              </div>
+              <div class="med-row">
+                <label class="chk"><input type="checkbox" id="mc-calcio" onchange="togMed('calcio')"/> Calcio</label>
+                <div id="med-calcio-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:140px"><option>1 g/día</option><option>2 g/día</option></select>
+                </div>
+              </div>
+              <label class="chk"><input type="checkbox"/> Progesterona 200 mg vaginal — 1 vez/día</label>
+              <div class="med-row">
+                <label class="chk"><input type="checkbox" id="mc-corticoides" onchange="togMed('corticoides')"/> Corticoides — betametasona</label>
+                <div id="med-corticoides-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
+                  <select class="fld-input" style="width:240px">
+                    <option>Esquema completo (2 dosis aplicadas)</option>
+                    <option>Esquema incompleto (1 dosis aplicada)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESTADO ANÍMICO — spec v3.0 sec 1.2 -->
+          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
+            <div class="flbl" style="margin-bottom:8px">Estado anímico de la paciente</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
+              <label class="estado-opt" onclick="selEstado(this)" data-val="tranquila">
+                <input type="radio" name="estado-animico" value="tranquila" style="display:none"/>
+                <span class="edo-ico">😌</span> Tranquila
+              </label>
+              <label class="estado-opt" onclick="selEstado(this)" data-val="ansiosa">
+                <input type="radio" name="estado-animico" value="ansiosa" style="display:none"/>
+                <span class="edo-ico">😟</span> Ansiosa
+              </label>
+              <label class="estado-opt" onclick="selEstado(this)" data-val="angustiada">
+                <input type="radio" name="estado-animico" value="angustiada" style="display:none"/>
+                <span class="edo-ico">😰</span> Angustiada
+              </label>
+              <label class="estado-opt" onclick="selEstado(this)" data-val="deprimida">
+                <input type="radio" name="estado-animico" value="deprimida" style="display:none"/>
+                <span class="edo-ico">😔</span> Deprimida
+              </label>
+            </div>
+          </div>
+
+          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
             <div class="flbl" style="margin-bottom:6px">Conducta</div>
             <select class="fld-input"><option>Continúa seguimiento</option><option>Solicita estudios</option><option>Ajusta medicación</option><option selected>Derivación</option><option>Internación</option></select>
           </div>
@@ -580,6 +861,45 @@
             <div style="padding:0 16px 14px"><div class="flbl" style="margin-bottom:5px">Notas de la consulta</div><textarea class="fld-input" rows="2" placeholder="Texto libre — no se analiza automáticamente…"></textarea></div>
           </div>
         </div>
+
+        <!-- CIERRE DE CONSULTA — handoff clínico (spec v3.0 sec 3.1) -->
+        <div class="tier" style="margin-top:0">
+          <div class="tier-hd">
+            <span class="tier-pill" style="background:var(--s-ok-l);color:var(--s-ok);border:1px solid var(--s-ok-m)">Cierre</span>
+            <span class="tier-title">Agenda para la próxima consulta</span>
+            <span class="tier-note">El sistema la mostrará al abrir la ficha</span>
+          </div>
+          <div style="padding:12px 16px 6px">
+            <div class="flbl" style="margin-bottom:8px">Estudios e intervenciones a seguir</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px" id="cierre-estudios">
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Doppler feto-placentario</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> NST (monitoreo fetal)</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Ecografía obstétrica</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Eco biométrica</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Perfil biofísico</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Repetir hemograma</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Repetir glucemia</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Proteínas en orina 24h</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Perfil hepático</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Urocultivo</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> TSH / T4 libre</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Amniocentesis</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Cordocentesis</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Versión cefálica externa</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Evaluar corticoides</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Ajustar antihipertensivo</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Planificar internación</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Planificar inducción</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Control TA domicilio</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Registro movimientos fetales</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Interconsulta perinatología</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Interconsulta endocrinología</label>
+              <label class="cierre-opt" onclick="togCierre(this)"><input type="checkbox"/> Interconsulta nefrología</label>
+            </div>
+          </div>
+          <div style="height:10px"></div>
+        </div>
+
         <div style="height:20px"></div>
       </div>
 
