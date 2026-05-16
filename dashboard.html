@@ -278,20 +278,7 @@
     .np-sname{font-size:15px;font-weight:700;color:var(--p-dark);margin-bottom:4px}
     .np-ssub{font-size:12px;color:var(--txt3);line-height:1.5;margin-bottom:20px}
 
-    /* ── PANEL DE RIESGO HORIZONTAL — spec v3.2 Opción B ── */
-    .risk-bar{display:flex;align-items:center;gap:16px;padding:10px 20px;border-bottom:1px solid var(--brd);transition:background .2s;flex-wrap:wrap}
-    .risk-bar.rr-high{background:var(--s-err-l)}
-    .risk-bar.rr-mod{background:var(--s-warn-l)}
-    .risk-bar.rr-low{background:var(--s-ok-l)}
-    .risk-bar.rr-none{background:var(--bg2)}
-    .rb-level{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
-    .rb-label{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
-    .rb-val{font-family:'DM Serif Display',serif;font-size:22px;line-height:1;transition:color .2s}
-    .rr-high .rb-val{color:var(--s-err)}
-    .rr-mod .rb-val{color:var(--s-warn)}
-    .rr-low .rb-val{color:var(--s-ok)}
-    .rr-none .rb-val{color:var(--txt3)}
-    .rb-sep{width:1px;height:32px;background:var(--brd2);flex-shrink:0}
+    /* ── PANEL DE RIESGO HORIZONTAL — spec v3.2 Opción B (legacy, usado por calcRisk) ── */
     .rb-factors{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
     .rb-factor{display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;white-space:nowrap}
     .rb-factor.fh{background:var(--s-err-l);color:var(--s-err);font-weight:600}
@@ -299,9 +286,55 @@
     .rb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
     .fh .rb-dot{background:var(--s-err)}
     .fm .rb-dot{background:var(--s-warn)}
-    .rb-ref{font-size:9px;color:var(--txt3);white-space:nowrap;flex-shrink:0;align-self:flex-end}
-    /* ── FORMULARIO SC-NUEVA — una sola columna ── */
-    .np-single-col{padding:16px 20px 32px;display:flex;flex-direction:column;gap:10px}
+
+    /* ── HEADER STICKY CLÍNICO — spec v4.0 ── */
+    .np-sticky-hd{position:sticky;top:86px;z-index:10;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;transition:border-color .2s,background .2s}
+    .np-sticky-hd.rr-high{border-bottom-color:var(--s-err-m);background:var(--s-err-l)}
+    .np-sticky-hd.rr-mod{border-bottom-color:var(--s-warn-m);background:var(--s-warn-l)}
+    .np-sticky-hd.rr-low{border-bottom-color:var(--s-ok-m)}
+    .nsh-id{display:flex;flex-direction:column;gap:3px}
+    .nsh-name{font-family:'DM Serif Display',serif;font-size:18px;line-height:1;color:var(--txt);min-height:22px}
+    .nsh-meta{display:flex;gap:12px;flex-wrap:wrap}
+    .nsh-meta-item{font-size:11px;color:var(--txt2)}
+    .nsh-meta-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px;margin-right:3px}
+    .nsh-obs{display:flex;gap:12px;align-items:center;justify-content:center}
+    .nsh-obs-item{display:flex;flex-direction:column;align-items:center;gap:1px}
+    .nsh-obs-val{font-size:16px;font-weight:500;color:var(--txt);line-height:1}
+    .nsh-obs-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .nsh-sep{width:1px;height:28px;background:var(--brd2)}
+    .nsh-risk{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+    .nsh-risk-lbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
+    .nsh-risk-val{font-family:'DM Serif Display',serif;font-size:20px;line-height:1;transition:color .2s}
+    .nsh-risk-val.rr-high{color:var(--s-err)}
+    .nsh-risk-val.rr-mod{color:var(--s-warn)}
+    .nsh-risk-val.rr-low{color:var(--s-ok)}
+    .nsh-risk-val.rr-none{color:var(--txt3)}
+    .nsh-pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+    .nsh-pill{font-size:10px;padding:2px 8px;border-radius:20px}
+    .nsh-pill.ph{background:var(--s-err-l);color:var(--s-err);font-weight:600}
+    .nsh-pill.pm{background:var(--s-warn-l);color:var(--s-warn);font-weight:600}
+    /* ── BARRA DE PASOS — spec v4.0 ── */
+    .np-steps{display:flex;gap:0;border:1px solid var(--brd2);border-radius:var(--r-lg);overflow:hidden;margin:12px 20px 0;background:var(--bg)}
+    .np-step{flex:1;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-right:1px solid var(--brd);transition:background .15s}
+    .np-step:last-child{border-right:none}
+    .np-step:hover{background:var(--bg2)}
+    .np-step.active{background:var(--p-light)}
+    .np-step.done{background:var(--bg)}
+    .nps-num{font-size:10px;font-weight:500;color:var(--txt3)}
+    .np-step.active .nps-num{color:var(--p)}
+    .np-step.done .nps-num{color:var(--s-ok)}
+    .nps-lbl{font-size:12px;font-weight:500;color:var(--txt2)}
+    .np-step.active .nps-lbl{color:var(--p)}
+    .nps-dot{width:6px;height:6px;border-radius:50%;background:var(--brd2);margin-top:2px}
+    .np-step.done .nps-dot{background:var(--s-ok)}
+    .np-step.active .nps-dot{background:var(--p)}
+    .np-step-panel{display:none;padding:16px 20px 0}
+    .np-step-panel.active{display:block}
+    .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px 20px;gap:8px}
+    .np-step-nav .btn-sec{padding:8px 18px;border-radius:var(--r);border:1px solid var(--brd2);background:transparent;font-size:13px;color:var(--txt2);cursor:pointer;font-family:'DM Sans',sans-serif}
+    .np-step-nav .btn-prim{padding:8px 18px;border-radius:var(--r);border:none;background:var(--p);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:'DM Sans',sans-serif}
+    /* Sidebar colapsado al entrar a sc-nueva */
+    .sidebar.collapsed{width:0;overflow:hidden;border:none;padding:0}
 
     /* MODAL */
     .modal-bg{background:rgba(26,26,24,.7);border-radius:0;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 86px)}
@@ -1373,18 +1406,52 @@
           </div>
         </div>
 
-        <!-- PANEL DE RIESGO HORIZONTAL -->
-        <div class="risk-bar rr-none" id="rp-hd">
-          <div class="rb-level">
-            <div class="rb-label">Riesgo para preeclampsia</div>
-            <div class="rb-val" id="rp-val">—</div>
+        <!-- HEADER CLÍNICO STICKY — spec v4.0 -->
+        <div class="np-sticky-hd rr-none" id="np-sticky-hd">
+          <div class="nsh-id">
+            <div class="nsh-name" id="nsh-name">Nueva paciente</div>
+            <div class="nsh-meta">
+              <div class="nsh-meta-item"><span class="nsh-meta-lbl">Edad</span><span id="nsh-edad">—</span></div>
+              <div class="nsh-meta-item"><span class="nsh-meta-lbl">DNI</span><span id="nsh-dni">—</span></div>
+              <div class="nsh-meta-item"><span class="nsh-meta-lbl">Fórmula</span><span id="nsh-formula">—</span></div>
+            </div>
           </div>
-          <div class="rb-sep"></div>
-          <div class="rb-factors" id="rb-factors">
-            <span style="font-size:11px;color:var(--txt3)">Completá los datos para clasificar el riesgo</span>
+          <div class="nsh-obs">
+            <div class="nsh-obs-item">
+              <div class="nsh-obs-val" id="nsh-ega">—</div>
+              <div class="nsh-obs-lbl">Edad gestacional</div>
+            </div>
+            <div class="nsh-sep"></div>
+            <div class="nsh-obs-item">
+              <div class="nsh-obs-val" id="nsh-fpp">—</div>
+              <div class="nsh-obs-lbl">Parto estimado</div>
+            </div>
           </div>
-          <div class="rb-ref">ISSHP 2018 · FASGO 2025</div>
+          <div class="nsh-risk">
+            <div class="nsh-risk-lbl">Riesgo PE</div>
+            <div class="nsh-risk-val rr-none" id="nsh-risk-val">—</div>
+            <div class="nsh-pills" id="nsh-pills"></div>
+          </div>
         </div>
+
+        <!-- BARRA DE PASOS -->
+        <div class="np-steps" id="np-steps">
+          <div class="np-step active" id="np-step-1" onclick="goStep(1)">
+            <div class="nps-num">1</div><div class="nps-lbl">Datos</div><div class="nps-dot"></div>
+          </div>
+          <div class="np-step" id="np-step-2" onclick="goStep(2)">
+            <div class="nps-num">2</div><div class="nps-lbl">Obstétrica</div><div class="nps-dot"></div>
+          </div>
+          <div class="np-step" id="np-step-3" onclick="goStep(3)">
+            <div class="nps-num">3</div><div class="nps-lbl">Factores</div><div class="nps-dot"></div>
+          </div>
+          <div class="np-step" id="np-step-4" onclick="goStep(4)">
+            <div class="nps-num">4</div><div class="nps-lbl">Hábitos</div><div class="nps-dot"></div>
+          </div>
+        </div>
+
+        <!-- FACTORES (hidden, needed for calcRisk() rendering) -->
+        <div id="rb-factors" style="display:none"></div>
 
         <!-- FORMULARIO EN UNA COLUMNA -->
         <div class="np-single-col">
