@@ -333,26 +333,19 @@ function calcRisk() {
     sub = "Sin factores identificados";
   }
 
-  /* ACTUALIZAR PANEL STICKY */
-  const valEl = document.getElementById("rp-val");
-  const subEl = document.getElementById("rp-sub");
-  const hdEl  = document.getElementById("rp-hd");
-  if (valEl) { valEl.textContent = level; valEl.className = "rp-val " + cls; }
-  if (subEl) { subEl.textContent = sub;   subEl.className = "rp-sub " + cls; }
-  if (hdEl)  { hdEl.className = "rp-hd " + cls; }
-
-  /* RENDERIZAR FACTORES */
-  const renderF = (list, id, dotCls, rowCls) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (list.length === 0) {
-      el.innerHTML = `<div class="rp-factor fn"><div class="rp-dot dn"></div>Ninguno</div>`;
-      return;
+  /* ACTUALIZAR PANEL HORIZONTAL */
+  const rbHd  = document.getElementById("rp-hd");
+  const rbVal = document.getElementById("rp-val");
+  const rbFac = document.getElementById("rb-factors");
+  if (rbHd)  rbHd.className  = "risk-bar " + cls;
+  if (rbVal) { rbVal.textContent = level; rbVal.className = "rb-val"; }
+  if (rbFac) {
+    if (factorsH.length === 0 && factorsM.length === 0) {
+      rbFac.innerHTML = `<span style="font-size:11px;color:var(--txt3)">Sin factores identificados</span>`;
+    } else {
+      rbFac.innerHTML =
+        factorsH.map(f => `<div class="rb-factor fh"><div class="rb-dot"></div>${f}</div>`).join("") +
+        factorsM.map(f => `<div class="rb-factor fm"><div class="rb-dot"></div>${f}</div>`).join("");
     }
-    el.innerHTML = list.map(f =>
-      `<div class="rp-factor ${rowCls}"><div class="rp-dot ${dotCls}"></div>${f}</div>`
-    ).join("");
-  };
-  renderF(factorsH, "rp-factors-h", "dh", "fh");
-  renderF(factorsM, "rp-factors-m", "dm", "fm");
+  }
 }
