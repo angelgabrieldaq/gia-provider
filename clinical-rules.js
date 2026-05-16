@@ -247,49 +247,112 @@ function evalHTATipo(select) {
   calcRisk();
 }
 
-/* ── RIESGO PE (ISSHP 2018) ──────────────────────────────────────────────────
- * ≥1 factor mayor → Alto · ≥2 moderados → Alto · 1 moderado → Moderado · 0 → Bajo
+/* ── RIESGO PE v2 — ISSHP 2018 / FASGO 2025 ─────────────────────────────────
+ * Lee TODAS las fuentes: edad, IMC, G/P/A/C, tipo HTA, checkboxes CLAP.
+ * NO modificar umbrales sin revisión médica.
  */
 function calcRisk() {
-  const chks = document.querySelectorAll("#sc-nueva .chk[data-w] input:checked");
-  let hi = 0, mo = 0;
-  chks.forEach(c => {
-    const w = c.closest("[data-w]").dataset.w;
-    if (w === "h") hi++; else mo++;
-  });
+  const factorsH = [];
+  const factorsM = [];
 
-  /* HTA group — select con data-w dinámico (FASGO 2025) */
-  const htaGroup = document.getElementById("hta-cronica-group");
-  if (htaGroup && htaGroup.dataset.w) {
-    const htaSelect = document.getElementById("np-hta-tipo");
-    if (htaSelect && htaSelect.value !== "") {
-      if (htaGroup.dataset.w === "h") hi++;
-      else mo++;
+  /* FUENTE 1: EDAD — ≥35 años → moderado (ISSHP 2018) */
+  const fnac = document.getElementById("np-fnac");
+  if (fnac && fnac.value) {
+    const d = new Date(fnac.value), now = new Date();
+    let age = now.getFullYear() - d.getFullYear();
+    if (now.getMonth() < d.getMonth() ||
+       (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
+    if (age >= 35) factorsM.push("Edad materna ≥ 35 años (" + age + " años)");
+  }
+
+  /* FUENTE 2: IMC — ≥30 → obesidad pregestacional → moderado (ISSHP 2018) */
+  const pesoEl  = document.getElementById("np-peso");
+  const tallaEl = document.getElementById("np-talla");
+  if (pesoEl && tallaEl && pesoEl.value && tallaEl.value) {
+    const peso = parseFloat(pesoEl.value);
+    const talla = parseFloat(tallaEl.value);
+    if (peso > 0 && talla > 100) {
+      const imc = peso / ((talla / 100) ** 2);
+      if (imc >= 30) factorsM.push("Obesidad pregestacional (IMC " + imc.toFixed(1) + " kg/m²)");
     }
   }
 
-  const rv  = document.getElementById("np-rr-val");
-  const rs  = document.getElementById("np-rr-sub");
-  const rr  = document.getElementById("np-risk-result");
-  if (!rv || !rs || !rr) return;
-
-  let lv, cl, sub;
-  if (hi >= 1) {
-    lv = "Alto"; cl = "rr-high";
-    sub = hi + " factor" + (hi > 1 ? "es mayores" : " mayor") +
-          (mo > 0 ? ", " + mo + " moderado" + (mo > 1 ? "s" : "") : "");
-  } else if (mo >= 2) {
-    lv  = "Alto"; cl = "rr-high";
-    sub = mo + " factores moderados = riesgo alto (ISSHP 2018)";
-  } else if (mo === 1) {
-    lv  = "Moderado"; cl = "rr-mod";
-    sub = "1 factor moderado — monitoreo reforzado";
-  } else {
-    lv  = "Bajo"; cl = "rr-low";
-    sub = "Sin factores de riesgo identificados";
+  /* FUENTE 3: FÓRMULA OBSTÉTRICA (ISSHP 2018) */
+  const gEl = document.getElementById("np-g");
+  const pEl = document.getElementById("np-p");
+  const aEl = document.getElementById("np-a");
+  if (gEl && pEl) {
+    const g = parseInt(gEl.value) || 1;
+    const pv = parseInt(pEl.value) || 0;
+    if (g === 1 && pv === 0) factorsM.push("Primigesta (G1P0)");
+  }
+  if (aEl) {
+    const av = parseInt(aEl.value) || 0;
+    if (av >= 3) factorsM.push("Pérdidas gestacionales recurrentes (≥ 3)");
   }
 
-  rv.textContent = lv;
-  rs.textContent = sub;
-  rr.className   = "risk-result " + cl;
+  /* FUENTE 4: TIPO DE HTA (FASGO 2025 sección 1) */
+  const htaEl = document.getElementById("np-hta-tipo");
+  if (htaEl && htaEl.value) {
+    const htaMap = {
+      esencial:    { w: "h", label: "HTA crónica esencial" },
+      secundaria:  { w: "h", label: "HTA crónica secundaria" },
+      guardapolvo: { w: "m", label: "HTA de guardapolvo blanco" },
+      enmascarada: { w: "h", label: "HTA enmascarada" },
+    };
+    const cfg = htaMap[htaEl.value];
+    if (cfg) {
+      if (cfg.w === "h") factorsH.push(cfg.label);
+      else factorsM.push(cfg.label);
+    }
+  }
+
+  /* FUENTE 5: CHECKBOXES CLAP — data-w="h"|"m" */
+  document.querySelectorAll("#sc-nueva [data-w] input:checked").forEach(cb => {
+    const w     = cb.closest("[data-w]").dataset.w;
+    const label = cb.closest("label") ? cb.closest("label").textContent.trim() : "";
+    if (w === "h") factorsH.push(label);
+    else if (w === "m") factorsM.push(label);
+  });
+
+  /* CLASIFICACIÓN ISSHP 2018 */
+  let level, cls, sub;
+  if (factorsH.length >= 1) {
+    level = "Alto"; cls = "rr-high";
+    sub = factorsH.length + " factor" + (factorsH.length > 1 ? "es mayores" : " mayor");
+    if (factorsM.length > 0)
+      sub += " · " + factorsM.length + " moderado" + (factorsM.length > 1 ? "s" : "");
+  } else if (factorsM.length >= 2) {
+    level = "Alto"; cls = "rr-high";
+    sub = factorsM.length + " factores moderados = alto (ISSHP 2018)";
+  } else if (factorsM.length === 1) {
+    level = "Moderado"; cls = "rr-mod";
+    sub = "1 factor moderado — monitoreo reforzado";
+  } else {
+    level = "Bajo"; cls = "rr-low";
+    sub = "Sin factores identificados";
+  }
+
+  /* ACTUALIZAR PANEL STICKY */
+  const valEl = document.getElementById("rp-val");
+  const subEl = document.getElementById("rp-sub");
+  const hdEl  = document.getElementById("rp-hd");
+  if (valEl) { valEl.textContent = level; valEl.className = "rp-val " + cls; }
+  if (subEl) { subEl.textContent = sub;   subEl.className = "rp-sub " + cls; }
+  if (hdEl)  { hdEl.className = "rp-hd " + cls; }
+
+  /* RENDERIZAR FACTORES */
+  const renderF = (list, id, dotCls, rowCls) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (list.length === 0) {
+      el.innerHTML = `<div class="rp-factor fn"><div class="rp-dot dn"></div>Ninguno</div>`;
+      return;
+    }
+    el.innerHTML = list.map(f =>
+      `<div class="rp-factor ${rowCls}"><div class="rp-dot ${dotCls}"></div>${f}</div>`
+    ).join("");
+  };
+  renderF(factorsH, "rp-factors-h", "dh", "fh");
+  renderF(factorsM, "rp-factors-m", "dm", "fm");
 }

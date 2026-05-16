@@ -278,6 +278,38 @@
     .np-sname{font-size:15px;font-weight:700;color:var(--p-dark);margin-bottom:4px}
     .np-ssub{font-size:12px;color:var(--txt3);line-height:1.5;margin-bottom:20px}
 
+    /* ── LAYOUT NUEVA PACIENTE — DOS COLUMNAS ── */
+    .np-layout{display:grid;grid-template-columns:1fr 240px;gap:16px;align-items:start;padding:12px 20px 24px}
+    .np-form-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+    .np-risk-col{position:sticky;top:86px;align-self:start}
+    /* ── PANEL DE RIESGO ── */
+    .rp-card{background:var(--bg);border:1px solid var(--brd2);border-radius:var(--r-lg);overflow:hidden}
+    .rp-hd{padding:12px 14px;border-bottom:1px solid var(--brd);transition:background .2s}
+    .rp-hd.rr-high{background:var(--s-err-l)}
+    .rp-hd.rr-mod{background:var(--s-warn-l)}
+    .rp-hd.rr-low{background:var(--s-ok-l)}
+    .rp-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+    .rp-val{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;transition:color .2s}
+    .rp-val.rr-high{color:var(--s-err)}
+    .rp-val.rr-mod{color:var(--s-warn)}
+    .rp-val.rr-low{color:var(--s-ok)}
+    .rp-sub{font-size:10px;margin-top:4px;line-height:1.4;transition:color .2s}
+    .rp-sub.rr-high{color:var(--s-err)}
+    .rp-sub.rr-mod{color:var(--s-warn)}
+    .rp-sub.rr-low{color:var(--s-ok)}
+    .rp-ref{font-size:9px;color:var(--txt3);margin-top:8px;padding-top:8px;border-top:1px solid var(--brd);line-height:1.5}
+    .rp-body{padding:10px 14px}
+    .rp-section{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px;margin-top:10px}
+    .rp-section:first-child{margin-top:0}
+    .rp-factor{display:flex;align-items:flex-start;gap:6px;padding:3px 0;font-size:10px;line-height:1.4}
+    .rp-factor.fh{color:var(--s-err);font-weight:600}
+    .rp-factor.fm{color:var(--s-warn);font-weight:600}
+    .rp-factor.fn{color:var(--txt3);font-style:italic}
+    .rp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+    .rp-dot.dh{background:var(--s-err)}
+    .rp-dot.dm{background:var(--s-warn)}
+    .rp-dot.dn{background:var(--brd2)}
+
     /* MODAL */
     .modal-bg{background:rgba(26,26,24,.7);border-radius:0;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 86px)}
     .modal{background:var(--bg);border-radius:16px;width:100%;max-width:420px;overflow:hidden;border:1px solid var(--brd2);box-shadow:0 8px 40px rgba(0,0,0,0.15)}
@@ -1348,8 +1380,12 @@
           </div>
         </div>
 
+        <div class="np-layout">
+        <!-- COLUMNA IZQUIERDA — tiers de carga -->
+        <div class="np-form-col">
+
         <!-- Datos personales -->
-        <div class="tier" style="margin-top:12px">
+        <div class="tier">
           <div class="tier-hd">
             <span class="tier-pill tp-a">Obligatorio</span>
             <span class="tier-title">Datos de la paciente</span>
@@ -1495,8 +1531,7 @@
             <span class="tier-note">Criterios ISSHP 2018 · determina la clasificación inicial</span>
           </div>
           <div style="padding:14px 16px">
-            <div class="risk-widget">
-              <div class="risk-chks">
+            <div class="risk-chks">
 
                 <!-- 1. Antecedentes personales -->
                 <div class="risk-sep">1 · Antecedentes personales</div>
@@ -1538,12 +1573,6 @@
                 <div class="risk-sep" style="margin-top:6px">5 · Otros factores relevantes</div>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Tabaquismo activo</label>
                 <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Exposición a violencia / estrés severo</label>
-              </div>
-              <div class="risk-result" id="np-risk-result">
-                <div class="rr-lbl">Clasificación inicial</div>
-                <div class="rr-val" id="np-rr-val">—</div>
-                <div class="rr-sub" id="np-rr-sub">Seleccioná factores para clasificar</div>
-                <div class="rr-ref">Basado en criterios ISSHP 2018 y guías del ACOG. La clasificación puede actualizarse con cada consulta.</div>
               </div>
             </div>
           </div>
@@ -1789,6 +1818,27 @@
             </div>
           </div>
         </div>
+        </div><!-- /np-form-col -->
+
+        <!-- COLUMNA DERECHA — panel sticky de riesgo -->
+        <div class="np-risk-col">
+          <div class="rp-card" id="np-risk-card">
+            <div class="rp-hd" id="rp-hd">
+              <div class="rp-lbl">Riesgo para preeclampsia</div>
+              <div class="rp-val" id="rp-val">—</div>
+              <div class="rp-sub" id="rp-sub">Completá los datos para clasificar</div>
+              <div class="rp-ref">ISSHP 2018 · FASGO 2025</div>
+            </div>
+            <div class="rp-body">
+              <div class="rp-section">Factores mayores</div>
+              <div id="rp-factors-h"></div>
+              <div class="rp-section">Factores moderados</div>
+              <div id="rp-factors-m"></div>
+            </div>
+          </div>
+        </div>
+        </div><!-- /np-layout -->
+
         <div style="height:20px"></div>
       </div>
 
@@ -2149,7 +2199,7 @@ function savePatient() {
     el.scrollIntoView({behavior:'smooth',block:'center'}); return;
   }
 
-  const rv   = document.getElementById('np-rr-val').textContent;
+  const rv   = document.getElementById('rp-val') ? document.getElementById('rp-val').textContent : '—';
   const hEga = document.getElementById('h-ega').textContent;
   const hEco = document.getElementById('h-eco1') ? document.getElementById('h-eco1').textContent : '';
   const hImc = document.getElementById('h-imc').textContent;
