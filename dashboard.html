@@ -107,8 +107,15 @@
     .screen{display:none}
     .screen.active{display:flex;flex-direction:column;height:100%}
     #sc-nueva.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
-    #sc-laboratorios.active{display:block}
-    .np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3);padding-bottom:80px}
+    #sc-form.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+    #sc-form .fhead{flex-shrink:0;position:relative;z-index:5}
+    #sc-form .warn-note{flex-shrink:0}
+    .form-scroll-body{flex:1;overflow-y:auto;padding-bottom:40px}
+    #sc-laboratorios.active{display:flex;flex-direction:column;height:100%;overflow:hidden;position:absolute;inset:0;z-index:5;background:var(--bg3)}
+    #sc-laboratorios .fhead{flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--brd2)}
+    #sc-laboratorios .labo-tabs{flex-shrink:0}
+    #sc-laboratorios .labo-panel.active{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:40px}
+    .np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3)}
 
     /* DASHBOARD */
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 12px}
@@ -334,7 +341,7 @@
     .np-step.active .nps-dot{background:var(--p)}
     .np-step-panel{display:none;padding:16px 20px 0}
     .np-step-panel.active{display:block}
-    .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px 20px;gap:8px}
+    .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid rgba(0,0,0,0.06)}
     .np-step-nav .btn-sec{padding:8px 18px;border-radius:var(--r);border:1px solid var(--brd2);background:transparent;font-size:13px;color:var(--txt2);cursor:pointer;font-family:'DM Sans',sans-serif}
     .np-step-nav .btn-prim{padding:8px 18px;border-radius:var(--r);border:none;background:var(--p);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:'DM Sans',sans-serif}
     /* Sidebar colapsado al entrar a sc-nueva */
@@ -364,7 +371,7 @@
     .labo-tab{font-size:12px;font-weight:600;padding:10px 18px;cursor:pointer;border:none;background:transparent;color:var(--txt3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'DM Sans',sans-serif;transition:all .12s}
     .labo-tab:hover{color:var(--txt)}
     .labo-tab.on{color:var(--p);border-bottom-color:var(--p)}
-    .labo-panel{display:none}.labo-panel.active{display:block}
+    .labo-panel{display:none}
     .labo-section{margin:12px 20px;border:1px solid var(--brd);border-radius:var(--r-lg);background:var(--bg);overflow:hidden}
     .labo-section-hd{padding:9px 16px;background:var(--bg2);border-bottom:1px solid var(--brd);font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px}
     .fhint.warn{color:var(--s-warn)}
@@ -781,6 +788,7 @@
           <span style="font-weight:700;flex-shrink:0">⚠</span>
           <span>Paciente de riesgo alto — proteínas en orina, edemas y síntomas de alarma son obligatorios.</span>
         </div>
+        <div class="form-scroll-body">
         <div class="tier">
           <div class="tier-hd">
             <span class="tier-pill tp-a">Prioridad 1</span>
@@ -973,6 +981,7 @@
         </div>
 
         <div style="height:20px"></div>
+        </div><!-- /form-scroll-body -->
       </div>
 
       <!-- HISTORIAL CLÍNICO -->
