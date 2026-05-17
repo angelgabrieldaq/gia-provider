@@ -7,243 +7,253 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
   <style>
-    :root {
-      --p:#2B57D9;--p-dark:#1A3FAA;--p-light:#EBF2FF;--p-mid:#A3C0F8;
-      --bg:#ffffff;--bg2:#f5f4f0;--bg3:#f0efea;
-      --txt:#1a1a18;--txt2:#5f5e5a;--txt3:#888780;
-      --brd:rgba(0,0,0,0.10);--brd2:rgba(0,0,0,0.18);
-      --s-ok:#0F6E56;--s-ok-l:#E1F5EE;--s-ok-m:#9FE1CB;
-      --s-warn:#633806;--s-warn-l:#FAEEDA;--s-warn-m:#EF9F27;
-      --s-err:#791F1F;--s-err-l:#FCEBEB;--s-err-m:#E24B4A;
-      --s-info:#0C447C;--s-info-l:#E6F1FB;--s-info-m:#B5D4F4;
-      --r:8px;--r-lg:12px;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:'DM Sans',sans-serif;overflow:hidden}
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    html,body { height:100%; font-family:var(--font-sans); overflow:hidden }
 
-    /* ── FONDO ── */
-    .scene{
-      position:fixed;inset:0;
-      background:#091525;
-      overflow:hidden;
-    }
-
-    /* orbs de luz */
-    .orb{position:absolute;border-radius:50%;pointer-events:none}
-    .orb-1{
-      width:900px;height:900px;
-      background:radial-gradient(circle,rgba(43,87,217,.18) 0%,transparent 60%);
-      top:-350px;left:-200px;
-    }
-    .orb-2{
-      width:700px;height:700px;
-      background:radial-gradient(circle,rgba(43,87,217,.12) 0%,transparent 60%);
-      bottom:-300px;right:-150px;
-    }
-    .orb-3{
-      width:400px;height:400px;
-      background:radial-gradient(circle,rgba(15,110,86,.10) 0%,transparent 65%);
-      top:40%;left:40%;transform:translate(-50%,-50%);
-    }
-
-    /* dot grid sutil */
-    .scene::after{
-      content:'';position:absolute;inset:0;pointer-events:none;
-      background-image:radial-gradient(rgba(255,255,255,0.045) 1px,transparent 1px);
-      background-size:32px 32px;
-    }
-
-    /* línea de datos / waveform decorativa */
-    .waveline{
-      position:absolute;bottom:0;left:0;right:0;
-      height:180px;pointer-events:none;opacity:.07;
-    }
-
-    /* ── LAYOUT ── */
-    .page{
-      position:relative;z-index:1;
+    /* ── LAYOUT SPLIT ────────────────────────────────────────── */
+    .page {
+      display:grid;
+      grid-template-columns: 420px 1fr;
       height:100vh;
-      display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      gap:0;
-      animation:fadeUp .55s ease both;
-    }
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-    /* ── MARCA ── */
-    .brand{
-      display:flex;flex-direction:column;align-items:center;
-      gap:6px;margin-bottom:32px;
-    }
-    .brand-name{
-      font-family:'DM Serif Display',serif;
-      font-size:64px;color:white;letter-spacing:-2px;line-height:1;
-    }
-    .brand-name em{font-style:normal;color:var(--p-mid)}
-    .brand-tag{
-      display:inline-flex;align-items:center;gap:6px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:20px;padding:4px 14px;
-    }
-    .brand-tag-dot{
-      width:5px;height:5px;border-radius:50%;
-      background:var(--s-ok-m);
-      animation:pulse 2.2s ease-in-out infinite;
-    }
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    .brand-tag span{
-      font-size:11px;font-weight:500;
-      color:rgba(255,255,255,.5);
-      letter-spacing:.3px;
     }
 
-    /* ── CARD ── */
-    .card{
+    /* ── PANEL IZQUIERDO — Branding ──────────────────────────── */
+    .panel-left {
+      background: var(--p-dark);
+      display:flex; flex-direction:column; justify-content:space-between;
+      padding: 48px 44px;
+      position: relative; overflow: hidden;
+    }
+    /* Textura de puntos sutil */
+    .panel-left::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    /* Orb de profundidad */
+    .panel-left::after {
+      content:''; position:absolute; pointer-events:none;
+      width:500px; height:500px; border-radius:50%;
+      background: radial-gradient(circle, rgba(163,192,248,.10) 0%, transparent 65%);
+      bottom:-200px; right:-150px;
+    }
+
+    .pl-brand { position:relative; z-index:1 }
+    .pl-logo { display:flex; align-items:baseline; gap:10px; margin-bottom:6px }
+    .pl-logo-name {
+      font-family: var(--font-serif);
+      font-size: 42px; color:white; letter-spacing:-1.5px; line-height:1;
+    }
+    .pl-logo-name em { font-style:normal; color:var(--p-mid) }
+    .pl-logo-by {
+      font-size:10px; font-weight:700; color:rgba(255,255,255,.3);
+      letter-spacing:.8px; text-transform:uppercase; align-self:center;
+    }
+    .pl-tagline {
+      font-size:13px; color:rgba(255,255,255,.55); line-height:1.6; max-width:290px;
+    }
+
+    .pl-features { position:relative; z-index:1; display:flex; flex-direction:column; gap:10px }
+    .pl-feat {
+      display:flex; align-items:flex-start; gap:12px;
+      padding:12px 16px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--r-lg);
+    }
+    .pl-feat-ico { font-size:16px; flex-shrink:0; margin-top:2px }
+    .pl-feat-txt-title { font-size:12px; font-weight:600; color:white; margin-bottom:2px }
+    .pl-feat-txt-sub   { font-size:11px; color:rgba(255,255,255,.45); line-height:1.4 }
+
+    .pl-foot { position:relative; z-index:1; display:flex; flex-direction:column; gap:6px }
+    .pl-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.13);
+      border-radius:6px; padding:5px 12px; width:fit-content;
+    }
+    .pl-badge span { font-size:10px; font-weight:600; color:rgba(255,255,255,.45); letter-spacing:.3px }
+    .pl-version    { font-size:10px; color:rgba(255,255,255,.22); letter-spacing:.2px }
+
+    /* ── PANEL DERECHO — Formulario ──────────────────────────── */
+    .panel-right {
+      background: var(--bg3);
+      display:flex; align-items:center; justify-content:center;
+      padding: 40px;
+    }
+
+    .card {
+      background: var(--bg);
+      border-radius: var(--r-lg);
+      padding: 40px 36px 32px;
+      width:100%; max-width:360px;
+      border:1px solid var(--brd);
+      box-shadow: 0 4px 24px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04);
+      animation: fadeUp .45s ease both .08s;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size:22px; color:var(--txt); letter-spacing:-.3px; margin-bottom:4px;
+    }
+    .card-sub { font-size:13px; color:var(--txt3); margin-bottom:28px; line-height:1.5 }
+
+    /* Formulario */
+    .form  { display:flex; flex-direction:column; gap:16px }
+    .field { display:flex; flex-direction:column; gap:5px }
+    .field label {
+      font-size:11px; font-weight:700; color:var(--txt2);
+      text-transform:uppercase; letter-spacing:.4px;
+    }
+    .field input {
+      padding:11px 14px;
+      border:1px solid var(--brd2); border-radius:var(--r);
+      background:var(--bg2); color:var(--txt);
+      font-size:14px; font-family:var(--font-sans); outline:none;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    .field input::placeholder { color:var(--txt3) }
+    .field input:focus {
+      border-color:var(--p);
+      box-shadow:0 0 0 3px var(--p-light);
       background:var(--bg);
-      border-radius:20px;
-      padding:40px 40px 32px;
-      width:100%;max-width:380px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,.06),
-        0 24px 64px rgba(0,0,0,.45),
-        0 4px 16px rgba(0,0,0,.3);
     }
 
-    .card-title{
-      font-family:'DM Serif Display',serif;
-      font-size:22px;color:var(--txt);
-      letter-spacing:-.3px;margin-bottom:4px;
-    }
-    .card-sub{font-size:13px;color:var(--txt3);margin-bottom:28px;line-height:1.5}
+    .row-pass { display:flex; justify-content:flex-end; margin-top:-8px }
+    .row-pass a { font-size:12px; color:var(--p); text-decoration:none; font-weight:500 }
+    .row-pass a:hover { text-decoration:underline }
 
-    /* form */
-    .form{display:flex;flex-direction:column;gap:16px}
-    .field{display:flex;flex-direction:column;gap:5px}
-    .field label{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
-    .field input{
-      padding:11px 14px;border:1px solid var(--brd2);border-radius:var(--r);
-      background:var(--bg2);color:var(--txt);font-size:14px;
-      font-family:'DM Sans',sans-serif;outline:none;
-      transition:border-color .15s,box-shadow .15s;
-    }
-    .field input::placeholder{color:var(--txt3)}
-    .field input:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--p-light);background:var(--bg)}
-
-    .row-pass{display:flex;justify-content:flex-end;margin-top:-8px}
-    .row-pass a{font-size:12px;color:var(--p);text-decoration:none;font-weight:500}
-    .row-pass a:hover{text-decoration:underline}
-
-    .btn-login{
+    .btn-login {
       margin-top:4px;
-      width:100%;padding:13px;border-radius:var(--r);
-      background:var(--p);color:white;border:none;
-      font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;
-      cursor:pointer;letter-spacing:.2px;
-      transition:background .15s,transform .1s;
+      width:100%; padding:13px; border-radius:var(--r);
+      background:var(--p); color:white; border:none;
+      font-size:14px; font-weight:700; font-family:var(--font-sans);
+      cursor:pointer; letter-spacing:.2px;
+      transition:background .15s, transform .1s;
     }
-    .btn-login:hover{background:var(--p-dark)}
-    .btn-login:active{transform:scale(.99)}
-    .btn-login.loading{background:var(--p-dark);cursor:not-allowed}
+    .btn-login:hover   { background:var(--p-dark) }
+    .btn-login:active  { transform:scale(.99) }
+    .btn-login.loading { background:var(--p-dark); cursor:not-allowed }
 
-    .demo-note{
-      margin-top:14px;
-      padding:10px 14px;border-radius:var(--r);
-      background:var(--p-light);border:1px solid var(--p-mid);
-      font-size:12px;color:var(--p-dark);text-align:center;line-height:1.5;
+    .demo-note {
+      margin-top:14px; padding:10px 14px; border-radius:var(--r);
+      background:var(--p-light); border:1px solid var(--p-mid);
+      font-size:12px; color:var(--p-dark); text-align:center; line-height:1.5;
     }
 
-    /* ── FOOTER ── */
-    .foot{
-      margin-top:24px;
-      display:flex;align-items:center;gap:16px;
+    .card-foot {
+      margin-top:20px; padding-top:16px;
+      border-top:1px solid var(--brd);
+      display:flex; justify-content:center; gap:16px;
     }
-    .foot-badge{
-      display:inline-flex;align-items:center;gap:5px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
-      border-radius:6px;padding:4px 10px;
-    }
-    .foot-badge span{font-size:10px;color:rgba(255,255,255,.35);font-weight:500;letter-spacing:.2px}
-    .foot-sep{width:1px;height:12px;background:rgba(255,255,255,.1)}
-    .foot a{font-size:11px;color:rgba(255,255,255,.3);text-decoration:none}
-    .foot a:hover{color:rgba(255,255,255,.55)}
+    .card-foot a { font-size:11px; color:var(--txt3); text-decoration:none }
+    .card-foot a:hover { color:var(--p) }
 
-    /* ── LOADING ── */
-    .overlay{
-      position:fixed;inset:0;z-index:100;
-      background:#091525;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-      opacity:0;pointer-events:none;transition:opacity .25s;
+    /* ── OVERLAY DE CARGA ─────────────────────────────────────── */
+    .overlay {
+      position:fixed; inset:0; z-index:100;
+      background:var(--bg);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:14px;
+      opacity:0; pointer-events:none; transition:opacity .25s;
     }
-    .overlay.show{opacity:1;pointer-events:all}
-    .ov-name{font-family:'DM Serif Display',serif;font-size:36px;color:white;letter-spacing:-1px}
-    .ov-name em{font-style:normal;color:var(--p-mid)}
-    .loader{width:32px;height:32px;border:2.5px solid rgba(163,192,248,.2);border-top-color:var(--p-mid);border-radius:50%;animation:spin .7s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .ov-txt{font-size:13px;color:rgba(255,255,255,.4);font-weight:400}
+    .overlay.show { opacity:1; pointer-events:all }
+    .ov-logo {
+      font-family:var(--font-serif);
+      font-size:40px; color:var(--p-dark); letter-spacing:-1px;
+    }
+    .ov-logo em { font-style:normal; color:var(--p) }
+    .loader {
+      width:28px; height:28px;
+      border:2.5px solid var(--brd2); border-top-color:var(--p);
+      border-radius:50%; animation:spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg) } }
+    .ov-txt { font-size:13px; color:var(--txt3) }
   </style>
 </head>
 <body>
 
 <div class="overlay" id="overlay">
-  <div class="ov-name">G<em>ia</em></div>
+  <div class="ov-logo">G<em>ia</em></div>
   <div class="loader"></div>
   <div class="ov-txt">Iniciando sesión…</div>
 </div>
 
-<div class="scene">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <!-- waveform decorativa de fondo -->
-  <svg class="waveline" viewBox="0 0 1440 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-    <polyline
-      points="0,140 80,140 100,140 120,80 140,20 160,140 180,140 220,140 240,100 260,60 280,140 320,140 360,140 380,110 400,50 420,30 440,100 460,140 520,140 560,140 580,90 600,40 620,140 680,140 720,140 740,105 760,55 780,140 840,140 880,140 900,95 920,45 940,140 1000,140 1040,140 1060,100 1080,55 1100,140 1160,140 1200,140 1220,108 1240,62 1260,140 1320,140 1380,140 1420,130 1440,140"
-      fill="none" stroke="white" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"
-    />
-  </svg>
-</div>
-
 <div class="page">
-  <div class="brand">
-    <div class="brand-name">G<em>ia</em></div>
-    <div class="brand-tag">
-      <div class="brand-tag-dot"></div>
-      <span>Módulo Obstétrico Inteligente · by Zenoxia</span>
+
+  <!-- PANEL IZQUIERDO — Identidad Zenoxia -->
+  <div class="panel-left">
+    <div class="pl-brand">
+      <div class="pl-logo">
+        <span class="pl-logo-name">G<em>ia</em></span>
+        <span class="pl-logo-by">by Zenoxia</span>
+      </div>
+      <div class="pl-tagline">Módulo Obstétrico Inteligente para el seguimiento clínico materno-fetal.</div>
+    </div>
+
+    <div class="pl-features">
+      <div class="pl-feat">
+        <div class="pl-feat-ico">🩺</div>
+        <div>
+          <div class="pl-feat-txt-title">Detección temprana de preeclampsia</div>
+          <div class="pl-feat-txt-sub">Algoritmo ISSHP 2018 + FASGO 2025 integrado en cada consulta.</div>
+        </div>
+      </div>
+      <div class="pl-feat">
+        <div class="pl-feat-ico">📋</div>
+        <div>
+          <div class="pl-feat-txt-title">Historial clínico longitudinal</div>
+          <div class="pl-feat-txt-sub">Tendencias de TA, peso y laboratorio en un solo vistazo.</div>
+        </div>
+      </div>
+      <div class="pl-feat">
+        <div class="pl-feat-ico">⚡</div>
+        <div>
+          <div class="pl-feat-txt-title">Alertas clínicas automatizadas</div>
+          <div class="pl-feat-txt-sub">Umbrales validados con obstetra. Sin falsos positivos.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pl-foot">
+      <div class="pl-badge"><span>SaMD · ANMAT Argentina</span></div>
+      <div class="pl-version">Gia v1.0 MVP · Zenoxia © 2026</div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Bienvenida</div>
-    <div class="card-sub">Accedé con tu cuenta para continuar.</div>
+  <!-- PANEL DERECHO — Acceso -->
+  <div class="panel-right">
+    <div class="card">
+      <div class="card-title">Bienvenida</div>
+      <div class="card-sub">Accedé con tu cuenta para continuar.</div>
 
-    <form class="form" onsubmit="handleLogin(event)">
-      <div class="field">
-        <label for="email">Correo electrónico</label>
-        <input type="email" id="email" placeholder="dra@consultorio.com" autocomplete="email" required/>
-      </div>
-      <div class="field">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required/>
-      </div>
-      <div class="row-pass"><a href="#">¿Olvidaste tu contraseña?</a></div>
-      <button type="submit" class="btn-login" id="btn-login">Ingresar</button>
-    </form>
+      <form class="form" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" placeholder="dra@consultorio.com" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <div class="row-pass"><a href="#">¿Olvidaste tu contraseña?</a></div>
+        <button type="submit" class="btn-login" id="btn-login">Ingresar</button>
+      </form>
 
-    <div class="demo-note">
-      <strong>Modo demo —</strong> ingresá cualquier correo y contraseña.
+      <div class="demo-note">
+        <strong>Modo demo —</strong> ingresá cualquier correo y contraseña.
+      </div>
+
+      <div class="card-foot">
+        <a href="#">Soporte</a>
+        <a href="#">Privacidad</a>
+      </div>
     </div>
   </div>
 
-  <div class="foot">
-    <div class="foot-badge"><span>SaMD · ANMAT Argentina</span></div>
-    <div class="foot-sep"></div>
-    <a href="#">Soporte</a>
-    <div class="foot-sep"></div>
-    <a href="#">Privacidad</a>
-  </div>
 </div>
 
 <script>
