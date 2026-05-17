@@ -107,6 +107,7 @@
     .screen{display:none}
     .screen.active{display:flex;flex-direction:column;height:100%}
     #sc-nueva.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+    #sc-nueva .np-sticky-hd{flex-shrink:0;min-height:60px}
     #sc-form.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
     #sc-form .fhead{flex-shrink:0;position:relative;z-index:5}
     #sc-form .warn-note{flex-shrink:0}
@@ -300,8 +301,10 @@
 
     /* ── HEADER STICKY CLÍNICO — spec v4.0 ── */
     .np-sticky-hd{position:relative;z-index:15;background:var(--bg);border-bottom:1px solid var(--brd);padding:12px 20px;display:grid;grid-template-columns:1fr auto 1fr auto;gap:20px;align-items:center;transition:border-color .2s,background .2s}
-    .np-sticky-hd.rr-high{border-bottom-color:var(--s-err-m);background:var(--s-err-l)}
-    .np-sticky-hd.rr-mod{border-bottom-color:var(--s-warn-m);background:var(--s-warn-l)}
+    .np-sticky-hd.rr-none .nsh-name{color:var(--txt)}
+    .np-sticky-hd.rr-none .nsh-risk-val{color:var(--txt3)}
+    .np-sticky-hd.rr-high{background:var(--s-err-l);border-bottom-color:var(--s-err-m)}
+    .np-sticky-hd.rr-mod{background:var(--s-warn-l);border-bottom-color:var(--s-warn-m)}
     .np-sticky-hd.rr-low{border-bottom-color:var(--s-ok-m)}
     .nsh-id{display:flex;flex-direction:column;gap:3px}
     .nsh-name{font-family:'DM Serif Display',serif;font-size:22px;line-height:1;color:var(--txt);min-height:26px}
@@ -395,7 +398,7 @@
     /* Medicación activa en formulario */
     .med-row{display:flex;flex-direction:column;gap:4px}
     /* Estado anímico */
-    .estado-opt{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--txt);transition:all .1s}
+    .estado-opt{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--txt);transition:all .1s}
     .estado-opt.sel{background:var(--p-light);border-color:var(--p);color:var(--p-dark);font-weight:600}
     .edo-ico{font-size:14px}
     /* Cierre de consulta */
@@ -898,9 +901,9 @@
           </div>
 
           <!-- ESTADO ANÍMICO — spec v3.0 sec 1.2 -->
-          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
+          <div style="padding:16px 16px 14px">
             <div class="flbl" style="margin-bottom:8px">Estado anímico de la paciente</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px">
               <label class="estado-opt" onclick="selEstado(this)" data-val="tranquila">
                 <input type="radio" name="estado-animico" value="tranquila" style="display:none"/>
                 <span class="edo-ico">😌</span> Tranquila
