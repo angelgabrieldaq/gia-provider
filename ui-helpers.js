@@ -5,6 +5,8 @@
 function go(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
+  const contentPanel = document.querySelector(".main");
+  if (contentPanel) contentPanel.scrollTop = 0;
 }
 
 function setBB(p) {
