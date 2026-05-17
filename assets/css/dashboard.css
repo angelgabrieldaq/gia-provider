@@ -395,6 +395,21 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .vac-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12px;color:var(--txt);flex-wrap:wrap}
 .vac-date{display:none;align-items:center;gap:6px;margin-left:22px;flex-wrap:wrap}
 .vac-date label{font-size:10px;color:var(--txt3);font-weight:600}
+/* ── FASGO 2025 ALERT CARDS ──────────────────────────────────────────────── */
+.fasgo-alert-area{display:flex;flex-direction:column;gap:8px;margin:10px 20px 0}
+.fac{border-radius:var(--r-lg);padding:14px 16px;border:1px solid;display:flex;flex-direction:column;gap:6px}
+.fac.fac-critical{background:var(--s-err-l);border-color:var(--s-err-m)}
+.fac.fac-warn{background:var(--s-warn-l);border-color:var(--s-warn-m)}
+.fac-title{font-size:13px;font-weight:700}
+.fac.fac-critical .fac-title{color:var(--s-err)}
+.fac.fac-warn .fac-title{color:var(--s-warn)}
+.fac-body{font-size:12px;color:var(--txt2);line-height:1.55}
+.fac-detail{font-size:11px;color:var(--txt3);line-height:1.6;white-space:pre-line;border-top:1px solid rgba(0,0,0,.08);padding-top:8px;margin-top:2px}
+.fac-checklist{display:flex;flex-direction:column;gap:5px;margin:4px 0}
+.fac-check-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--txt2);cursor:pointer}
+.fac-check-item input[type=checkbox]{margin-top:1px;accent-color:var(--p);flex-shrink:0}
+.fac-nota{font-size:11px;font-weight:600;color:var(--s-warn);margin-top:8px;padding:7px 10px;background:var(--s-warn-l);border-radius:var(--r);border:1px solid var(--s-warn-m)}
+
 .prev-row{display:flex;flex-direction:column;gap:4px;padding:5px 0}
 .prev-row-top{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--txt)}
 .prev-detail{margin-left:22px;padding:8px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--brd);display:none}

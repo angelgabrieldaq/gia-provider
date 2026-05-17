@@ -366,6 +366,186 @@ function calcRisk() {
   updateStickyHeader();
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+ * evaluarPreeclampsiaFASGO2025 — Algoritmo FASGO 2025
+ * Consenso de Trastornos Hipertensivos en el Embarazo — Argentina
+ *
+ * Implementa clasificación binaria: PE con o sin signos de severidad.
+ * Elimina la categoría "PE leve/severa" per FASGO 2025.
+ * NO modificar umbrales sin revisión médica.
+ *
+ * @param {Object} d
+ * @param {number}  d.pas                    PAS (mmHg)
+ * @param {number}  d.pad                    PAD (mmHg)
+ * @param {Object}  [d.sintomas]
+ * @param {boolean} [d.sintomas.cefalea]     Cefalea intensa persistente
+ * @param {boolean} [d.sintomas.escotomas]   Alteraciones visuales / escotomas
+ * @param {boolean} [d.sintomas.eclampsia]   Convulsión establecida
+ * @param {boolean} [d.sintomas.epigastralgia] Epigastralgia / dolor hipocondrio D
+ * @param {Object}  [d.lab]
+ * @param {number}  [d.lab.got]              GOT/AST (U/L)
+ * @param {number}  [d.lab.gpt]              GPT/ALT (U/L)
+ * @param {number}  [d.lab.plaquetas]        Recuento plaquetario (/mm³)
+ * @param {number}  [d.lab.uRPC]             Razón Prot/Creat urinaria (mg/mmol)
+ * @param {number}  [d.lab.proteinuria24h]   Proteinuria 24h (mg/24h)
+ * @param {boolean} [d.lab.tirasReactivas]   Solo tiras cualitativas disponibles
+ * @returns {Object} Resultado clínico estructurado
+ * ══════════════════════════════════════════════════════════════════════════ */
+function evaluarPreeclampsiaFASGO2025(d) {
+  const r = {
+    emergenciaHipertensiva: false,
+    clasificacion:          null,   // null|'sin_severidad'|'con_severidad'|'pendiente'
+    signosSeveridad:        [],
+    proteinuriaSignificativa: null,
+    advertenciaTiras:       false,
+    mgso4Indicado:          false,
+    mgso4Protocolo:         null,
+    alertCards:             [],
+  };
+
+  const pas  = parseFloat(d.pas) || 0;
+  const pad  = parseFloat(d.pad) || 0;
+  const sint = d.sintomas || {};
+  const lab  = d.lab      || {};
+
+  /* ── 1. EMERGENCIA HIPERTENSIVA ──────────────────────────────────────────
+   * FASGO 2025: PAS ≥ 160 y/o PAD ≥ 110 → antihipertensivo < 30–60 min.    */
+  if (pas >= 160 || pad >= 110) {
+    r.emergenciaHipertensiva = true;
+    r.alertCards.push({
+      level:   'critical',
+      titulo:  '🚨 Emergencia hipertensiva',
+      cuerpo:  `PA ${pas}/${pad} mmHg supera umbral de emergencia (≥ 160/110). Iniciar antihipertensivo de acción rápida dentro de los próximos 30–60 minutos.`,
+      detalle: 'Opciones de primera línea (FASGO 2025 sec. 6.2):\n' +
+               '• Labetalol 20 mg IV — puede repetir c/10 min (máx 300 mg total)\n' +
+               '• Nifedipina 10 mg VO — puede repetir c/30 min (máx 30 mg)\n' +
+               '⚠ No usar Nifedipina sublingual. No usar Hidralazina IV de primera línea.',
+    });
+  }
+
+  /* ── 2. PROTEINURIA SIGNIFICATIVA ────────────────────────────────────────
+   * FASGO 2025: punto de corte diagnóstico uRPC ≥ 30 mg/mmol.
+   * Tiras reactivas cualitativas NO son suficientes para confirmar diagnóstico. */
+  if (lab.tirasReactivas) {
+    r.advertenciaTiras = true;
+    r.alertCards.push({
+      level:   'warn',
+      titulo:  '⚠ Tiras reactivas: resultado cualitativo insuficiente',
+      cuerpo:  'Las tiras reactivas (+/++) no son suficientes para confirmar proteinuria significativa según FASGO 2025.',
+      detalle: 'Se requiere alguno de los siguientes métodos cuantitativos:\n' +
+               '• Razón Proteína/Creatinina urinaria (uRPC) ≥ 30 mg/mmol\n' +
+               '• Proteinuria en orina de 24h ≥ 300 mg/24h\n' +
+               'Solicitar muestra de orina para uRPC antes de descartar diagnóstico.',
+    });
+  }
+
+  if (lab.uRPC != null && !isNaN(lab.uRPC)) {
+    r.proteinuriaSignificativa = lab.uRPC >= 30;
+  } else if (lab.proteinuria24h != null && !isNaN(lab.proteinuria24h)) {
+    r.proteinuriaSignificativa = lab.proteinuria24h >= 300;
+  }
+
+  /* ── 3. SIGNOS DE SEVERIDAD (compromiso de órgano blanco) ───────────────
+   * FASGO 2025: clasificación binaria — PE con o sin signos de severidad.   */
+
+  /* Neurológico */
+  if (sint.eclampsia) {
+    r.signosSeveridad.push({ sistema: 'Neurológico', desc: 'Eclampsia establecida (convulsión tónico-clónica)' });
+  }
+  if (sint.cefalea) {
+    r.signosSeveridad.push({ sistema: 'Neurológico', desc: 'Cefalea intensa persistente (no cede a analgesia habitual)' });
+  }
+  if (sint.escotomas) {
+    r.signosSeveridad.push({ sistema: 'Neurológico', desc: 'Alteraciones visuales / escotomas' });
+  }
+
+  /* Hepático — umbral doble del normal: GOT/GPT > 70 U/L (FASGO 2025) */
+  if (sint.epigastralgia) {
+    r.signosSeveridad.push({ sistema: 'Hepático', desc: 'Epigastralgia / dolor en hipocondrio derecho' });
+  }
+  if (lab.got != null && !isNaN(lab.got) && lab.got > 70) {
+    r.signosSeveridad.push({ sistema: 'Hepático', desc: `GOT/AST ${lab.got} U/L — elevada al doble del límite superior (> 70 U/L)` });
+  }
+  if (lab.gpt != null && !isNaN(lab.gpt) && lab.gpt > 70) {
+    r.signosSeveridad.push({ sistema: 'Hepático', desc: `GPT/ALT ${lab.gpt} U/L — elevada al doble del límite superior (> 70 U/L)` });
+  }
+
+  /* Hematológico — trombocitopenia grave */
+  if (lab.plaquetas != null && !isNaN(lab.plaquetas) && lab.plaquetas < 100000) {
+    r.signosSeveridad.push({
+      sistema: 'Hematológico',
+      desc: `Plaquetas ${lab.plaquetas.toLocaleString('es-AR')}/mm³ — trombocitopenia grave (< 100.000/mm³)`,
+    });
+  }
+
+  /* ── 4. CLASIFICACIÓN FINAL ──────────────────────────────────────────────*/
+  const htaPresente = (pas >= 140 || pad >= 90);
+
+  if (htaPresente) {
+    if (r.signosSeveridad.length > 0) {
+      r.clasificacion = 'con_severidad';
+    } else if (r.proteinuriaSignificativa === true) {
+      r.clasificacion = 'sin_severidad';
+    } else if (r.proteinuriaSignificativa === null && lab.tirasReactivas) {
+      r.clasificacion = 'pendiente';
+    }
+  }
+
+  const descSignos = r.signosSeveridad
+    .map(s => `• [${s.sistema}] ${s.desc}`)
+    .join('\n');
+
+  if (r.clasificacion === 'con_severidad') {
+    r.alertCards.push({
+      level:   'critical',
+      titulo:  '🔴 Preeclampsia con signos de severidad',
+      cuerpo:  `${r.signosSeveridad.length} signo(s) de severidad detectado(s). Requiere internación, evaluación multidisciplinaria y decisión de finalización según EGA. (FASGO 2025)`,
+      detalle: descSignos || null,
+    });
+  } else if (r.clasificacion === 'sin_severidad') {
+    r.alertCards.push({
+      level:   'warn',
+      titulo:  '🟡 Preeclampsia sin signos de severidad',
+      cuerpo:  'PA ≥ 140/90 con proteinuria significativa confirmada. Sin signos de severidad al momento de la evaluación. Continuar monitoreo estrecho (control en 48–72h). (FASGO 2025)',
+      detalle: null,
+    });
+  } else if (r.clasificacion === 'pendiente') {
+    r.alertCards.push({
+      level:   'warn',
+      titulo:  '⏳ Confirmación de proteinuria pendiente',
+      cuerpo:  'HTA presente. Confirmar proteinuria con uRPC ≥ 30 mg/mmol o proteinuria en orina de 24h ≥ 300 mg/24h para clasificar definitivamente.',
+      detalle: null,
+    });
+  }
+
+  /* ── 5. NEUROPROTECCIÓN — MgSO4 ─────────────────────────────────────────
+   * FASGO 2025: indicado en PE con severidad, eclampsia o ante parto inminente.
+   * Monitoreo CLÍNICO mandatorio. NO solicitar magnesemia de rutina.          */
+  if (r.clasificacion === 'con_severidad' || sint.eclampsia) {
+    r.mgso4Indicado  = true;
+    r.mgso4Protocolo = {
+      ataque:        '4 g IV en 15–20 min (solución MgSO4 20% en 100 mL SF o agua dest.)',
+      mantenimiento: '1 g/h IV en infusión continua por 24 horas posparto',
+      monitoreo: [
+        'Reflejo patelar presente (si ausente → suspender infusión)',
+        'Diuresis ≥ 25 mL/hora',
+        'Frecuencia respiratoria ≥ 14 rpm',
+        'Estado del sensorio conservado',
+      ],
+      antidoto: 'Gluconato de calcio 1 g IV (10 mL de solución 10%) — disponible a pie de cama',
+      nota:     'NO solicitar magnesemia de rutina. El monitoreo es estrictamente clínico. (FASGO 2025 sec. 8.3)',
+    };
+    r.alertCards.push({
+      level:   'critical',
+      titulo:  '💊 Protocolo MgSO4 — Neuroprotección indicada',
+      cuerpo:  `Ataque: ${r.mgso4Protocolo.ataque}. Mantenimiento: ${r.mgso4Protocolo.mantenimiento}.`,
+      detalle: '__MGSO4_CHECKLIST__',
+    });
+  }
+
+  return r;
+}
+
 /* ── HEADER CLÍNICO STICKY — spec v4.0 ─────────────────────────────────────
  * Sincroniza nombre, edad, DNI, fórmula, EGA, FPP y riesgo PE en tiempo real. */
 function updateStickyHeader() {
