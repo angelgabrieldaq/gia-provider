@@ -156,6 +156,9 @@
           </div>
         </div>
 
+        <!-- FASGO 2025 DYNAMIC ALERTS — populated by guardarConsulta() / guardarLaboratorios() -->
+        <div id="fasgo-alert-area" class="fasgo-alert-area"></div>
+
         <!-- ALERTA ACTIVA -->
         <div class="strip" style="margin:10px 20px 0;border-radius:var(--r)" onclick="showModal()">
           <div class="sdot"></div>
@@ -375,7 +378,7 @@
           </div>
           <div class="fhead-r">
             <button class="btn-s" onclick="showPatient()">Cancelar</button>
-            <button class="btn-p" onclick="showModal()">Cerrar consulta</button>
+            <button class="btn-p" onclick="guardarConsulta()">Cerrar consulta</button>
           </div>
         </div>
         <div class="warn-note">
@@ -422,7 +425,7 @@
             </div>
             <div class="fld">
               <label class="flbl">Proteínas en orina</label>
-              <select class="fld-input"><option>Negativas</option><option>Trazas</option><option>1+</option><option selected>2+</option><option>3+</option></select>
+              <select class="fld-input" id="f-prot-select"><option>Negativas</option><option>Trazas</option><option>1+</option><option selected>2+</option><option>3+</option></select>
             </div>
             <div class="fld">
               <label class="flbl">Edemas</label>
@@ -432,10 +435,10 @@
           <div style="padding:0 16px 12px">
             <div class="flbl" style="margin-bottom:8px">Síntomas de alarma</div>
             <div class="chks">
-              <label class="chk"><input type="checkbox" checked/> Dolor de cabeza</label>
-              <label class="chk"><input type="checkbox"/> Destellos visuales</label>
-              <label class="chk"><input type="checkbox"/> Manchas en la visión</label>
-              <label class="chk"><input type="checkbox"/> Dolor en boca del estómago</label>
+              <label class="chk"><input type="checkbox" id="f-cefalea" checked/> Dolor de cabeza</label>
+              <label class="chk"><input type="checkbox" id="f-escotomas-dest"/> Destellos visuales</label>
+              <label class="chk"><input type="checkbox" id="f-escotomas-manch"/> Manchas en la visión</label>
+              <label class="chk"><input type="checkbox" id="f-epigastralgia"/> Dolor en boca del estómago</label>
               <label class="chk"><input type="checkbox"/> Zumbido en los oídos</label>
               <label class="chk"><input type="checkbox"/> Ninguno</label>
             </div>
@@ -1505,7 +1508,7 @@
           </div>
           <div class="fhead-r">
             <button class="btn-s" onclick="showPatient()">Volver a paciente</button>
-            <button class="btn-p">Guardar resultados</button>
+            <button class="btn-p" onclick="guardarLaboratorios()">Guardar resultados</button>
           </div>
         </div>
         <div class="labo-tabs">
@@ -1756,8 +1759,18 @@
                 <div class="fhint" id="lab3-hb-hint"></div>
               </div>
               <div class="fld">
+                <label class="flbl">Razón Prot/Creat urinaria (uRPC · mg/mmol)</label>
+                <input type="number" step="0.1" class="fld-input" id="lab3-urpc"
+                  data-alert-threshold="30"
+                  data-alert-direction="above"
+                  data-alert-level="critical"
+                  data-alert-message="🚨 uRPC ≥ 30 mg/mmol — proteinuria significativa confirmada. Criterio diagnóstico FASGO 2025."
+                  oninput="evalClinicalField(this)"/>
+                <div class="fhint" id="lab3-urpc-hint"></div>
+              </div>
+              <div class="fld">
                 <label class="flbl">Proteinuria (mg/24h)</label>
-                <input type="number" class="fld-input" id="lab3-prot"
+              <input type="number" class="fld-input" id="lab3-prot"
                   data-alert-threshold="300"
                   data-alert-direction="above"
                   data-alert-level="critical"
@@ -1902,6 +1915,110 @@ function savePatient() {
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('collapsed');
   showDash();
+}
+
+/* ── FASGO 2025 — LEER DATOS DISPONIBLES ─────────────────────────────────── */
+function _readFASGOData() {
+  const protSelect = document.getElementById('f-prot-select')?.value || '';
+  const tirasVals  = ['Trazas', '1+', '2+', '3+'];
+
+  const plt = parseFloat(document.getElementById('lab3-plt')?.value);
+
+  return {
+    pas: parseFloat(document.getElementById('f-s')?.value)    || 0,
+    pad: parseFloat(document.getElementById('f-d')?.value)    || 0,
+    sintomas: {
+      cefalea:       document.getElementById('f-cefalea')?.checked        || false,
+      escotomas:     (document.getElementById('f-escotomas-dest')?.checked ||
+                      document.getElementById('f-escotomas-manch')?.checked) || false,
+      epigastralgia: document.getElementById('f-epigastralgia')?.checked  || false,
+      eclampsia:     false,
+    },
+    lab: {
+      got:             _nullNum('lab3-ast'),
+      gpt:             _nullNum('lab3-alt'),
+      plaquetas:       isNaN(plt) ? null : plt * 1000,
+      uRPC:            _nullNum('lab3-urpc'),
+      proteinuria24h:  _nullNum('lab3-prot'),
+      tirasReactivas:  tirasVals.includes(protSelect),
+    },
+  };
+}
+
+function _nullNum(id) {
+  const v = parseFloat(document.getElementById(id)?.value);
+  return isNaN(v) ? null : v;
+}
+
+/* ── FASGO 2025 — CERRAR CONSULTA ────────────────────────────────────────── */
+function guardarConsulta() {
+  const data      = _readFASGOData();
+  const resultado = evaluarPreeclampsiaFASGO2025(data);
+  window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
+  console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
+  renderAlertCardsFASGO(resultado);
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.remove('collapsed');
+  showPatient();
+}
+
+/* ── FASGO 2025 — GUARDAR LABORATORIOS ──────────────────────────────────────*/
+function guardarLaboratorios() {
+  const data      = _readFASGOData();
+  const resultado = evaluarPreeclampsiaFASGO2025(data);
+  window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
+  console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));
+  renderAlertCardsFASGO(resultado);
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.remove('collapsed');
+  showPatient();
+}
+
+/* ── FASGO 2025 — RENDER ALERT CARDS ────────────────────────────────────────*/
+function renderAlertCardsFASGO(resultado) {
+  const area = document.getElementById('fasgo-alert-area');
+  if (!area) return;
+
+  if (!resultado || !resultado.alertCards || resultado.alertCards.length === 0) {
+    area.innerHTML = '';
+    return;
+  }
+
+  area.innerHTML = resultado.alertCards.map(card => {
+    const cls = card.level === 'critical' ? 'fac-critical' : 'fac-warn';
+
+    let detalleHtml = '';
+
+    if (card.detalle === '__MGSO4_CHECKLIST__' && resultado.mgso4Protocolo) {
+      const items = resultado.mgso4Protocolo.monitoreo
+        .map(m => `<label class="fac-check-item"><input type="checkbox"/> <span>${m}</span></label>`)
+        .join('');
+      detalleHtml = `
+        <div class="fac-detail">
+          <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px">
+            Checklist de monitoreo clínico obligatorio
+          </div>
+          <div class="fac-checklist">${items}</div>
+          <div style="font-size:11px;margin-top:6px;color:var(--txt3)">
+            Antídoto disponible: ${resultado.mgso4Protocolo.antidoto}
+          </div>
+          <div class="fac-nota">⚠ ${resultado.mgso4Protocolo.nota}</div>
+        </div>`;
+    } else if (card.detalle) {
+      const escaped = card.detalle
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      detalleHtml = `<div class="fac-detail">${escaped}</div>`;
+    }
+
+    return `
+      <div class="fac ${cls}">
+        <div class="fac-title">${card.titulo}</div>
+        <div class="fac-body">${card.cuerpo}</div>
+        ${detalleHtml}
+      </div>`;
+  }).join('');
 }
 </script>
 </body>
