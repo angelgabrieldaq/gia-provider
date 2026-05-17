@@ -17,9 +17,20 @@ function evalClinicalField(input) {
 
   let hint = document.getElementById(hintId);
   if (!hint) {
-    hint = document.createElement("div");
-    hint.id = hintId;
-    input.parentNode.appendChild(hint);
+    const sibling = input.nextElementSibling;
+    if (sibling && sibling.classList.contains("fhint")) {
+      hint = sibling;
+      hint.id = hintId;
+    } else {
+      hint = document.createElement("div");
+      hint.id = hintId;
+      const fld = input.closest(".fld");
+      if (fld) {
+        fld.appendChild(hint);
+      } else {
+        input.insertAdjacentElement("afterend", hint);
+      }
+    }
   }
 
   if (isNaN(val) || input.value === "") {
