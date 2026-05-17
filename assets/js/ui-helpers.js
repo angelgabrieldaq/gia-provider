@@ -99,9 +99,14 @@ function togVacDate(cb, dateId) {
   if (el) el.style.display = cb.checked ? "flex" : "none";
 }
 
-/* ── MAMOGRAFÍA — toggle estudio ─────────────────────────────────────────────*/
+/* ── PREVENTIVOS — toggle detalle de estudio ─────────────────────────────────*/
 function togMamEstudio(cb) {
-  const el = document.getElementById("mam-estudio-det");
+  const el = cb.closest(".prev-row").querySelector(".prev-detail");
+  if (el) el.style.display = cb.checked ? "block" : "none";
+}
+
+function togPapEstudio(cb) {
+  const el = cb.closest(".prev-row").querySelector(".prev-detail");
   if (el) el.style.display = cb.checked ? "block" : "none";
 }
 
