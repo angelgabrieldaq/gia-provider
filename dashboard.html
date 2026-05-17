@@ -50,7 +50,7 @@
 
     /* LAYOUT */
     .body{display:flex;flex:1;overflow:hidden}
-    .sidebar{width:220px;background:var(--bg);border-right:1px solid var(--brd2);display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar{width:220px;background:var(--bg);border-right:1px solid var(--brd2);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease,padding .2s ease,border .2s ease}
     .sb-head{padding:12px 14px 10px;border-bottom:1px solid var(--brd2);background:var(--bg2)}
     .sb-lbl{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
     .sb-search{width:100%;padding:8px 11px;border:1px solid var(--brd2);border-radius:var(--r);background:var(--bg);color:var(--txt);font-size:12px;outline:none;font-family:'DM Sans',sans-serif}
@@ -288,7 +288,7 @@
     .fm .rb-dot{background:var(--s-warn)}
 
     /* ── HEADER STICKY CLÍNICO — spec v4.0 ── */
-    .np-sticky-hd{position:sticky;top:86px;z-index:10;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;transition:border-color .2s,background .2s}
+    .np-sticky-hd{position:sticky;top:86px;z-index:10;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr auto;gap:16px;align-items:center;transition:border-color .2s,background .2s}
     .np-sticky-hd.rr-high{border-bottom-color:var(--s-err-m);background:var(--s-err-l)}
     .np-sticky-hd.rr-mod{border-bottom-color:var(--s-warn-m);background:var(--s-warn-l)}
     .np-sticky-hd.rr-low{border-bottom-color:var(--s-ok-m)}
@@ -1405,17 +1405,6 @@
 
       <!-- NUEVA PACIENTE -->
       <div class="screen" id="sc-nueva">
-        <div class="fhead">
-          <div>
-            <div class="ftitle">Nueva paciente</div>
-            <div class="fsub">Completá los datos para registrar una paciente en el sistema · Ficha perinatal CLAP/MINSAL</div>
-          </div>
-          <div class="fhead-r">
-            <button class="btn-s" onclick="showDash()">Cancelar</button>
-            <button class="btn-p" onclick="savePatient()">Guardar paciente</button>
-          </div>
-        </div>
-
         <!-- HEADER CLÍNICO STICKY — spec v4.0 -->
         <div class="np-sticky-hd rr-none" id="np-sticky-hd">
           <div class="nsh-id">
@@ -1441,6 +1430,10 @@
             <div class="nsh-risk-lbl">Riesgo PE</div>
             <div class="nsh-risk-val rr-none" id="nsh-risk-val">—</div>
             <div class="nsh-pills" id="nsh-pills"></div>
+          </div>
+          <div class="nsh-actions" style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn-s" onclick="showDash()">Cancelar</button>
+            <button class="btn-p" onclick="savePatient()">Guardar</button>
           </div>
         </div>
 
@@ -1890,8 +1883,6 @@
           <button class="btn-sec" id="np-btn-prev" onclick="goStep(currentStep - 1)" style="visibility:hidden">← Anterior</button>
           <button class="btn-prim" id="np-btn-next" onclick="goStep(currentStep + 1)">Siguiente →</button>
         </div>
-        <div style="height:20px"></div>
-
         <div style="height:20px"></div>
       </div>
 
