@@ -207,5 +207,5 @@ function goStep(n) {
       next.onclick = () => goStep(currentStep + 1);
     }
   }
-  document.getElementById("sc-nueva")?.scrollTo({ top: 0, behavior: "smooth" });
+  document.querySelector(".np-nueva-body")?.scrollTo({ top: 0, behavior: "smooth" });
 }

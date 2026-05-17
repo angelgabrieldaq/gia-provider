@@ -104,7 +104,10 @@
 
     /* MAIN */
     .main{flex:1;overflow-y:auto;background:var(--bg3)}
-    .screen{display:none}.screen.active{display:block}
+    .screen{display:none}
+    .screen.active{display:flex;flex-direction:column;height:100%}
+    #sc-nueva.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+    .np-nueva-body{flex:1;overflow-y:auto;background:var(--bg3)}
 
     /* DASHBOARD */
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 12px}
@@ -288,7 +291,7 @@
     .fm .rb-dot{background:var(--s-warn)}
 
     /* ── HEADER STICKY CLÍNICO — spec v4.0 ── */
-    .np-sticky-hd{position:sticky;top:86px;z-index:10;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr auto;gap:16px;align-items:center;transition:border-color .2s,background .2s}
+    .np-sticky-hd{position:relative;z-index:10;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 20px;display:grid;grid-template-columns:1fr auto 1fr auto;gap:16px;align-items:center;transition:border-color .2s,background .2s}
     .np-sticky-hd.rr-high{border-bottom-color:var(--s-err-m);background:var(--s-err-l)}
     .np-sticky-hd.rr-mod{border-bottom-color:var(--s-warn-m);background:var(--s-warn-l)}
     .np-sticky-hd.rr-low{border-bottom-color:var(--s-ok-m)}
@@ -1453,7 +1456,9 @@
           </div>
         </div>
 
-        <!-- FACTORES (hidden, needed for calcRisk() rendering) -->
+        <!-- CUERPO SCROLLEABLE -->
+        <div class="np-nueva-body">
+
         <div id="rb-factors" style="display:none"></div>
 
         <!-- PANEL 1 — Datos -->
@@ -1884,6 +1889,8 @@
           <button class="btn-prim" id="np-btn-next" onclick="goStep(currentStep + 1)">Siguiente →</button>
         </div>
         <div style="height:20px"></div>
+
+        </div><!-- /np-nueva-body -->
       </div>
 
       <!-- LABORATORIOS -->
