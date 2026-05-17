@@ -19,6 +19,8 @@ function showDash() {
   go("sc-dash");
   setBB([{ l: "Dashboard" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.classList.remove("collapsed");
 }
 
 function showPatient() {
@@ -49,6 +51,9 @@ function showNueva() {
   go("sc-nueva");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Nueva paciente" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.classList.add("collapsed");
+  goStep(1);
 }
 
 function showLaboratorios() {
@@ -174,19 +179,33 @@ function switchResumenChart(btn, id) {
   document.getElementById("rc-labo").style.display  = id === "labo" ? "block" : "none";
 }
 
-/* ── CONSULTA — validación TA ────────────────────────────────────────────────*/
-function chk() {
-  const s = +document.getElementById("f-s").value || 0;
-  const d = +document.getElementById("f-d").value || 0;
-  const si = document.getElementById("f-s"), di = document.getElementById("f-d");
-  const sh = document.getElementById("h-s"),  dh = document.getElementById("h-d");
+/* ── FORMULARIO EN PASOS — spec v4.0 ─────────────────────────────────────────*/
+let currentStep = 1;
+const TOTAL_STEPS = 4;
 
-  if (s >= 160)        { si.className = "fld-input ferr"; sh.className = "fhint err"; sh.textContent = "⚠ Valor muy elevado (≥160) — alerta crítica al guardar"; }
-  else if (s >= 140)   { si.className = "fld-input ferr"; sh.className = "fhint err"; sh.textContent = "⚠ Valor elevado (≥140) — alerta moderada al guardar"; }
-  else if (s < 60 || s > 220) { si.className = "fld-input ferr"; sh.className = "fhint err"; sh.textContent = "✗ Fuera de rango válido (60–220) — verificar medición"; }
-  else                 { si.className = "fld-input fok";  sh.className = "fhint ok";  sh.textContent = "✓ Dentro del rango normal"; }
-
-  if (d >= 110)        { di.className = "fld-input ferr"; dh.className = "fhint err"; dh.textContent = "⚠ Valor muy elevado (≥110) — alerta crítica al guardar"; }
-  else if (d >= 90)    { di.className = "fld-input ferr"; dh.className = "fhint err"; dh.textContent = "⚠ Valor elevado (≥90) — alerta moderada al guardar"; }
-  else                 { di.className = "fld-input fok";  dh.className = "fhint ok";  dh.textContent = "✓ Dentro del rango normal"; }
+function goStep(n) {
+  if (n < 1 || n > TOTAL_STEPS) return;
+  currentStep = n;
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const stepEl  = document.getElementById("np-step-"  + i);
+    const panelEl = document.getElementById("np-panel-" + i);
+    if (!stepEl || !panelEl) continue;
+    stepEl.classList.remove("active", "done");
+    panelEl.classList.remove("active");
+    if (i < n)  stepEl.classList.add("done");
+    if (i === n) { stepEl.classList.add("active"); panelEl.classList.add("active"); }
+  }
+  const prev = document.getElementById("np-btn-prev");
+  const next = document.getElementById("np-btn-next");
+  if (prev) prev.style.visibility = n === 1 ? "hidden" : "visible";
+  if (next) {
+    if (n === TOTAL_STEPS) {
+      next.textContent = "Guardar paciente";
+      next.onclick = () => savePatient();
+    } else {
+      next.textContent = "Siguiente →";
+      next.onclick = () => goStep(currentStep + 1);
+    }
+  }
+  document.getElementById("sc-nueva")?.scrollTo({ top: 0, behavior: "smooth" });
 }

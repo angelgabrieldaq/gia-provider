@@ -63,6 +63,7 @@ function calcEdad() {
   const cbEdad = document.getElementById("cb-edad35");
   if (cbEdad) { cbEdad.checked = (age >= 35); }
   calcRisk();
+  updateStickyHeader();
 }
 
 /* ── EGA POR FUM ─────────────────────────────────────────────────────────────*/
@@ -80,6 +81,7 @@ function calcEGA() {
   const pepStr = pep.toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
   h.className = "fhint ok";
   h.textContent = "EGA: " + sem + "+" + rem + " sem · Parto estimado (Naegele): " + pepStr;
+  updateStickyHeader();
 }
 
 /* ── EGA CORREGIDA POR ECO 1er TRIMESTRE ─────────────────────────────────────
@@ -204,6 +206,7 @@ function calcFormulaObstetrica() {
   }
 
   calcRisk();
+  updateStickyHeader();
 }
 
 /* ── CLASIFICACIÓN HTA — FASGO 2025 ─────────────────────────────────────────
@@ -333,19 +336,99 @@ function calcRisk() {
     sub = "Sin factores identificados";
   }
 
-  /* ACTUALIZAR PANEL HORIZONTAL */
-  const rbHd  = document.getElementById("rp-hd");
-  const rbVal = document.getElementById("rp-val");
+  /* ACTUALIZAR HEADER STICKY (spec v4.0) */
+  const stickyHd = document.getElementById("np-sticky-hd");
+  if (stickyHd) stickyHd.className = "np-sticky-hd " + cls;
+
+  /* Guardar factores en rb-factors (hidden) para que updateStickyHeader() los lea */
   const rbFac = document.getElementById("rb-factors");
-  if (rbHd)  rbHd.className  = "risk-bar " + cls;
-  if (rbVal) { rbVal.textContent = level; rbVal.className = "rb-val"; }
   if (rbFac) {
     if (factorsH.length === 0 && factorsM.length === 0) {
-      rbFac.innerHTML = `<span style="font-size:11px;color:var(--txt3)">Sin factores identificados</span>`;
+      rbFac.innerHTML = "";
     } else {
       rbFac.innerHTML =
-        factorsH.map(f => `<div class="rb-factor fh"><div class="rb-dot"></div>${f}</div>`).join("") +
-        factorsM.map(f => `<div class="rb-factor fm"><div class="rb-dot"></div>${f}</div>`).join("");
+        factorsH.map(f => `<div class="rb-factor fh">${f}</div>`).join("") +
+        factorsM.map(f => `<div class="rb-factor fm">${f}</div>`).join("");
     }
+  }
+
+  updateStickyHeader();
+}
+
+/* ── HEADER CLÍNICO STICKY — spec v4.0 ─────────────────────────────────────
+ * Sincroniza nombre, edad, DNI, fórmula, EGA, FPP y riesgo PE en tiempo real. */
+function updateStickyHeader() {
+  const hd = document.getElementById("np-sticky-hd");
+  if (!hd) return;
+
+  const nombre   = (document.getElementById("np-nombre")?.value || "").trim();
+  const apellido = (document.getElementById("np-apellido")?.value || "").trim();
+  const nameEl   = document.getElementById("nsh-name");
+  if (nameEl) {
+    if (nombre || apellido) {
+      nameEl.textContent = (apellido ? apellido + ", " : "") + nombre;
+      nameEl.style.color = "var(--txt)";
+    } else {
+      nameEl.textContent = "Nueva paciente";
+      nameEl.style.color = "var(--txt3)";
+    }
+  }
+
+  const fnac  = document.getElementById("np-fnac");
+  const ageEl = document.getElementById("nsh-edad");
+  if (fnac && fnac.value && ageEl) {
+    const d = new Date(fnac.value), now = new Date();
+    let age = now.getFullYear() - d.getFullYear();
+    if (now.getMonth() < d.getMonth() ||
+       (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
+    ageEl.textContent = age + " años";
+    ageEl.style.color = age >= 35 ? "var(--s-warn)" : "var(--txt2)";
+  } else if (ageEl) ageEl.textContent = "—";
+
+  const dniEl = document.getElementById("nsh-dni");
+  if (dniEl) dniEl.textContent = document.getElementById("np-dni")?.value || "—";
+
+  const g  = parseInt(document.getElementById("np-g")?.value)  || 1;
+  const pv = parseInt(document.getElementById("np-p")?.value)  || 0;
+  const av = parseInt(document.getElementById("np-a")?.value)  || 0;
+  const cv = parseInt(document.getElementById("np-c")?.value)  || 0;
+  const fmlEl = document.getElementById("nsh-formula");
+  if (fmlEl) fmlEl.textContent = "G"+g+" P"+pv+" A"+av+" C"+cv;
+
+  const fum   = document.getElementById("np-fum");
+  const egaEl = document.getElementById("nsh-ega");
+  const fppEl = document.getElementById("nsh-fpp");
+  if (fum && fum.value && egaEl && fppEl) {
+    const fumD = new Date(fum.value), hoy = new Date();
+    const dias = Math.floor((hoy - fumD) / 86400000);
+    if (dias >= 0 && dias <= 294) {
+      egaEl.textContent = Math.floor(dias/7) + "+" + (dias%7) + " sem";
+      const fpp = new Date(fumD); fpp.setDate(fpp.getDate() + 280);
+      fppEl.textContent = fpp.toLocaleDateString("es-AR", { day:"numeric", month:"short" });
+    }
+  } else {
+    if (egaEl) egaEl.textContent = "—";
+    if (fppEl) fppEl.textContent = "—";
+  }
+
+  const cls = hd.className.includes("rr-high") ? "rr-high"
+            : hd.className.includes("rr-mod")  ? "rr-mod"
+            : hd.className.includes("rr-low")  ? "rr-low"
+            : "rr-none";
+  const riskValEl = document.getElementById("nsh-risk-val");
+  if (riskValEl) {
+    const levelMap = { "rr-high":"Alto", "rr-mod":"Moderado", "rr-low":"Bajo", "rr-none":"—" };
+    riskValEl.textContent = levelMap[cls] || "—";
+    riskValEl.className   = "nsh-risk-val " + cls;
+  }
+
+  const pillsEl = document.getElementById("nsh-pills");
+  const rbFac   = document.getElementById("rb-factors");
+  if (pillsEl && rbFac) {
+    const items = rbFac.querySelectorAll(".rb-factor");
+    pillsEl.innerHTML = Array.from(items).slice(0, 3).map(el => {
+      const isPh = el.classList.contains("fh");
+      return `<div class="nsh-pill ${isPh?"ph":"pm"}">${el.textContent.trim()}</div>`;
+    }).join("");
   }
 }
