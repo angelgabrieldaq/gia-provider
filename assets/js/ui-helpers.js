@@ -81,12 +81,6 @@ function togTier(btn) {
   if (arrow) arrow.textContent = open ? "▲" : "▼";
 }
 
-function togNP(btn) {
-  const b = document.getElementById("tb-np");
-  b.classList.toggle("open");
-  btn.querySelector("span:last-child").textContent = b.classList.contains("open") ? "Colapsar ▲" : "Expandir ▼";
-}
-
 function togB(btn) {
   const b = document.getElementById("tb");
   b.classList.toggle("open");
