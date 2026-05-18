@@ -334,8 +334,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 #np-panel-4.active > .tier:first-child{margin-top:0}
 #np-panel-4.active .tier{margin-top:0}
 #np-panel-4.active .tier:first-child{border-radius:0;border-left:none;border-right:none;border-top:none}
-.np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:transparent;border-top:none;pointer-events:none}
-.np-step-nav button{pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--brd2);z-index:10}
 .np-step-nav .btn-sec{padding:8px 18px;border-radius:var(--r);border:1px solid var(--brd2);background:transparent;font-size:13px;color:var(--txt2);cursor:pointer;font-family:var(--font-sans)}
 .np-step-nav .btn-prim{padding:8px 18px;border-radius:var(--r);border:none;background:var(--p);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:var(--font-sans)}
 
