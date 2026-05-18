@@ -250,8 +250,9 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 
 /* ── NUEVA PACIENTE — RISK WIDGET ────────────────────────────────────────── */
 .risk-widget{display:grid;grid-template-columns:1fr 210px;gap:14px;align-items:start}
-.risk-chks{display:flex;flex-direction:column;gap:5px}
-.risk-sep{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:6px 0 2px}
+.risk-chks{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.risk-sep{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:6px 0 2px;grid-column:1/-1}
+.risk-sep:first-child{margin-top:0}
 .risk-result{border-radius:var(--r-lg);padding:14px 16px;border:1px solid var(--brd2);background:var(--bg2);transition:all .22s;position:sticky;top:12px}
 .risk-result.rr-high{background:var(--s-err-l);border-color:var(--s-err-m)}
 .risk-result.rr-mod{background:var(--s-warn-l);border-color:var(--s-warn-m)}
@@ -327,8 +328,10 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .nps-dot{width:6px;height:6px;border-radius:50%;background:var(--brd2);margin-top:2px}
 .np-step.done .nps-dot{background:var(--s-ok)}
 .np-step.active .nps-dot{background:var(--p)}
-.np-step-panel{display:none;padding:16px 20px 0}
-.np-step-panel.active{display:block}
+.np-step-panel{display:none;padding:0}
+.np-step-panel.active{display:block;padding:16px 20px 0}
+#np-panel-4.active{padding:0}
+#np-panel-4 .tier{margin-top:0;border-radius:0;border-left:none;border-right:none}
 .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid rgba(0,0,0,0.06)}
 .np-step-nav .btn-sec{padding:8px 18px;border-radius:var(--r);border:1px solid var(--brd2);background:transparent;font-size:13px;color:var(--txt2);cursor:pointer;font-family:var(--font-sans)}
 .np-step-nav .btn-prim{padding:8px 18px;border-radius:var(--r);border:none;background:var(--p);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:var(--font-sans)}
