@@ -314,7 +314,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .nsh-pill.pm{background:var(--s-warn-l);color:var(--s-warn);font-weight:600}
 
 /* ── BARRA DE PASOS (spec v4.0) ──────────────────────────────────────────── */
-.np-steps{display:flex;gap:0;border:1px solid var(--brd2);border-radius:var(--r-lg);overflow:hidden;margin:12px 20px;background:var(--bg);position:relative;z-index:20;flex-shrink:0}
+.np-steps{display:flex;gap:0;border:1px solid var(--brd2);border-radius:var(--r-lg);overflow:hidden;margin:12px 20px 0;background:var(--bg);position:relative;z-index:20;flex-shrink:0}
 .np-step{flex:1;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-right:1px solid var(--brd);transition:background .15s}
 .np-step:last-child{border-right:none}
 .np-step:hover{background:var(--bg2)}
