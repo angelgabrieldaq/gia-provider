@@ -418,3 +418,4 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .prev-row{display:flex;flex-direction:column;gap:4px;padding:5px 0}
 .prev-row-top{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--txt)}
 .prev-detail{margin-left:22px;padding:8px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--brd);display:none}
+
