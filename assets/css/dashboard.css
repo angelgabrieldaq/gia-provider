@@ -100,7 +100,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 #sc-laboratorios .fhead{flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--brd2)}
 #sc-laboratorios .labo-tabs{flex-shrink:0}
 #sc-laboratorios .labo-panel.active{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:40px}
-.np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3);padding-bottom:80px}
+.np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3);padding-bottom:60px}
 
 /* ── DASHBOARD ───────────────────────────────────────────────────────────── */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 12px}
@@ -329,9 +329,8 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .np-step.done .nps-dot{background:var(--s-ok)}
 .np-step.active .nps-dot{background:var(--p)}
 .np-step-panel{display:none}
-.np-step-panel.active{display:block}
-#np-panel-1.active,#np-panel-2.active,#np-panel-3.active{padding:16px 20px 0}
-#np-panel-4.active{overflow:hidden}
+.np-step-panel.active{display:block;padding:16px 20px 0}
+#np-panel-4.active{padding:0}
 #np-panel-4.active .tier{margin-top:0}
 #np-panel-4.active .tier:first-child{border-radius:0;border-left:none;border-right:none;border-top:none}
 .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid rgba(0,0,0,0.06)}
