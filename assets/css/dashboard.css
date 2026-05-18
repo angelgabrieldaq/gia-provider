@@ -164,11 +164,11 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .tier-pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
 .tp-a{background:var(--s-err-l);color:var(--s-err);border:1px solid var(--s-err-m)}
 .tp-b{background:var(--s-warn-l);color:var(--s-warn);border:1px solid var(--s-warn-m)}
-.tier-title{font-size:12px;font-weight:600;color:var(--txt)}
+.tier-title{font-size:12px;font-weight:600;color:var(--txt);line-height:1.4}
 .tier-note{margin-left:auto;font-size:11px;color:var(--txt3)}
 .fields{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fld{display:flex;flex-direction:column;gap:5px}
-.flbl{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px}
+.flbl{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px;line-height:1.4}
 .fhint{font-size:10px;color:var(--txt3)}
 .fhint.err{color:var(--s-err)}
 .fhint.ok{color:var(--s-ok)}
@@ -391,9 +391,15 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .cierre-opt.sel{background:var(--p-light);border-color:var(--p);color:var(--p-dark);font-weight:600}
 
 /* ── HÁBITOS Y PREVENTIVO ────────────────────────────────────────────────── */
-.hab-sub{padding:0 16px 10px}
+.hab-sub{padding:0 16px 14px}
+.hab-sub+.hab-sub{border-top:1px solid var(--brd)}
 .hab-sub-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:12px 0 8px;border-bottom:1px solid var(--brd);margin-bottom:8px}
+.tier-subsec{padding:0 16px 14px}
+.fields+.tier-subsec,.tier-subsec+.tier-subsec{border-top:1px solid var(--brd)}
+.tier-subsec-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:10px 0 8px}
+.vac-row label{font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px}
 .hab-row{display:flex;align-items:flex-start;gap:10px;padding:5px 0;font-size:12px;color:var(--txt)}
+.hab-row label{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--txt)}
 .hab-detail{margin:6px 0 2px 22px;padding:8px 12px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--brd);display:none}
 .vac-row{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12px;color:var(--txt);flex-wrap:wrap}
 .vac-date{display:none;align-items:center;gap:6px;margin-left:22px;flex-wrap:wrap}
