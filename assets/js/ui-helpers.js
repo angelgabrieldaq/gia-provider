@@ -6,7 +6,10 @@ function go(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   const contentPanel = document.querySelector(".main");
+  const panelBody    = document.querySelector(".np-nueva-body");
   if (contentPanel) contentPanel.scrollTop = 0;
+  if (panelBody)    panelBody.scrollTop    = 0;
+  window.scrollTo(0, 0);
 }
 
 function setBB(p) {
