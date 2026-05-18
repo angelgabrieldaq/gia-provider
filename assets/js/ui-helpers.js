@@ -211,5 +211,6 @@ function goStep(n) {
       next.onclick = () => goStep(currentStep + 1);
     }
   }
-  document.querySelector(".np-nueva-body")?.scrollTo({ top: 0, behavior: "smooth" });
+  const body = document.querySelector(".np-nueva-body");
+  if (body) body.scrollTop = 0;
 }
