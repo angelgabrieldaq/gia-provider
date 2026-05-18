@@ -329,7 +329,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .np-step.done .nps-dot{background:var(--s-ok)}
 .np-step.active .nps-dot{background:var(--p)}
 .np-step-panel{display:none}
-.np-step-panel.active{display:block;padding:0}
+.np-step-panel.active{display:block;padding:0;min-height:100%}
 .np-step-panel.active .tier{margin-top:0}
 .np-step-panel.active .tier:first-child{border-radius:0;border-left:none;border-right:none;border-top:none}
 .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--brd2);z-index:20}
