@@ -11,6 +11,21 @@ function parseLocalDate(v) {
   return new Date(yyyy, mm - 1, dd);
 }
 
+/* ── EDAD EN AÑOS — helper centralizado ──────────────────────────────────────
+ * Elimina el cálculo duplicado en calcEdad, calcRisk y updateStickyHeader.
+ * @param {string} dateStr  Valor de un <input type="date"> ("YYYY-MM-DD")
+ * @returns {number|null}   Edad en años completos, o null si dateStr está vacío.
+ */
+function getPatientAge(dateStr) {
+  if (!dateStr) return null;
+  const d   = parseLocalDate(dateStr);
+  const now = new Date();
+  let age   = now.getFullYear() - d.getFullYear();
+  if (now.getMonth() < d.getMonth() ||
+     (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
+  return age;
+}
+
 /* ── CAMPO CLÍNICO GENÉRICO ──────────────────────────────────────────────────
  * Lee SOLO desde data-attributes. NUNCA desde el id del campo.
  * Esto es mandatorio en un SaMD: si el id cambia, la alerta no puede morir
@@ -72,10 +87,8 @@ function calcEdad() {
   const v = document.getElementById("np-fnac").value;
   const h = document.getElementById("h-edad");
   if (!v) { h.textContent = ""; return; }
-  const d = parseLocalDate(v), t = new Date();
-  let age = t.getFullYear() - d.getFullYear();
-  if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) age--;
-  if (age < 12 || age > 55) {
+  const age = getPatientAge(v);
+  if (age === null || age < 12 || age > 55) {
     h.className = "fhint err"; h.textContent = "✗ Verificar fecha"; return;
   }
   h.className = "fhint ok"; h.textContent = age + " años";
@@ -281,11 +294,8 @@ function calcRisk() {
   /* FUENTE 1: EDAD — ≥35 años → moderado (ISSHP 2018) */
   const fnac = document.getElementById("np-fnac");
   if (fnac && fnac.value) {
-    const d = parseLocalDate(fnac.value), now = new Date();
-    let age = now.getFullYear() - d.getFullYear();
-    if (now.getMonth() < d.getMonth() ||
-       (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
-    if (age >= 35) factorsM.push("Edad materna ≥ 35 años (" + age + " años)");
+    const age = getPatientAge(fnac.value);
+    if (age !== null && age >= 35) factorsM.push("Edad materna ≥ 35 años (" + age + " años)");
   }
 
   /* FUENTE 2: IMC — ≥30 → obesidad pregestacional → moderado (ISSHP 2018) */
@@ -577,11 +587,8 @@ function updateStickyHeader() {
   const fnac  = document.getElementById("np-fnac");
   const ageEl = document.getElementById("nsh-edad");
   if (fnac && fnac.value && ageEl) {
-    const d = parseLocalDate(fnac.value), now = new Date();
-    let age = now.getFullYear() - d.getFullYear();
-    if (now.getMonth() < d.getMonth() ||
-       (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
-    ageEl.textContent = age + " años";
+    const age = getPatientAge(fnac.value);
+    ageEl.textContent = age !== null ? age + " años" : "—";
     ageEl.style.color = age >= 35 ? "var(--s-warn)" : "var(--txt2)";
   } else if (ageEl) ageEl.textContent = "—";
 

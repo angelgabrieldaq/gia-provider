@@ -157,7 +157,17 @@
         </div>
 
         <!-- FASGO 2025 DYNAMIC ALERTS — populated by guardarConsulta() / guardarLaboratorios() -->
-        <div id="fasgo-alert-area" class="fasgo-alert-area"></div>
+        <div id="fasgo-alert-area" class="fasgo-alert-area" role="region" aria-label="Alertas clínicas FASGO 2025" aria-live="polite"></div>
+
+        <!-- BANNER PROTEINURIA PENDIENTE — visible solo cuando clasificacion === 'pendiente' -->
+        <div id="pendiente-banner" class="pendiente-banner" style="display:none" role="alert">
+          <span class="pb-ico">⏳</span>
+          <div class="pb-body">
+            <div class="pb-title">Confirmación de proteinuria pendiente</div>
+            <div class="pb-sub">HTA presente. Solicitar uRPC ≥ 30 mg/mmol o proteinuria 24h antes de próxima consulta para clasificar definitivamente.</div>
+          </div>
+          <button class="pb-btn" onclick="showLaboratorios()">Cargar labs →</button>
+        </div>
 
         <!-- ALERTA ACTIVA -->
         <div class="strip" style="margin:10px 20px 0;border-radius:var(--r)" onclick="showModal()">
@@ -377,7 +387,7 @@
             <div class="fsub">34 sem + 2 días · Riesgo alto · Borrador guardado automáticamente</div>
           </div>
           <div class="fhead-r">
-            <button class="btn-s" onclick="clearAllForms(); showPatient()">Cancelar</button>
+            <button class="btn-s" onclick="cancelConsulta()">Cancelar</button>
             <button class="btn-p" onclick="guardarConsulta()">Cerrar consulta</button>
           </div>
         </div>
@@ -396,6 +406,7 @@
             <div class="fld">
               <label class="flbl">Presión sistólica (mmHg)</label>
               <input type="number" class="fld-input" id="f-s" min="60" max="220"
+                aria-label="Presión sistólica en milímetros de mercurio" aria-required="true"
                 data-alert-threshold="140"
                 data-alert-direction="above"
                 data-alert-level="danger"
@@ -406,6 +417,7 @@
             <div class="fld">
               <label class="flbl">Presión diastólica (mmHg)</label>
               <input type="number" class="fld-input" id="f-d" min="40" max="140"
+                aria-label="Presión diastólica en milímetros de mercurio" aria-required="true"
                 data-alert-threshold="90"
                 data-alert-direction="above"
                 data-alert-level="danger"
@@ -1048,7 +1060,7 @@
             <div class="nsh-pills" id="nsh-pills"></div>
           </div>
           <div class="nsh-actions" style="display:flex;gap:6px;flex-shrink:0">
-            <button class="btn-s" onclick="clearAllForms(); showDash()">Cancelar</button>
+            <button class="btn-s" onclick="cancelNueva()">Cancelar</button>
             <button class="btn-p" onclick="savePatient()">Guardar</button>
           </div>
         </div>
@@ -1942,6 +1954,7 @@ function savePatient() {
   if (!window.giaPatients) window.giaPatients = [];
   window.giaPatients.push(payload);
 
+  clearDraft('sc-nueva');
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('collapsed');
   showDash();
@@ -1960,8 +1973,8 @@ function _readFASGOData(source) {
   const plaquetas = pltRaw != null ? pltRaw * 1000 : null;
 
   return {
-    pas: fromLaboratorio ? null : (parseFloat(document.getElementById('f-s')?.value) || 0),
-    pad: fromLaboratorio ? null : (parseFloat(document.getElementById('f-d')?.value) || 0),
+    pas: fromLaboratorio ? null : (parseFloat(document.getElementById('f-s')?.value) || null),
+    pad: fromLaboratorio ? null : (parseFloat(document.getElementById('f-d')?.value) || null),
     sintomas: fromLaboratorio ? null : {
       cefalea:       document.getElementById('f-cefalea')?.checked        || false,
       escotomas:     (document.getElementById('f-escotomas-dest')?.checked ||
@@ -1989,36 +2002,58 @@ function _nullNum(id) {
 
 /* ── FASGO 2025 — CERRAR CONSULTA ────────────────────────────────────────── */
 function guardarConsulta() {
-  const data      = _readFASGOData('consulta');
-  const resultado = evaluarPreeclampsiaFASGO2025(data);
-  window.giaLastConsulta = {
-    ...data,
-    fasgoResult: resultado,
-    savedAt:     new Date().toISOString(),
-    _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
-  };
-  console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
-  renderAlertCardsFASGO(resultado);
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar) sidebar.classList.remove('collapsed');
-  showPatient();
+  /* Validación: PA sistólica y diastólica son obligatorias para cerrar */
+  const sEl = document.getElementById('f-s');
+  const dEl = document.getElementById('f-d');
+  if (!sEl?.value || !dEl?.value) {
+    [sEl, dEl].forEach(el => { if (el && !el.value) el.classList.add('ferr'); });
+    _showToast('Ingresar PA sistólica y diastólica antes de cerrar');
+    sEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  try {
+    const data      = _readFASGOData('consulta');
+    const resultado = evaluarPreeclampsiaFASGO2025(data);
+    window.giaLastConsulta = {
+      ...data,
+      fasgoResult: resultado,
+      savedAt:     new Date().toISOString(),
+      _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
+    };
+    console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
+    renderAlertCardsFASGO(resultado);
+    clearDraft('sc-form');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('collapsed');
+    showPatient();
+  } catch (err) {
+    console.error('[Gia] Error al cerrar consulta:', err);
+    _showToast('Error al evaluar — datos guardados localmente. Contactar soporte.');
+  }
 }
 
 /* ── FASGO 2025 — GUARDAR LABORATORIOS ──────────────────────────────────────*/
 function guardarLaboratorios() {
-  const data      = _readFASGOData('laboratorios');
-  const resultado = evaluarPreeclampsiaFASGO2025(data);
-  window.giaLastConsulta = {
-    ...data,
-    fasgoResult: resultado,
-    savedAt:     new Date().toISOString(),
-    _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
-  };
-  console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));
-  renderAlertCardsFASGO(resultado);
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar) sidebar.classList.remove('collapsed');
-  showPatient();
+  try {
+    const data      = _readFASGOData('laboratorios');
+    const resultado = evaluarPreeclampsiaFASGO2025(data);
+    window.giaLastConsulta = {
+      ...data,
+      fasgoResult: resultado,
+      savedAt:     new Date().toISOString(),
+      _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
+    };
+    console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));
+    renderAlertCardsFASGO(resultado);
+    clearDraft('sc-laboratorios');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('collapsed');
+    showPatient();
+  } catch (err) {
+    console.error('[Gia] Error al guardar laboratorios:', err);
+    _showToast('Error al evaluar — datos guardados localmente. Contactar soporte.');
+  }
 }
 
 /* ── FASGO 2025 — RENDER ALERT CARDS ────────────────────────────────────────*/
@@ -2026,46 +2061,75 @@ function renderAlertCardsFASGO(resultado) {
   const area = document.getElementById('fasgo-alert-area');
   if (!area) return;
 
-  if (!resultado || !resultado.alertCards || resultado.alertCards.length === 0) {
-    area.innerHTML = '';
-    return;
-  }
+  /* Banner pendiente */
+  const banner = document.getElementById('pendiente-banner');
+  if (banner) banner.style.display = resultado?.clasificacion === 'pendiente' ? 'flex' : 'none';
 
-  area.innerHTML = resultado.alertCards.map(card => {
-    const cls = card.level === 'critical' ? 'fac-critical' : 'fac-warn';
+  area.innerHTML = '';
+  if (!resultado?.alertCards?.length) return;
 
-    let detalleHtml = '';
+  resultado.alertCards.forEach(card => {
+    const isCritical = card.level === 'critical';
+    const div = document.createElement('div');
+    div.className = 'fac ' + (isCritical ? 'fac-critical' : 'fac-warn');
+    if (isCritical) div.setAttribute('role', 'alert');
+
+    const title = document.createElement('div');
+    title.className   = 'fac-title';
+    title.textContent = card.titulo;
+    div.appendChild(title);
+
+    const body = document.createElement('div');
+    body.className   = 'fac-body';
+    body.textContent = card.cuerpo;
+    div.appendChild(body);
 
     if (card.detalle === '__MGSO4_CHECKLIST__' && resultado.mgso4Protocolo) {
-      const items = resultado.mgso4Protocolo.monitoreo
-        .map(m => `<label class="fac-check-item"><input type="checkbox"/> <span>${m}</span></label>`)
-        .join('');
-      detalleHtml = `
-        <div class="fac-detail">
-          <div style="font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px">
-            Checklist de monitoreo clínico obligatorio
-          </div>
-          <div class="fac-checklist">${items}</div>
-          <div style="font-size:11px;margin-top:6px;color:var(--txt3)">
-            Antídoto disponible: ${resultado.mgso4Protocolo.antidoto}
-          </div>
-          <div class="fac-nota">⚠ ${resultado.mgso4Protocolo.nota}</div>
-        </div>`;
+      const detail  = document.createElement('div');
+      detail.className = 'fac-detail';
+
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px';
+      hdr.textContent = 'Checklist de monitoreo clínico obligatorio';
+      detail.appendChild(hdr);
+
+      const list = document.createElement('div');
+      list.className = 'fac-checklist';
+      resultado.mgso4Protocolo.monitoreo.forEach(m => {
+        const lbl  = document.createElement('label');
+        lbl.className = 'fac-check-item';
+        const cb   = document.createElement('input');
+        cb.type    = 'checkbox';
+        cb.setAttribute('aria-label', m);
+        const span = document.createElement('span');
+        span.textContent = m;
+        lbl.appendChild(cb);
+        lbl.appendChild(span);
+        list.appendChild(lbl);
+      });
+      detail.appendChild(list);
+
+      const ant = document.createElement('div');
+      ant.style.cssText = 'font-size:11px;margin-top:6px;color:var(--txt3)';
+      ant.textContent = 'Antídoto disponible: ' + resultado.mgso4Protocolo.antidoto;
+      detail.appendChild(ant);
+
+      const nota = document.createElement('div');
+      nota.className   = 'fac-nota';
+      nota.textContent = '⚠ ' + resultado.mgso4Protocolo.nota;
+      detail.appendChild(nota);
+
+      div.appendChild(detail);
+
     } else if (card.detalle) {
-      const escaped = card.detalle
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      detalleHtml = `<div class="fac-detail">${escaped}</div>`;
+      const detail = document.createElement('div');
+      detail.className   = 'fac-detail';
+      detail.textContent = card.detalle;
+      div.appendChild(detail);
     }
 
-    return `
-      <div class="fac ${cls}">
-        <div class="fac-title">${card.titulo}</div>
-        <div class="fac-body">${card.cuerpo}</div>
-        ${detalleHtml}
-      </div>`;
-  }).join('');
+    area.appendChild(div);
+  });
 }
 </script>
 </body>
