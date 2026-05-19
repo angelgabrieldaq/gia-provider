@@ -420,8 +420,13 @@
             </div>
             <div class="fld">
               <label class="flbl">Frecuencia cardíaca fetal (lpm)</label>
-              <input type="number" class="fld-input"/>
-              <div class="fhint ok">Normal (rango 100–180 lpm)</div>
+              <input type="number" class="fld-input" id="f-fcf" min="60" max="220"
+                data-alert-threshold="110"
+                data-alert-direction="below"
+                data-alert-level="danger"
+                data-alert-message="⚠ Bradicardia fetal (&lt;110 lpm). Evaluar vitalidad fetal de inmediato."
+                onchange="evalClinicalField(this)"/>
+              <div class="fhint" id="f-fcf-hint"></div>
             </div>
             <div class="fld">
               <label class="flbl">Proteínas en orina</label>
@@ -1256,33 +1261,33 @@
 
                 <!-- 1. Antecedentes personales -->
                 <div class="risk-sep">1 · Antecedentes personales</div>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Diabetes pregestacional (tipo 1 o 2)</label>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Enfermedad renal crónica</label>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Síndrome antifosfolípido (SAF)</label>
-                <label class="chk" data-w="m"><input type="checkbox" id="cb-obesidad" onchange="calcRisk()"/> Obesidad pregestacional (IMC ≥ 30)</label>
+                <label class="chk" data-w="h"><input type="checkbox" value="diabetes_pregestacional" onchange="calcRisk()"/> Diabetes pregestacional (tipo 1 o 2)</label>
+                <label class="chk" data-w="h"><input type="checkbox" value="enfermedad_renal_cronica" onchange="calcRisk()"/> Enfermedad renal crónica</label>
+                <label class="chk" data-w="h"><input type="checkbox" value="saf" onchange="calcRisk()"/> Síndrome antifosfolípido (SAF)</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="obesidad_pregestacional" id="cb-obesidad" onchange="calcRisk()"/> Obesidad pregestacional (IMC ≥ 30)</label>
 
                 <!-- 2. Antecedentes obstétricos -->
                 <div class="risk-sep" style="margin-top:6px">2 · Antecedentes obstétricos</div>
-                <label class="chk" data-w="h"><input type="checkbox" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
-                <label class="chk" data-w="m"><input type="checkbox" id="cb-perdidas" onchange="calcRisk()"/> Pérdidas gestacionales recurrentes ≥ 3</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Antecedente familiar de preeclampsia</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Intervalo intergenésico &gt; 10 años</label>
+                <label class="chk" data-w="h"><input type="checkbox" value="preeclampsia_anterior" onchange="calcRisk()"/> Preeclampsia en embarazo anterior</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="perdidas_recurrentes" id="cb-perdidas" onchange="calcRisk()"/> Pérdidas gestacionales recurrentes ≥ 3</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="antecedente_familiar_preeclampsia" onchange="calcRisk()"/> Antecedente familiar de preeclampsia</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="intervalo_intergenesico_largo" onchange="calcRisk()"/> Intervalo intergenésico &gt; 10 años</label>
 
                 <!-- 3. Condición actual del embarazo -->
                 <div class="risk-sep" style="margin-top:6px">3 · Condición actual del embarazo</div>
-                <label class="chk" data-w="m"><input type="checkbox" id="cb-primigesta" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Embarazo múltiple</label>
-                <label class="chk" data-w="m"><input type="checkbox" id="cb-edad35" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="primigesta" id="cb-primigesta" onchange="calcRisk()"/> Primigesta (primer embarazo)</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="embarazo_multiple" onchange="calcRisk()"/> Embarazo múltiple</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="edad_materna_35" id="cb-edad35" onchange="calcRisk()"/> Edad materna ≥ 35 años</label>
 
                 <!-- 4. Condición socioeconómica -->
                 <div class="risk-sep" style="margin-top:6px">4 · Condición socioeconómica</div>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Nivel socioeconómico bajo</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Sin acceso a red de apoyo</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="nivel_socioeconomico_bajo" onchange="calcRisk()"/> Nivel socioeconómico bajo</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="sin_red_de_apoyo" onchange="calcRisk()"/> Sin acceso a red de apoyo</label>
 
                 <!-- 5. Otros factores de riesgo -->
                 <div class="risk-sep" style="margin-top:6px">5 · Otros factores relevantes</div>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Tabaquismo activo</label>
-                <label class="chk" data-w="m"><input type="checkbox" onchange="calcRisk()"/> Exposición a violencia / estrés severo</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="tabaquismo_activo" onchange="calcRisk()"/> Tabaquismo activo</label>
+                <label class="chk" data-w="m"><input type="checkbox" value="violencia_estres_severo" onchange="calcRisk()"/> Exposición a violencia / estrés severo</label>
               </div>
             </div>
           </div>
@@ -1877,7 +1882,7 @@ function savePatient() {
     factoresRiesgo: Array.from(
       document.querySelectorAll('#sc-nueva [data-w] input:checked')
     ).map(cb => ({
-      label:  cb.closest('label')?.textContent?.trim() || '',
+      code:   cb.value || '',
       weight: cb.closest('[data-w]')?.dataset?.w || 'm',
     })),
     habitos: {
@@ -1923,29 +1928,31 @@ function savePatient() {
 }
 
 /* ── FASGO 2025 — LEER DATOS DISPONIBLES ─────────────────────────────────── */
-function _readFASGOData() {
+function _readFASGOData(source) {
+  const fromConsulta    = source === 'consulta';
+  const fromLaboratorio = source === 'laboratorios';
+
   const protSelect = document.getElementById('f-prot-select')?.value || '';
   const tirasVals  = ['Trazas', '1+', '2+', '3+'];
-
   const plt = parseFloat(document.getElementById('lab3-plt')?.value);
 
   return {
-    pas: parseFloat(document.getElementById('f-s')?.value)    || 0,
-    pad: parseFloat(document.getElementById('f-d')?.value)    || 0,
-    sintomas: {
+    pas: fromLaboratorio ? null : (parseFloat(document.getElementById('f-s')?.value) || 0),
+    pad: fromLaboratorio ? null : (parseFloat(document.getElementById('f-d')?.value) || 0),
+    sintomas: fromLaboratorio ? null : {
       cefalea:       document.getElementById('f-cefalea')?.checked        || false,
       escotomas:     (document.getElementById('f-escotomas-dest')?.checked ||
                       document.getElementById('f-escotomas-manch')?.checked) || false,
       epigastralgia: document.getElementById('f-epigastralgia')?.checked  || false,
-      eclampsia:     document.getElementById('f-eclampsia')?.checked  || false,
+      eclampsia:     document.getElementById('f-eclampsia')?.checked      || false,
     },
-    lab: {
-      got:             _nullNum('lab3-ast'),
-      gpt:             _nullNum('lab3-alt'),
-      plaquetas:       isNaN(plt) ? null : plt * 1000,
-      uRPC:            _nullNum('lab3-urpc'),
-      proteinuria24h:  _nullNum('lab3-prot'),
-      tirasReactivas:  tirasVals.includes(protSelect),
+    lab: fromConsulta ? null : {
+      got:            _nullNum('lab3-ast'),
+      gpt:            _nullNum('lab3-alt'),
+      plaquetas:      isNaN(plt) ? null : plt * 1000,
+      uRPC:           _nullNum('lab3-urpc'),
+      proteinuria24h: _nullNum('lab3-prot'),
+      tirasReactivas: tirasVals.includes(protSelect),
     },
   };
 }
@@ -1957,7 +1964,7 @@ function _nullNum(id) {
 
 /* ── FASGO 2025 — CERRAR CONSULTA ────────────────────────────────────────── */
 function guardarConsulta() {
-  const data      = _readFASGOData();
+  const data      = _readFASGOData('consulta');
   const resultado = evaluarPreeclampsiaFASGO2025(data);
   window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
   console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
@@ -1969,7 +1976,7 @@ function guardarConsulta() {
 
 /* ── FASGO 2025 — GUARDAR LABORATORIOS ──────────────────────────────────────*/
 function guardarLaboratorios() {
-  const data      = _readFASGOData();
+  const data      = _readFASGOData('laboratorios');
   const resultado = evaluarPreeclampsiaFASGO2025(data);
   window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
   console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));

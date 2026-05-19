@@ -1,6 +1,19 @@
 /* ui-helpers.js — Gia · Módulo Obstétrico Inteligente
  * Navegación, breadcrumb y helpers de UI. Sin lógica clínica. */
 
+/* ── STATE RESET — previene contaminación entre sesiones ─────────────────────*/
+function clearAllForms() {
+  document.querySelectorAll(".main input, .main select, .main textarea").forEach(el => {
+    if (el.type === "checkbox" || el.type === "radio") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+    el.classList.remove("fok", "ferr");
+  });
+  document.querySelectorAll(".main .fhint").forEach(h => { h.textContent = ""; h.className = "fhint"; });
+}
+
 /* ── NAVEGACIÓN ──────────────────────────────────────────────────────────────*/
 function go(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -36,6 +49,7 @@ function showPatient() {
 }
 
 function showForm() {
+  clearAllForms();
   go("sc-form");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Nueva consulta" }]);
 }
@@ -53,6 +67,7 @@ function showHistory() {
 }
 
 function showNueva() {
+  clearAllForms();
   go("sc-nueva");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Nueva paciente" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
@@ -62,6 +77,7 @@ function showNueva() {
 }
 
 function showLaboratorios() {
+  clearAllForms();
   go("sc-laboratorios");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Laboratorios" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
