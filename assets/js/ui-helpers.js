@@ -184,7 +184,7 @@ function showModal() {
 
 function showHistory() {
   go("sc-history");
-  setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Historial clínico" }]);
+  setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Evolutivo Longitudinal" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
   document.getElementById("si-l").classList.add("active");
 }
@@ -298,10 +298,12 @@ function filterHist(btn, f) {
 
 /* ── CHARTS ──────────────────────────────────────────────────────────────────*/
 function switchChart(btn, id) {
-  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  const container = btn.closest('.hcharts');
+  container.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
-  document.getElementById("hc-bp").style.display    = id === "bp"   ? "block" : "none";
-  document.getElementById("hc-peso").style.display  = id === "peso" ? "block" : "none";
+  container.querySelectorAll(".hchart-wrap").forEach(p => p.style.display = "none");
+  const target = container.querySelector('[data-chart="' + id + '"]');
+  if (target) target.style.display = "block";
 }
 
 /* ── MODAL / CONSULTA ────────────────────────────────────────────────────────*/
@@ -331,11 +333,12 @@ function togCierre(label) {
 }
 
 function switchResumenChart(btn, id) {
-  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  const container = btn.closest('.hcharts');
+  container.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
-  document.getElementById("rc-bp").style.display    = id === "bp"   ? "block" : "none";
-  document.getElementById("rc-peso").style.display  = id === "peso" ? "block" : "none";
-  document.getElementById("rc-labo").style.display  = id === "labo" ? "block" : "none";
+  container.querySelectorAll(".hchart-wrap").forEach(p => p.style.display = "none");
+  const target = container.querySelector('[data-chart="' + id + '"]');
+  if (target) target.style.display = "block";
 }
 
 /* ── FORMULARIO EN PASOS — spec v4.0 ─────────────────────────────────────────*/
@@ -368,4 +371,18 @@ function goStep(n) {
   }
   const body = document.querySelector(".np-nueva-body");
   if (body) body.scrollTop = 0;
+}
+
+/* ── EVOLUTIVO LONGITUDINAL — robustez gráficos dinámicos ───────────────────
+ * Llama desde renderEvolutivoCharts() antes de calcular pendientes.
+ * Muestra estado vacío si n < 2 para evitar división por cero (NaN/Infinity). */
+function _checkEvolutivoMinRecords(containerId, n) {
+  const wrap  = document.getElementById(containerId);
+  if (!wrap) return false;
+  const empty = wrap.querySelector('.hchart-empty');
+  const chart = wrap.querySelector('svg');
+  const ok    = n >= 2;
+  if (empty) empty.style.display = ok ? 'none' : 'flex';
+  if (chart) chart.style.display = ok ? 'block' : 'none';
+  return ok;
 }
