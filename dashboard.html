@@ -377,7 +377,7 @@
             <div class="fsub">34 sem + 2 días · Riesgo alto · Borrador guardado automáticamente</div>
           </div>
           <div class="fhead-r">
-            <button class="btn-s" onclick="clearAllForms(); showPatient()">Cancelar</button>
+            <button class="btn-s" onclick="cancelConsulta()">Cancelar</button>
             <button class="btn-p" onclick="guardarConsulta()">Cerrar consulta</button>
           </div>
         </div>
@@ -1048,7 +1048,7 @@
             <div class="nsh-pills" id="nsh-pills"></div>
           </div>
           <div class="nsh-actions" style="display:flex;gap:6px;flex-shrink:0">
-            <button class="btn-s" onclick="clearAllForms(); showDash()">Cancelar</button>
+            <button class="btn-s" onclick="cancelNueva()">Cancelar</button>
             <button class="btn-p" onclick="savePatient()">Guardar</button>
           </div>
         </div>
@@ -1943,6 +1943,7 @@ function savePatient() {
   if (!window.giaPatients) window.giaPatients = [];
   window.giaPatients.push(payload);
 
+  clearDraft('sc-nueva');
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('collapsed');
   showDash();
@@ -2000,6 +2001,7 @@ function guardarConsulta() {
   };
   console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
   renderAlertCardsFASGO(resultado);
+  clearDraft('sc-form');
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('collapsed');
   showPatient();
@@ -2017,6 +2019,7 @@ function guardarLaboratorios() {
   };
   console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));
   renderAlertCardsFASGO(resultado);
+  clearDraft('sc-laboratorios');
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('collapsed');
   showPatient();

@@ -14,6 +14,127 @@ function clearAllForms() {
   document.querySelectorAll(".main .fhint").forEach(h => { h.textContent = ""; h.className = "fhint"; });
 }
 
+/* ── AUTOSAVE DRAFT — LocalStorage anti-interrupciones ──────────────────────
+ * Guarda el estado del formulario activo en cada input/change.
+ * Nota de seguridad: LocalStorage no está cifrado. En Sprint 2, el backend
+ * reemplaza este mecanismo y se elimina el draft de LS al iniciar sesión.
+ */
+const _DRAFT_KEYS = {
+  'sc-nueva':        'gia_draft_nueva',
+  'sc-form':         'gia_draft_consulta',
+  'sc-laboratorios': 'gia_draft_labs',
+};
+
+function _activeDraftKey() {
+  const active = document.querySelector('.screen.active');
+  return active ? (_DRAFT_KEYS[active.id] || null) : null;
+}
+
+function saveDraft() {
+  const key    = _activeDraftKey();
+  if (!key) return;
+  const screen = document.querySelector('.screen.active');
+  const data   = {};
+  screen.querySelectorAll('input[id], select[id], textarea[id]').forEach(el => {
+    data[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+  });
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch (_) {}
+}
+
+function clearDraft(screenId) {
+  const key = _DRAFT_KEYS[screenId];
+  if (key) localStorage.removeItem(key);
+}
+
+function _restoreAndNotify(screenId) {
+  const key = _DRAFT_KEYS[screenId];
+  if (!key) return;
+  const raw = localStorage.getItem(key);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    if (!Object.keys(data).length) return;
+    let restored = 0;
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox' || el.type === 'radio') { el.checked = val; }
+      else { el.value = val; }
+      restored++;
+    });
+    if (restored > 0) _showToast('Borrador recuperado');
+  } catch (_) {}
+}
+
+/* Programmatic assignment (el.value = '') no dispara input/change en el spec
+ * HTML5 — saveDraft() nunca se invoca durante clearAllForms() ni durante
+ * _restoreAndNotify(). Este listener es seguro sin flags adicionales. */
+document.addEventListener('input',  saveDraft, { passive: true });
+document.addEventListener('change', saveDraft, { passive: true });
+
+/* ── CANCEL WRAPPERS — limpian draft además de navegar ───────────────────────*/
+function cancelNueva()    { clearAllForms(); clearDraft('sc-nueva');        showDash();    }
+function cancelConsulta() { clearAllForms(); clearDraft('sc-form');         showPatient(); }
+function cancelLaboratorios() { clearAllForms(); clearDraft('sc-laboratorios'); showPatient(); }
+
+/* ── TOAST VISUAL ────────────────────────────────────────────────────────────*/
+function _showToast(msg) {
+  let t = document.getElementById('gia-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id        = 'gia-toast';
+    t.className = 'gia-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.remove('show');
+  /* doble rAF garantiza que el browser procese el remove antes del add */
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    t.classList.add('show');
+    clearTimeout(t._hideTimer);
+    t._hideTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }));
+}
+
+/* ── AUTO-FOCUS — primer campo visible del formulario ────────────────────────*/
+function _autoFocusFirst(screenId) {
+  /* setTimeout(60): espera a que go() + goStep() terminen de actualizar el DOM */
+  setTimeout(() => {
+    const screen = document.getElementById(screenId);
+    if (!screen) return;
+    const first = screen.querySelector(
+      'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([disabled]), select:not([disabled])'
+    );
+    if (first && first.offsetParent !== null) first.focus();
+  }, 60);
+}
+
+/* ── ENTER-TO-NEXT — navegación a dos manos sin mouse ───────────────────────
+ * Avanza al siguiente campo interactivo visible al presionar Enter.
+ * - textarea: comportamiento nativo (salto de línea), no se intercepta.
+ * - checkbox/radio: avanza el foco; Space sigue toggling nativamente.
+ * - select: avanza (la selección de opciones usa las flechas del teclado).
+ */
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const el = e.target;
+  if (el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON') return;
+  if (!el.matches('input, select')) return;
+
+  const screen = document.querySelector('.screen.active');
+  if (!screen) return;
+
+  const focusable = Array.from(screen.querySelectorAll(
+    'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+  )).filter(node => node.offsetParent !== null);
+
+  const idx = focusable.indexOf(el);
+  if (idx >= 0 && idx < focusable.length - 1) {
+    e.preventDefault();
+    focusable[idx + 1].focus();
+  }
+});
+
 /* ── NAVEGACIÓN ──────────────────────────────────────────────────────────────*/
 function go(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -52,6 +173,8 @@ function showForm() {
   clearAllForms();
   go("sc-form");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Nueva consulta" }]);
+  _restoreAndNotify('sc-form');
+  _autoFocusFirst('sc-form');
 }
 
 function showModal() {
@@ -74,6 +197,8 @@ function showNueva() {
   const sidebar = document.getElementById("sidebar");
   if (sidebar) sidebar.classList.add("collapsed");
   goStep(1);
+  _restoreAndNotify('sc-nueva');
+  _autoFocusFirst('sc-nueva');
 }
 
 function showLaboratorios() {
@@ -82,6 +207,8 @@ function showLaboratorios() {
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Laboratorios" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
   document.getElementById("si-l").classList.add("active");
+  _restoreAndNotify('sc-laboratorios');
+  _autoFocusFirst('sc-laboratorios');
 }
 
 /* ── TABS DE LABORATORIO ─────────────────────────────────────────────────────*/
