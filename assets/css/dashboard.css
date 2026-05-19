@@ -100,7 +100,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 #sc-laboratorios .fhead{flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--brd2)}
 #sc-laboratorios .labo-tabs{flex-shrink:0}
 #sc-laboratorios .labo-panel.active{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:40px}
-.np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3)}
+.np-nueva-body{flex:1;min-height:0;overflow-y:auto;background:var(--bg3);display:flex;flex-direction:column}
 
 /* ── DASHBOARD ───────────────────────────────────────────────────────────── */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 12px}
@@ -329,10 +329,11 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .np-step.done .nps-dot{background:var(--s-ok)}
 .np-step.active .nps-dot{background:var(--p)}
 .np-step-panel{display:none}
-.np-step-panel.active{display:block;padding:0;min-height:100%}
+.np-step-panel.active{display:block;padding:16px 20px 40px}
+#np-panel-4.active{padding:0 0 40px 0}
 .np-step-panel.active .tier{margin-top:0}
 .np-step-panel.active .tier:first-child{border-radius:0;border-left:none;border-right:none;border-top:none}
-.np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--brd2);z-index:100}
+.np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--brd2);z-index:100;margin-top:auto}
 .np-step-nav .btn-sec{padding:8px 18px;border-radius:var(--r);border:1px solid var(--brd2);background:transparent;font-size:13px;color:var(--txt2);cursor:pointer;font-family:var(--font-sans)}
 .np-step-nav .btn-prim{padding:8px 18px;border-radius:var(--r);border:none;background:var(--p);font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:var(--font-sans)}
 
