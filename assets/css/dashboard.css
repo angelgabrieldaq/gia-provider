@@ -429,3 +429,32 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 /* ── TOAST GLOBAL ────────────────────────────────────────────────────────────*/
 .gia-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--txt);color:var(--bg);padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.2px;opacity:0;transition:opacity .22s,transform .22s;z-index:9999;pointer-events:none;white-space:nowrap}
 .gia-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── BANNER PROTEINURIA PENDIENTE ────────────────────────────────────────────*/
+.pendiente-banner{display:flex;align-items:flex-start;gap:10px;margin:10px 20px 0;padding:10px 14px;background:var(--s-warn-l);border:1px solid var(--s-warn-m);border-radius:var(--r)}
+.pb-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.pb-body{flex:1;min-width:0}
+.pb-title{font-size:12px;font-weight:700;color:var(--s-warn)}
+.pb-sub{font-size:11px;color:var(--txt2);margin-top:2px;line-height:1.5}
+.pb-btn{flex-shrink:0;background:var(--s-warn);color:#fff;border:none;border-radius:var(--r);padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;align-self:center}
+.pb-btn:hover{opacity:.88}
+
+/* ── PRINT — impresión de resumen clínico ────────────────────────────────────*/
+@media print {
+  body{background:#fff}
+  .sidebar,.topbar,.bbar,.np-step-nav,.fhead-r,.warn-note,
+  .strip,.agenda-box,.ph-r,.btn-p,.btn-s,.btn-sec,
+  .pitem,.fhead,.hctabs,.htabs{display:none!important}
+  .main{margin:0;padding:0;box-shadow:none;overflow:visible}
+  .screen{display:block!important;position:static!important}
+  .screen:not(#sc-patient){display:none!important}
+  #sc-patient{padding:0}
+  .ph{border-bottom:1px solid #ccc;padding:12px 0}
+  .fasgo-alert-area{margin:0}
+  .fac{border:1px solid #ccc;break-inside:avoid;margin-bottom:8px}
+  .fac-critical{border-color:#c00}
+  .fac-warn{border-color:#b8860b}
+  .pendiente-banner{border:1px solid #b8860b;break-inside:avoid}
+  .vitals,.hsum{break-inside:avoid}
+  @page{margin:1.5cm}
+}
