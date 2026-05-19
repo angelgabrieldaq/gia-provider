@@ -2,6 +2,15 @@
  * Lógica clínica validada con obstetra. NO modificar umbrales sin revisión médica.
  * Spec Técnico v2.0 — ISSHP 2018 / IADPSG / ACOG / CLAP */
 
+/* ── PARSING DE FECHAS SIN SHIFT UTC ────────────────────────────────────────
+ * new Date("YYYY-MM-DD") interpreta como UTC medianoche → en UTC-3 retrocede un día.
+ * Usar new Date(year, month-1, day) fuerza construcción local, sin desplazamiento.
+ */
+function parseLocalDate(v) {
+  const [yyyy, mm, dd] = v.split('-').map(Number);
+  return new Date(yyyy, mm - 1, dd);
+}
+
 /* ── CAMPO CLÍNICO GENÉRICO ──────────────────────────────────────────────────
  * Lee SOLO desde data-attributes. NUNCA desde el id del campo.
  * Esto es mandatorio en un SaMD: si el id cambia, la alerta no puede morir
@@ -63,7 +72,7 @@ function calcEdad() {
   const v = document.getElementById("np-fnac").value;
   const h = document.getElementById("h-edad");
   if (!v) { h.textContent = ""; return; }
-  const d = new Date(v), t = new Date();
+  const d = parseLocalDate(v), t = new Date();
   let age = t.getFullYear() - d.getFullYear();
   if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) age--;
   if (age < 12 || age > 55) {
@@ -82,7 +91,7 @@ function calcEGA() {
   const v = document.getElementById("np-fum").value;
   const h = document.getElementById("h-ega");
   if (!v) { h.textContent = ""; return; }
-  const fum = new Date(v), hoy = new Date();
+  const fum = parseLocalDate(v), hoy = new Date();
   const dias = Math.floor((hoy - fum) / 86400000);
   if (dias < 0 || dias > 294) {
     h.className = "fhint err"; h.textContent = "✗ Verificar fecha de FUM"; return;
@@ -111,7 +120,7 @@ function calcEcoCorrected() {
     return;
   }
 
-  const eco    = new Date(ecoFecha);
+  const eco    = parseLocalDate(ecoFecha);
   const egaDias = ecoSem * 7 + ecoDias;
   const fppEco  = new Date(eco);
   fppEco.setDate(fppEco.getDate() + (280 - egaDias));
@@ -272,7 +281,7 @@ function calcRisk() {
   /* FUENTE 1: EDAD — ≥35 años → moderado (ISSHP 2018) */
   const fnac = document.getElementById("np-fnac");
   if (fnac && fnac.value) {
-    const d = new Date(fnac.value), now = new Date();
+    const d = parseLocalDate(fnac.value), now = new Date();
     let age = now.getFullYear() - d.getFullYear();
     if (now.getMonth() < d.getMonth() ||
        (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
@@ -568,7 +577,7 @@ function updateStickyHeader() {
   const fnac  = document.getElementById("np-fnac");
   const ageEl = document.getElementById("nsh-edad");
   if (fnac && fnac.value && ageEl) {
-    const d = new Date(fnac.value), now = new Date();
+    const d = parseLocalDate(fnac.value), now = new Date();
     let age = now.getFullYear() - d.getFullYear();
     if (now.getMonth() < d.getMonth() ||
        (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
@@ -590,7 +599,7 @@ function updateStickyHeader() {
   const egaEl = document.getElementById("nsh-ega");
   const fppEl = document.getElementById("nsh-fpp");
   if (fum && fum.value && egaEl && fppEl) {
-    const fumD = new Date(fum.value), hoy = new Date();
+    const fumD = parseLocalDate(fum.value), hoy = new Date();
     const dias = Math.floor((hoy - fumD) / 86400000);
     if (dias >= 0 && dias <= 294) {
       egaEl.textContent = Math.floor(dias/7) + "+" + (dias%7) + " sem";

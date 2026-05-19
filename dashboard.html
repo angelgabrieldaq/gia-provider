@@ -377,7 +377,7 @@
             <div class="fsub">34 sem + 2 días · Riesgo alto · Borrador guardado automáticamente</div>
           </div>
           <div class="fhead-r">
-            <button class="btn-s" onclick="showPatient()">Cancelar</button>
+            <button class="btn-s" onclick="clearAllForms(); showPatient()">Cancelar</button>
             <button class="btn-p" onclick="guardarConsulta()">Cerrar consulta</button>
           </div>
         </div>
@@ -1048,7 +1048,7 @@
             <div class="nsh-pills" id="nsh-pills"></div>
           </div>
           <div class="nsh-actions" style="display:flex;gap:6px;flex-shrink:0">
-            <button class="btn-s" onclick="showDash()">Cancelar</button>
+            <button class="btn-s" onclick="clearAllForms(); showDash()">Cancelar</button>
             <button class="btn-p" onclick="savePatient()">Guardar</button>
           </div>
         </div>
@@ -1934,7 +1934,10 @@ function _readFASGOData(source) {
 
   const protSelect = document.getElementById('f-prot-select')?.value || '';
   const tirasVals  = ['Trazas', '1+', '2+', '3+'];
-  const plt = parseFloat(document.getElementById('lab3-plt')?.value);
+
+  /* Plaquetas: preferir trimestre 3, caer a trimestre 1 si no hay dato */
+  const pltRaw = _nullNum('lab3-plt') ?? _nullNum('lab1-plt');
+  const plaquetas = pltRaw != null ? pltRaw * 1000 : null;
 
   return {
     pas: fromLaboratorio ? null : (parseFloat(document.getElementById('f-s')?.value) || 0),
@@ -1949,9 +1952,9 @@ function _readFASGOData(source) {
     lab: fromConsulta ? null : {
       got:            _nullNum('lab3-ast'),
       gpt:            _nullNum('lab3-alt'),
-      plaquetas:      isNaN(plt) ? null : plt * 1000,
+      plaquetas,
       uRPC:           _nullNum('lab3-urpc'),
-      proteinuria24h: _nullNum('lab3-prot'),
+      proteinuria24h: _nullNum('lab3-prot') ?? _nullNum('lab1-prot'),
       tirasReactivas: tirasVals.includes(protSelect),
     },
   };
