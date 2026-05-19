@@ -240,15 +240,24 @@
           </div>
 
           <!-- Presión arterial -->
-          <div id="rc-bp" class="hchart-wrap">
+          <div id="rc-bp" class="hchart-wrap" data-chart="bp">
+            <div class="hchart-empty" style="display:none;align-items:center;justify-content:center;height:140px;flex-direction:column;gap:6px;color:var(--txt3);font-size:11px">
+              <span style="font-size:20px;opacity:0.4">📈</span>
+              <span>Se requieren al menos 2 registros para proyectar tendencias</span>
+            </div>
             <div class="hchart-legend">
               <span class="hcl hcl-s">Sistólica</span>
               <span class="hcl hcl-d">Diastólica</span>
-              <span class="hcl-ref">⋯ umbrales clínicos</span>
+              <span class="hcl-ref">⋯ umbrales FASGO 2025</span>
             </div>
             <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
-              <rect x="50" y="14" width="570" height="21" fill="rgba(226,75,74,0.07)" rx="2"/>
-              <rect x="50" y="35" width="570" height="20" fill="rgba(239,159,39,0.06)" rx="2"/>
+              <!-- ── ZONAS CLÍNICAS SEMÁNTICAS ── -->
+              <rect x="50" y="14" width="570" height="21" fill="rgba(226,75,74,0.13)" rx="2"/>
+              <text x="58" y="27" font-size="7" fill="#E24B4A" opacity="0.8" font-family="DM Sans,sans-serif" font-weight="600">HTA severa ≥160</text>
+              <rect x="50" y="35" width="570" height="20" fill="rgba(239,159,39,0.10)" rx="2"/>
+              <text x="58" y="47" font-size="7" fill="#C87900" opacity="0.85" font-family="DM Sans,sans-serif" font-weight="600">HTA moderada 140–159</text>
+              <rect x="50" y="55" width="570" height="81" fill="rgba(15,110,86,0.07)" rx="2"/>
+              <text x="58" y="67" font-size="7" fill="#0F6E56" opacity="0.65" font-family="DM Sans,sans-serif">Normal &lt;140</text>
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="34" x2="620" y2="34" stroke="#E24B4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
@@ -285,12 +294,18 @@
           </div>
 
           <!-- Peso + AU -->
-          <div id="rc-peso" class="hchart-wrap" style="display:none">
+          <div id="rc-peso" class="hchart-wrap" data-chart="peso" style="display:none">
             <div class="hchart-legend">
               <span class="hcl hcl-p">Peso corporal</span>
-              <span class="hcl-ref">Ganancia normal: 0.3–0.5 kg/semana en 3er trim.</span>
+              <span class="hcl-ref">Ganancia aceptable IMC normal: 11.5–16 kg totales · 0.3–0.5 kg/sem T3</span>
             </div>
             <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+              <!-- Banda de ganancia aceptable (53kg+11.5 a 53+16 kg = 64.5–69 kg) -->
+              <rect x="50" y="44" width="570" height="48" fill="rgba(15,110,86,0.07)" rx="2"/>
+              <text x="58" y="53" font-size="7" fill="#0F6E56" opacity="0.65" font-family="DM Sans,sans-serif">Rango de ganancia aceptable (IOM) 64.5–69 kg</text>
+              <!-- Zona exceso >69 kg -->
+              <rect x="50" y="14" width="570" height="30" fill="rgba(239,159,39,0.07)" rx="2"/>
+              <text x="58" y="26" font-size="7" fill="#C87900" opacity="0.75" font-family="DM Sans,sans-serif">Ganancia excesiva &gt;69 kg · vigilar edema</text>
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <text x="45" y="18"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">75 kg</text>
@@ -317,7 +332,7 @@
           </div>
 
           <!-- Laboratorio -->
-          <div id="rc-labo" class="hchart-wrap" style="display:none">
+          <div id="rc-labo" class="hchart-wrap" data-chart="labo" style="display:none">
             <div class="hchart-legend">
               <span class="hcl hcl-s">Hemoglobina (g/dL)</span>
               <span class="hcl hcl-d">Glucemia ayunas (mg/dL)</span>
@@ -374,7 +389,7 @@
         <div class="act-bar">
           <button class="btn-p" onclick="showForm()">+ Nueva consulta</button>
           <button class="btn-s" onclick="showLaboratorios()">🔬 Laboratorios</button>
-          <button class="btn-s" onclick="showHistory()">Historial completo</button>
+          <button class="btn-s" onclick="showHistory()">Evolutivo Longitudinal</button>
           <button class="btn-s">Exportar PDF</button>
         </div>
       </div>
@@ -599,14 +614,14 @@
         </div><!-- /form-scroll-body -->
       </div>
 
-      <!-- HISTORIAL CLÍNICO -->
+      <!-- EVOLUTIVO LONGITUDINAL -->
       <div class="screen" id="sc-history">
         <div class="ph" style="padding:12px 20px">
           <div class="ph-top">
             <div class="ph-av av-r" style="width:38px;height:38px;font-size:12px">LR</div>
             <div style="flex:1">
-              <div style="font-size:14px;font-weight:700;font-family:'DM Serif Display',serif">Ramírez, Laura Beatriz</div>
-              <div class="ph-meta">29 años · G2P1 · EGA actual: 34+2 semanas · Preeclampsia activa</div>
+              <div style="font-size:14px;font-weight:700;font-family:'DM Serif Display',serif">Evolutivo Longitudinal · Ramírez, Laura</div>
+              <div class="ph-meta">29 años · G2P1 · EGA actual: 34+2 semanas · Seguimiento S12–S34 · 9 consultas</div>
             </div>
             <button class="btn-s" onclick="showPatient()" style="align-self:center;font-size:11px">← Volver a ficha</button>
           </div>
@@ -632,15 +647,26 @@
 
           <!-- BP chart -->
           <div class="hchart-wrap" id="hc-bp" data-chart="bp">
+            <div class="hchart-empty" style="display:none;align-items:center;justify-content:center;height:160px;flex-direction:column;gap:6px;color:var(--txt3);font-size:12px">
+              <span style="font-size:24px;opacity:0.4">📈</span>
+              <span>Se requieren al menos 2 registros para proyectar líneas de tendencia</span>
+            </div>
             <div class="hchart-legend">
               <span class="hcl hcl-s">Sistólica</span>
               <span class="hcl hcl-d">Diastólica</span>
-              <span class="hcl-ref">⋯ umbrales FASGO 2025 · puntós = nivel de riesgo</span>
+              <span class="hcl-ref">⋯ umbrales FASGO 2025 · puntos = nivel de riesgo</span>
             </div>
             <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
-              <!-- danger/warning zones -->
-              <rect x="50" y="14" width="570" height="20" fill="rgba(226,75,74,0.08)" rx="2"/>
-              <rect x="50" y="34" width="570" height="21" fill="rgba(239,159,39,0.06)" rx="2"/>
+              <!-- ── ZONAS CLÍNICAS SEMÁNTICAS (FASGO 2025 / ISSHP) ── -->
+              <!-- Zona roja: HTA severa ≥160 mmHg sistólica -->
+              <rect x="50" y="14" width="570" height="20" fill="rgba(226,75,74,0.14)" rx="2"/>
+              <text x="58" y="27" font-size="7" fill="#E24B4A" opacity="0.8" font-family="DM Sans,sans-serif" font-weight="600">HTA severa ≥160</text>
+              <!-- Zona naranja: HTA moderada 140–159 mmHg -->
+              <rect x="50" y="34" width="570" height="21" fill="rgba(239,159,39,0.11)" rx="2"/>
+              <text x="58" y="46" font-size="7" fill="#C87900" opacity="0.85" font-family="DM Sans,sans-serif" font-weight="600">HTA moderada 140–159</text>
+              <!-- Zona verde: Presión normal <140 mmHg -->
+              <rect x="50" y="55" width="570" height="81" fill="rgba(15,110,86,0.07)" rx="2"/>
+              <text x="58" y="67" font-size="7" fill="#0F6E56" opacity="0.65" font-family="DM Sans,sans-serif">Zona normal sistólica &lt;140</text>
               <!-- axes -->
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>

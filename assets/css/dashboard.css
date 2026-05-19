@@ -240,6 +240,7 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .hctab:hover{color:var(--txt2)}
 .hctab.on{background:var(--bg);border-color:var(--brd2);color:var(--txt);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .hchart-wrap{padding:14px 16px 10px}
+.hchart-empty{padding:20px 16px;text-align:center;gap:8px}
 .hchart-legend{display:flex;gap:14px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
 .hcl{font-size:10px;font-weight:600;display:flex;align-items:center;gap:5px}
 .hcl::before{content:'';width:20px;height:2px;border-radius:2px;display:inline-block}
