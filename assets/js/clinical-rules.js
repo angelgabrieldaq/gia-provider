@@ -632,3 +632,42 @@ function updateStickyHeader() {
     }).join("");
   }
 }
+
+/* ── COCIENTE sFlt-1/PlGF — FASGO 2025 / Zeisler et al. ─────────────────────
+ * Umbral diagnóstico validado: ≤ 38 descarta PE en las próximas 4 semanas.
+ * > 85 en embarazos ≥ 34 sem: alta probabilidad de PE a corto plazo.
+ * NO modificar umbrales sin revisión médica (evidencia clase I FASGO 2025).
+ */
+function calcAngiogenicRatio() {
+  const sflt1 = parseFloat(document.getElementById('lab3-sflt1')?.value);
+  const plgf  = parseFloat(document.getElementById('lab3-plgf')?.value);
+  const hint  = document.getElementById('lab3-ratio-hint');
+  if (!hint) return;
+
+  if (isNaN(sflt1) || isNaN(plgf) || plgf === 0) {
+    hint.className   = "fhint";
+    hint.style.color = "";
+    hint.textContent = "— Ingresar ambos valores para calcular";
+    return;
+  }
+
+  const ratio = sflt1 / plgf;
+  let cls, color, msg;
+  if (ratio <= 38) {
+    cls   = "fhint ok";
+    color = "var(--s-ok)";
+    msg   = `✓ Cociente ${ratio.toFixed(1)} ≤ 38 — Bajo riesgo de PE en próximas 4 semanas (FASGO 2025)`;
+  } else if (ratio <= 85) {
+    cls   = "fhint warn";
+    color = "var(--s-warn)";
+    msg   = `⚠ Cociente ${ratio.toFixed(1)} entre 38 y 85 — Riesgo intermedio. Intensificar seguimiento.`;
+  } else {
+    cls   = "fhint err";
+    color = "var(--s-err)";
+    msg   = `🚨 Cociente ${ratio.toFixed(1)} > 85 — Alta probabilidad de PE a corto plazo. Evaluar internación (FASGO 2025).`;
+  }
+
+  hint.className   = cls;
+  hint.style.color = color;
+  hint.textContent = msg;
+}

@@ -1786,6 +1786,27 @@
               </div>
             </div>
           </div>
+          <!-- BIOMARCADORES — Estudios Especiales (Opcional) -->
+          <div class="tier-subsec">
+            <div class="tier-subsec-title">Estudios especiales (Opcional)</div>
+            <div class="fields">
+              <div class="fld">
+                <label class="flbl">sFlt-1 (pg/mL)</label>
+                <input type="number" step="1" class="fld-input" id="lab3-sflt1" onchange="calcAngiogenicRatio()"/>
+                <div class="fhint" id="lab3-sflt1-hint">Soluble fms-like tyrosine kinase-1 · Disponible en centros de referencia</div>
+              </div>
+              <div class="fld">
+                <label class="flbl">PlGF (pg/mL)</label>
+                <input type="number" step="1" class="fld-input" id="lab3-plgf" onchange="calcAngiogenicRatio()"/>
+                <div class="fhint" id="lab3-plgf-hint">Placental Growth Factor · Disponible en centros de referencia</div>
+              </div>
+              <div class="fld" style="grid-column:1/-1">
+                <label class="flbl">Cociente sFlt-1/PlGF (calculado)</label>
+                <div class="fhint" id="lab3-ratio-hint" style="font-size:13px;padding:6px 0">— Ingresar ambos valores para calcular</div>
+              </div>
+            </div>
+          </div>
+
           <div style="height:16px"></div>
         </div>
 
@@ -1956,6 +1977,8 @@ function _readFASGOData(source) {
       uRPC:           _nullNum('lab3-urpc'),
       proteinuria24h: _nullNum('lab3-prot') ?? _nullNum('lab1-prot'),
       tirasReactivas: tirasVals.includes(protSelect),
+      sflt1:          _nullNum('lab3-sflt1'),
+      plgf:           _nullNum('lab3-plgf'),
     },
   };
 }
@@ -1969,7 +1992,12 @@ function _nullNum(id) {
 function guardarConsulta() {
   const data      = _readFASGOData('consulta');
   const resultado = evaluarPreeclampsiaFASGO2025(data);
-  window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
+  window.giaLastConsulta = {
+    ...data,
+    fasgoResult: resultado,
+    savedAt:     new Date().toISOString(),
+    _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
+  };
   console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
   renderAlertCardsFASGO(resultado);
   const sidebar = document.getElementById('sidebar');
@@ -1981,7 +2009,12 @@ function guardarConsulta() {
 function guardarLaboratorios() {
   const data      = _readFASGOData('laboratorios');
   const resultado = evaluarPreeclampsiaFASGO2025(data);
-  window.giaLastConsulta = { ...data, fasgoResult: resultado, savedAt: new Date().toISOString() };
+  window.giaLastConsulta = {
+    ...data,
+    fasgoResult: resultado,
+    savedAt:     new Date().toISOString(),
+    _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
+  };
   console.log('[FASGO 2025 — Labs]', JSON.stringify(resultado, null, 2));
   renderAlertCardsFASGO(resultado);
   const sidebar = document.getElementById('sidebar');
