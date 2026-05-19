@@ -1203,9 +1203,9 @@
             </div>
           </div>
           <!-- EGA por ecografía 1er trimestre -->
-          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
-            <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:10px 0 8px">EGA por ecografía · 1er trimestre (corrección de FPP)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="tier-subsec">
+            <div class="tier-subsec-title">EGA por ecografía · 1er trimestre (corrección de FPP)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
               <div class="fld">
                 <label class="flbl">Fecha de la eco</label>
                 <input type="date" class="fld-input" id="np-eco1-fecha" oninput="calcEcoCorrected()"/>
@@ -1223,8 +1223,8 @@
           </div>
 
           <!-- HTA -->
-          <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
-            <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;padding:10px 0 8px">Antecedente de HTA</div>
+          <div class="tier-subsec">
+            <div class="tier-subsec-title">Antecedente de HTA</div>
             <div class="fld" data-w="h" id="hta-cronica-group">
               <select class="fld-input" id="np-hta-tipo" onchange="evalHTATipo(this)" style="font-size:12px">
                 <option value="">— Sin antecedente de HTA —</option>
@@ -1250,7 +1250,7 @@
             <span class="tier-title">Factores de riesgo — Ficha CLAP</span>
             <span class="tier-note">Criterios ISSHP 2018 · determina la clasificación inicial</span>
           </div>
-          <div style="padding:0 16px 14px">
+          <div class="tier-subsec">
             <div class="risk-chks">
 
                 <!-- 1. Antecedentes personales -->
@@ -1302,18 +1302,18 @@
           <div class="hab-sub">
             <div class="hab-sub-title">Hábitos tóxicos</div>
             <div class="hab-row">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+              <label>
                 <input type="checkbox" id="h-tabaquismo" onchange="togHabit(this,'hab-tabaco-det')"/> Tabaquismo
               </label>
             </div>
             <div class="hab-detail" id="hab-tabaco-det">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div class="fld"><label class="flbl">Cigarrillos / día</label><input type="number" class="fld-input" id="h-cigarrillos" placeholder="ej. 5" min="0"/></div>
                 <div class="fld"><label class="flbl">¿Desea dejar?</label><select class="fld-input" id="h-desea-dejar"><option value="">—</option><option value="si">Sí</option><option value="no">No</option><option value="intento">Ya lo intentó</option></select></div>
               </div>
             </div>
             <div class="hab-row">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+              <label>
                 <input type="checkbox" id="h-alcohol" onchange="togHabit(this,'hab-alcohol-det')"/> Consumo de alcohol
               </label>
             </div>
@@ -1321,7 +1321,7 @@
               <div class="fld"><label class="flbl">Frecuencia</label><select class="fld-input" id="h-alcohol-freq"><option value="ocasional">Ocasional</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
             </div>
             <div class="hab-row">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+              <label>
                 <input type="checkbox" id="h-sustancias" onchange="togHabit(this,'hab-drogas-det')"/> Consumo de sustancias
               </label>
             </div>
@@ -1339,9 +1339,9 @@
           </div>
 
           <!-- Actividad física -->
-          <div class="hab-sub" style="border-top:1px solid var(--brd)">
+          <div class="hab-sub">
             <div class="hab-sub-title">Actividad física y alimentación</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div class="fld">
                 <label class="flbl">Nivel de actividad</label>
                 <select class="fld-input" id="h-actividad">
@@ -1366,11 +1366,11 @@
           </div>
 
           <!-- Vacunas -->
-          <div class="hab-sub" style="border-top:1px solid var(--brd)">
+          <div class="hab-sub">
             <div class="hab-sub-title">Vacunas — Calendario Nacional Argentina</div>
 
             <div class="vac-row">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+              <label>
                 <input type="checkbox" id="vac-influenza" onchange="togVacDate(this,'vac-gripal-d')"/> Antigripal (anual)
               </label>
               <span style="font-size:10px;color:var(--txt3);margin-left:4px">Recomendada en cualquier trimestre</span>
@@ -1381,7 +1381,7 @@
             </div>
 
             <div class="vac-row" style="margin-top:6px">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+              <label>
                 <input type="checkbox" id="vac-triple" onchange="togVacDate(this,'vac-dtpa-d')"/> dTpa (difteria-tétanos-pertussis)
               </label>
               <span style="font-size:10px;color:var(--txt3);margin-left:4px">2do trimestre · 20–33 sem</span>
@@ -1392,7 +1392,7 @@
             </div>
 
             <div class="vac-row" style="margin-top:6px">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+              <label>
                 <input type="checkbox" id="vac-hepb" onchange="togVacDate(this,'vac-vhb-d')"/> Hepatitis B (VHB)
               </label>
               <span style="font-size:10px;color:var(--txt3);margin-left:4px">Si no tiene esquema completo</span>
@@ -1405,7 +1405,7 @@
             </div>
 
             <div class="vac-row" style="margin-top:6px">
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:600">
+              <label>
                 <input type="checkbox" id="vac-covid" onchange="togVacDate(this,'vac-covid-d')"/> COVID-19
               </label>
               <span style="font-size:10px;color:var(--txt3);margin-left:4px">Según disponibilidad de campaña</span>
@@ -1417,17 +1417,17 @@
           </div>
 
           <!-- Exámenes preventivos -->
-          <div class="hab-sub" style="border-top:1px solid var(--brd)">
+          <div class="hab-sub">
             <div class="hab-sub-title">Exámenes preventivos</div>
 
             <div class="prev-row">
               <div class="prev-row-top">
-                <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                <label>
                   <input type="checkbox" onchange="togMamEstudio(this)"/> Mamografía / ecografía mamaria
                 </label>
               </div>
               <div class="prev-detail" id="mam-estudio-det">
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
                   <div class="fld"><label class="flbl">Tipo de estudio</label><select class="fld-input"><option>Mamografía</option><option>Eco mamaria</option><option>Ambas</option></select></div>
                   <div class="fld"><label class="flbl">Fecha del estudio</label><input type="date" class="fld-input" id="prev-mam-fecha"/></div>
                   <div class="fld"><label class="flbl">Resultado BIRADS</label><select class="fld-input" id="prev-mam-hall"><option value="">— s/d —</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4A</option><option>4B</option><option>4C</option><option>5</option><option>6</option></select></div>
@@ -1437,12 +1437,12 @@
 
             <div class="prev-row">
               <div class="prev-row-top">
-                <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+                <label>
                   <input type="checkbox" onchange="togPapEstudio(this)"/> PAP / Citología cervical
                 </label>
               </div>
               <div class="prev-detail">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                   <div class="fld"><label class="flbl">Fecha del PAP</label><input type="date" class="fld-input" id="prev-pap-fecha"/></div>
                   <div class="fld"><label class="flbl">Resultado</label><select class="fld-input" id="prev-pap-hall"><option>Normal (NILM)</option><option>ASC-US</option><option>ASC-H</option><option>LSIL</option><option>HSIL</option><option>Carcinoma</option><option>Pendiente</option></select></div>
                 </div>
@@ -1451,9 +1451,9 @@
 
             <div class="prev-row">
               <div class="prev-row-top">
-                <span style="font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.3px">Serología obligatoria en embarazo</span>
+                <span class="flbl">Serología obligatoria en embarazo</span>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px">
                 <div class="fld">
                   <label class="flbl">HIV / SIDA</label>
                   <select class="fld-input">
