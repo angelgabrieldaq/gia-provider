@@ -331,7 +331,6 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .np-step-panel{display:none}
 .np-step-panel.active{display:flex;flex-direction:column;flex:1;padding:16px 20px 40px}
 .np-step-panel.active .tier:last-child{flex:1}
-#np-panel-4.active{padding:0 0 40px 0}
 .np-step-panel.active .tier{margin-top:0}
 .np-step-panel.active .tier:first-child{border-radius:0;border-left:none;border-right:none;border-top:none}
 .np-step-nav{display:flex;justify-content:space-between;padding:12px 20px;gap:8px;position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--brd2);z-index:100;margin-top:auto}
