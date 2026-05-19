@@ -395,52 +395,53 @@
           <div class="fields">
             <div class="fld">
               <label class="flbl">Presión sistólica (mmHg)</label>
-              <input type="number" class="fld-input" id="f-s" value="158" min="60" max="220"
+              <input type="number" class="fld-input" id="f-s" min="60" max="220"
                 data-alert-threshold="140"
                 data-alert-direction="above"
                 data-alert-level="danger"
                 data-alert-message="⚠ PA sistólica ≥140 — alerta moderada al guardar"
-                oninput="evalClinicalField(this)"/>
+                onchange="evalClinicalField(this)"/>
               <div class="fhint" id="f-s-hint"></div>
             </div>
             <div class="fld">
               <label class="flbl">Presión diastólica (mmHg)</label>
-              <input type="number" class="fld-input" id="f-d" value="102" min="40" max="140"
+              <input type="number" class="fld-input" id="f-d" min="40" max="140"
                 data-alert-threshold="90"
                 data-alert-direction="above"
                 data-alert-level="danger"
                 data-alert-message="⚠ PA diastólica ≥90 — alerta moderada al guardar"
-                oninput="evalClinicalField(this)"/>
+                onchange="evalClinicalField(this)"/>
               <div class="fhint" id="f-d-hint"></div>
             </div>
             <div class="fld">
               <label class="flbl">Peso (kg)</label>
-              <input type="number" class="fld-input" value="68"/>
+              <input type="number" class="fld-input"/>
               <div class="fhint">+1.2 kg respecto a la consulta anterior</div>
             </div>
             <div class="fld">
               <label class="flbl">Frecuencia cardíaca fetal (lpm)</label>
-              <input type="number" class="fld-input fok" value="144"/>
+              <input type="number" class="fld-input"/>
               <div class="fhint ok">Normal (rango 100–180 lpm)</div>
             </div>
             <div class="fld">
               <label class="flbl">Proteínas en orina</label>
-              <select class="fld-input" id="f-prot-select"><option>Negativas</option><option>Trazas</option><option>1+</option><option selected>2+</option><option>3+</option></select>
+              <select class="fld-input" id="f-prot-select"><option>Negativas</option><option>Trazas</option><option>1+</option><option>2+</option><option>3+</option></select>
             </div>
             <div class="fld">
               <label class="flbl">Edemas</label>
-              <select class="fld-input"><option>Ausentes</option><option>Leves</option><option selected>Moderados</option><option>Severos</option></select>
+              <select class="fld-input"><option>Ausentes</option><option>Leves</option><option>Moderados</option><option>Severos</option></select>
             </div>
           </div>
           <div style="padding:0 16px 12px">
             <div class="flbl" style="margin-bottom:8px">Síntomas de alarma</div>
             <div class="chks">
-              <label class="chk"><input type="checkbox" id="f-cefalea" checked/> Dolor de cabeza</label>
+              <label class="chk"><input type="checkbox" id="f-cefalea"/> Dolor de cabeza</label>
               <label class="chk"><input type="checkbox" id="f-escotomas-dest"/> Destellos visuales</label>
               <label class="chk"><input type="checkbox" id="f-escotomas-manch"/> Manchas en la visión</label>
               <label class="chk"><input type="checkbox" id="f-epigastralgia"/> Dolor en boca del estómago</label>
-              <label class="chk"><input type="checkbox"/> Zumbido en los oídos</label>
-              <label class="chk"><input type="checkbox"/> Ninguno</label>
+              <label class="chk"><input type="checkbox" id="f-zumbido"/> Zumbido en los oídos</label>
+              <label class="chk"><input type="checkbox" id="f-eclampsia"/> Convulsiones (Eclampsia)</label>
+              <label class="chk"><input type="checkbox" id="f-sintomas-ninguno" onchange="togSintomasNinguno(this)"/> Ninguno</label>
             </div>
           </div>
           <!-- MEDICACIÓN ACTIVA — spec v3.0 sec 1.1 -->
@@ -468,7 +469,7 @@
                   <select class="fld-input" style="width:120px"><option>c/8h</option><option>c/12h</option><option>c/24h</option></select>
                 </div>
               </div>
-              <label class="chk"><input type="checkbox"/> AAS 100 mg — 1 vez/día</label>
+              <label class="chk"><input type="checkbox" id="mc-aas"/> AAS 100 mg — 1 vez/día</label>
               <div class="med-row">
                 <label class="chk"><input type="checkbox" id="mc-hierro" onchange="togMed('hierro')"/> Hierro</label>
                 <div id="med-hierro-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
@@ -481,7 +482,7 @@
                   <select class="fld-input" style="width:140px"><option>1 g/día</option><option>2 g/día</option></select>
                 </div>
               </div>
-              <label class="chk"><input type="checkbox"/> Progesterona 200 mg vaginal — 1 vez/día</label>
+              <label class="chk"><input type="checkbox" id="mc-progesterona"/> Progesterona 200 mg vaginal — 1 vez/día</label>
               <div class="med-row">
                 <label class="chk"><input type="checkbox" id="mc-corticoides" onchange="togMed('corticoides')"/> Corticoides — betametasona</label>
                 <div id="med-corticoides-det" style="display:none;flex-direction:row;gap:6px;margin-left:24px">
@@ -519,7 +520,7 @@
 
           <div style="padding:0 16px 14px;border-top:1px solid var(--brd)">
             <div class="flbl" style="margin-bottom:6px">Conducta</div>
-            <select class="fld-input"><option>Continúa seguimiento</option><option>Solicita estudios</option><option>Ajusta medicación</option><option selected>Derivación</option><option>Internación</option></select>
+            <select class="fld-input" id="f-conducta"><option>Continúa seguimiento</option><option>Solicita estudios</option><option>Ajusta medicación</option><option>Derivación</option><option>Internación</option></select>
           </div>
         </div>
         <div class="tier">
@@ -533,9 +534,9 @@
               <div class="fld"><label class="flbl">Altura uterina (cm)</label><input type="number" class="fld-input" placeholder="ej. 32"/></div>
               <div class="fld"><label class="flbl">Movimientos fetales</label><select class="fld-input"><option>Presentes y normales</option><option>Disminuidos</option><option>Ausentes</option></select></div>
             </div>
-            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Estudios solicitados</div><input type="text" class="fld-input" placeholder="hemograma, proteínas en orina 24h…"/></div>
-            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Próximo control</div><input type="date" class="fld-input"/><div class="fhint">Sugerido: en 48 horas por estado crítico</div></div>
-            <div style="padding:0 16px 14px"><div class="flbl" style="margin-bottom:5px">Notas de la consulta</div><textarea class="fld-input" rows="2" placeholder="Texto libre — no se analiza automáticamente…"></textarea></div>
+            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Estudios solicitados</div><input type="text" class="fld-input" id="f-estudios-texto" placeholder="hemograma, proteínas en orina 24h…"/></div>
+            <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Próximo control</div><input type="date" class="fld-input" id="f-prox-control"/><div class="fhint">Sugerido: en 48 horas por estado crítico</div></div>
+            <div style="padding:0 16px 14px"><div class="flbl" style="margin-bottom:5px">Notas de la consulta</div><textarea class="fld-input" id="f-notas" rows="2" placeholder="Texto libre — no se analiza automáticamente…"></textarea></div>
           </div>
         </div>
 
@@ -1457,28 +1458,28 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px">
                 <div class="fld">
                   <label class="flbl">HIV / SIDA</label>
-                  <select class="fld-input">
+                  <select class="fld-input" id="prev-hiv">
                     <option>Sin datos</option><option>No realizado</option>
                     <option>Negativo</option><option>Positivo</option><option>Pendiente</option>
                   </select>
                 </div>
                 <div class="fld">
                   <label class="flbl">Chagas</label>
-                  <select class="fld-input">
+                  <select class="fld-input" id="prev-chagas">
                     <option>Sin datos</option><option>No realizado</option>
                     <option>No reactivo</option><option>Reactivo</option><option>Pendiente</option>
                   </select>
                 </div>
                 <div class="fld">
                   <label class="flbl">Rubéola (IgG)</label>
-                  <select class="fld-input">
+                  <select class="fld-input" id="prev-rubeola">
                     <option>Sin datos</option><option>No realizado</option>
                     <option>Inmune</option><option>No inmune</option><option>Pendiente</option>
                   </select>
                 </div>
                 <div class="fld">
                   <label class="flbl">Toxoplasma</label>
-                  <select class="fld-input">
+                  <select class="fld-input" id="prev-toxo">
                     <option>Sin datos</option><option>No realizado</option>
                     <option>IgG+ / IgM-</option><option>IgM+</option><option>Pendiente</option>
                   </select>
@@ -1529,7 +1530,7 @@
                   data-alert-direction="below"
                   data-alert-level="warn"
                   data-alert-message="⚠ Hb &lt; 11 g/dL — anemia gestacional. Valorar hierro oral."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-hb-hint"></div>
               </div>
               <div class="fld">
@@ -1539,7 +1540,7 @@
                   data-alert-direction="below"
                   data-alert-level="warn"
                   data-alert-message="⚠ Hematocrito &lt; 33% — posible anemia. Correlacionar con Hb."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-hto-hint"></div>
               </div>
               <div class="fld">
@@ -1549,7 +1550,7 @@
                   data-alert-direction="below"
                   data-alert-level="danger"
                   data-alert-message="⚠ Plaquetas &lt; 100.000 — trombocitopenia. Evaluar HELLP."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-plt-hint"></div>
               </div>
               <div class="fld">
@@ -1568,7 +1569,7 @@
                   data-alert-direction="above"
                   data-alert-level="danger"
                   data-alert-message="⚠ Glucemia ≥ 92 mg/dL en ayunas — criterio diagnóstico DMG (IADPSG). Solicitar PTOG."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-glu-hint"></div>
               </div>
               <div class="fld">
@@ -1582,7 +1583,7 @@
                   data-alert-direction="above"
                   data-alert-level="warn"
                   data-alert-message="⚠ Creatinina &gt; 0,9 mg/dL — evaluar función renal."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-creat-hint"></div>
               </div>
               <div class="fld">
@@ -1592,7 +1593,7 @@
                   data-alert-direction="above"
                   data-alert-level="warn"
                   data-alert-message="⚠ Ácido úrico elevado — marcador precoz de PE. Correlacionar con TA."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-au-hint"></div>
               </div>
             </div>
@@ -1607,7 +1608,7 @@
                   data-alert-direction="above"
                   data-alert-level="critical"
                   data-alert-message="🚨 Proteinuria ≥ 300 mg/24h — criterio diagnóstico de preeclampsia."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-prot-hint"></div>
               </div>
               <div class="fld">
@@ -1617,7 +1618,7 @@
                   data-alert-direction="above"
                   data-alert-level="warn"
                   data-alert-message="⚠ TSH &gt; 2,5 en 1er trim — hipotiroidismo subclínico. Valorar levotiroxina."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab1-tsh-hint"></div>
               </div>
             </div>
@@ -1636,7 +1637,7 @@
                   data-alert-direction="above"
                   data-alert-level="danger"
                   data-alert-message="⚠ Basal ≥ 92 mg/dL — diagnóstico de DMG (IADPSG)."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-ptog0-hint"></div>
               </div>
               <div class="fld">
@@ -1646,7 +1647,7 @@
                   data-alert-direction="above"
                   data-alert-level="danger"
                   data-alert-message="⚠ 60 min ≥ 180 mg/dL — diagnóstico de DMG (IADPSG)."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-ptog60-hint"></div>
               </div>
               <div class="fld">
@@ -1656,7 +1657,7 @@
                   data-alert-direction="above"
                   data-alert-level="critical"
                   data-alert-message="🚨 PTOG 120 min ≥ 140 mg/dL — criterio diagnóstico DMG (IADPSG 2010 / ADA). Iniciar manejo multidisciplinario."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-ptog120-hint"></div>
               </div>
               <div class="fld">
@@ -1666,7 +1667,7 @@
                   data-alert-direction="above"
                   data-alert-level="warn"
                   data-alert-message="⚠ HbA1c ≥ 5,7% — prediabetes. Correlacionar con PTOG."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-hba1c-hint"></div>
               </div>
             </div>
@@ -1681,7 +1682,7 @@
                   data-alert-direction="below"
                   data-alert-level="warn"
                   data-alert-message="⚠ Hb &lt; 10,5 g/dL en 2do trim — anemia moderada. Evaluar ferritina."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-hb-hint"></div>
               </div>
               <div class="fld">
@@ -1691,7 +1692,7 @@
                   data-alert-direction="below"
                   data-alert-level="warn"
                   data-alert-message="⚠ Ferritina &lt; 15 ng/mL — déficit de hierro. Iniciar suplementación."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab2-ferr-hint"></div>
               </div>
             </div>
@@ -1710,7 +1711,7 @@
                   data-alert-direction="above"
                   data-alert-level="danger"
                   data-alert-message="⚠ AST &gt; 40 U/L — posible compromiso hepático. Evaluar HELLP."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-ast-hint"></div>
               </div>
               <div class="fld">
@@ -1720,7 +1721,7 @@
                   data-alert-direction="above"
                   data-alert-level="danger"
                   data-alert-message="⚠ ALT &gt; 40 U/L — hepatotoxicidad. Evaluar contexto clínico."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-alt-hint"></div>
               </div>
               <div class="fld">
@@ -1730,7 +1731,7 @@
                   data-alert-direction="above"
                   data-alert-level="critical"
                   data-alert-message="🚨 LDH &gt; 600 U/L — criterio diagnóstico de síndrome HELLP."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-ldh-hint"></div>
               </div>
               <div class="fld">
@@ -1740,7 +1741,7 @@
                   data-alert-direction="below"
                   data-alert-level="critical"
                   data-alert-message="🚨 Plaquetas &lt; 100.000 — trombocitopenia severa. Criterio HELLP."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-plt-hint"></div>
               </div>
             </div>
@@ -1755,7 +1756,7 @@
                   data-alert-direction="below"
                   data-alert-level="danger"
                   data-alert-message="⚠ Hb &lt; 10 g/dL — anemia moderada-severa. Riesgo periparto elevado."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-hb-hint"></div>
               </div>
               <div class="fld">
@@ -1765,7 +1766,7 @@
                   data-alert-direction="above"
                   data-alert-level="critical"
                   data-alert-message="🚨 uRPC ≥ 30 mg/mmol — proteinuria significativa confirmada. Criterio diagnóstico FASGO 2025."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-urpc-hint"></div>
               </div>
               <div class="fld">
@@ -1775,7 +1776,7 @@
                   data-alert-direction="above"
                   data-alert-level="critical"
                   data-alert-message="🚨 Proteinuria ≥ 300 mg/24h — criterio diagnóstico de preeclampsia."
-                  oninput="evalClinicalField(this)"/>
+                  onchange="evalClinicalField(this)"/>
                 <div class="fhint" id="lab3-prot-hint"></div>
               </div>
             </div>
@@ -1901,6 +1902,10 @@ function savePatient() {
       papHallazgo: document.getElementById('prev-pap-hall')?.value   || '',
       mamFecha:    document.getElementById('prev-mam-fecha')?.value  || '',
       mamHallazgo: document.getElementById('prev-mam-hall')?.value   || '',
+      hiv:         document.getElementById('prev-hiv')?.value        || '',
+      chagas:      document.getElementById('prev-chagas')?.value     || '',
+      rubeola:     document.getElementById('prev-rubeola')?.value    || '',
+      toxo:        document.getElementById('prev-toxo')?.value       || '',
     },
     createdAt: new Date().toISOString(),
     savedBy:   'demo-user',
@@ -1932,7 +1937,7 @@ function _readFASGOData() {
       escotomas:     (document.getElementById('f-escotomas-dest')?.checked ||
                       document.getElementById('f-escotomas-manch')?.checked) || false,
       epigastralgia: document.getElementById('f-epigastralgia')?.checked  || false,
-      eclampsia:     false,
+      eclampsia:     document.getElementById('f-eclampsia')?.checked  || false,
     },
     lab: {
       got:             _nullNum('lab3-ast'),

@@ -90,6 +90,15 @@ function togB(btn) {
   btn.querySelector("span:last-child").textContent = b.classList.contains("open") ? "Colapsar ▲" : "Expandir ▼";
 }
 
+/* ── SÍNTOMAS — Ninguno deselecciona los demás ───────────────────────────────*/
+function togSintomasNinguno(cb) {
+  if (!cb.checked) return;
+  ['f-cefalea','f-escotomas-dest','f-escotomas-manch','f-epigastralgia','f-zumbido','f-eclampsia'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+}
+
 /* ── HÁBITOS — toggle individual ─────────────────────────────────────────────*/
 function togHabit(cb, detailId) {
   const el = document.getElementById(detailId);
