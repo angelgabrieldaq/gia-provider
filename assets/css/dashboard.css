@@ -216,8 +216,8 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .hvit-l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
 .hexp{font-size:16px;color:var(--txt3);margin-left:8px;transition:transform .15s;flex-shrink:0}
 .hexp.open{transform:rotate(180deg)}
-.hbody{display:none;border-top:1px solid var(--brd);padding:12px 14px;background:var(--bg2)}
-.hbody.open{display:block}
+.hbody{display:block;max-height:0;overflow:hidden;background:var(--bg2);transition:max-height .24s cubic-bezier(0.4,0,0.2,1)}
+.hbody.open{max-height:900px;border-top:1px solid var(--brd);padding:12px 14px}
 .hdet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .hdet{display:flex;flex-direction:column;gap:2px}
 .hdet-l{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px}
@@ -247,6 +247,9 @@ html,body{height:100%;font-family:var(--font-sans);background:var(--bg3);color:v
 .hcl-d::before{background:var(--s-warn-m)}.hcl-d{color:var(--s-warn)}
 .hcl-p::before{background:var(--p)}.hcl-p{color:var(--p-dark)}
 .hcl-ref{font-size:10px;color:var(--txt3);margin-left:auto}
+.hcl-fcf::before{background:var(--s-ok-m)}.hcl-fcf{color:var(--s-ok)}
+.hcharts svg circle{cursor:pointer;transition:stroke-width .1s}
+.hcharts svg circle:hover{stroke-width:9!important;stroke-opacity:.22}
 .hchart-wrap svg{width:100%;height:auto;display:block;overflow:visible}
 
 /* ── NUEVA PACIENTE — RISK WIDGET ────────────────────────────────────────── */

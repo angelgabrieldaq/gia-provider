@@ -298,10 +298,12 @@ function filterHist(btn, f) {
 
 /* ── CHARTS ──────────────────────────────────────────────────────────────────*/
 function switchChart(btn, id) {
-  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  const container = btn.closest('.hcharts');
+  container.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
-  document.getElementById("hc-bp").style.display    = id === "bp"   ? "block" : "none";
-  document.getElementById("hc-peso").style.display  = id === "peso" ? "block" : "none";
+  container.querySelectorAll(".hchart-wrap").forEach(p => p.style.display = "none");
+  const target = container.querySelector('[data-chart="' + id + '"]');
+  if (target) target.style.display = "block";
 }
 
 /* ── MODAL / CONSULTA ────────────────────────────────────────────────────────*/
@@ -331,11 +333,12 @@ function togCierre(label) {
 }
 
 function switchResumenChart(btn, id) {
-  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  const container = btn.closest('.hcharts');
+  container.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
-  document.getElementById("rc-bp").style.display    = id === "bp"   ? "block" : "none";
-  document.getElementById("rc-peso").style.display  = id === "peso" ? "block" : "none";
-  document.getElementById("rc-labo").style.display  = id === "labo" ? "block" : "none";
+  container.querySelectorAll(".hchart-wrap").forEach(p => p.style.display = "none");
+  const target = container.querySelector('[data-chart="' + id + '"]');
+  if (target) target.style.display = "block";
 }
 
 /* ── FORMULARIO EN PASOS — spec v4.0 ─────────────────────────────────────────*/

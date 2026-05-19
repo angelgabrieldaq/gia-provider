@@ -615,130 +615,198 @@
         <div class="hsum">
           <div class="hsc"><div class="hsc-v">9</div><div class="hsc-l">Consultas registradas</div></div>
           <div class="hsc"><div class="hsc-v">22</div><div class="hsc-l">Semanas de seguimiento</div></div>
-          <div class="hsc"><div class="hsc-v" style="color:var(--s-err)">3</div><div class="hsc-l">Alertas generadas</div></div>
-          <div class="hsc"><div class="hsc-v">↑18</div><div class="hsc-l">Variación sistólica (mmHg)</div></div>
+          <div class="hsc"><div class="hsc-v" style="color:var(--s-err)">4</div><div class="hsc-l">Alertas generadas</div></div>
+          <div class="hsc"><div class="hsc-v" style="color:var(--s-warn)">↑46</div><div class="hsc-l">Variación sistólica total (mmHg)</div></div>
         </div>
 
         <!-- TREND CHARTS -->
         <div class="hcharts">
           <div class="hchart-hd">
-            <span class="hchart-title">Evolución longitudinal</span>
+            <span class="hchart-title">Evolución longitudinal — hover para ver valores</span>
             <div class="hctabs">
               <button class="hctab on" onclick="switchChart(this,'bp')">Presión arterial</button>
               <button class="hctab" onclick="switchChart(this,'peso')">Peso</button>
+              <button class="hctab" onclick="switchChart(this,'fcf')">FCF fetal</button>
             </div>
           </div>
 
           <!-- BP chart -->
-          <div class="hchart-wrap" id="hc-bp">
+          <div class="hchart-wrap" id="hc-bp" data-chart="bp">
             <div class="hchart-legend">
               <span class="hcl hcl-s">Sistólica</span>
               <span class="hcl hcl-d">Diastólica</span>
-              <span class="hcl-ref">⋯ umbrales clínicos</span>
+              <span class="hcl-ref">⋯ umbrales FASGO 2025 · puntós = nivel de riesgo</span>
             </div>
             <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
-              <!-- color zones -->
-              <rect x="50" y="14" width="570" height="21" fill="rgba(226,75,74,0.07)" rx="2"/>
-              <rect x="50" y="35" width="570" height="20" fill="rgba(239,159,39,0.06)" rx="2"/>
+              <!-- danger/warning zones -->
+              <rect x="50" y="14" width="570" height="20" fill="rgba(226,75,74,0.08)" rx="2"/>
+              <rect x="50" y="34" width="570" height="21" fill="rgba(239,159,39,0.06)" rx="2"/>
               <!-- axes -->
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <!-- gridline 120 -->
+              <line x1="50" y1="83" x2="620" y2="83" stroke="var(--brd)" stroke-width="1" stroke-dasharray="2,5" opacity="0.6"/>
               <!-- threshold lines -->
-              <line x1="50" y1="34" x2="620" y2="34" stroke="#E24B4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
-              <text x="45" y="37" font-size="9" fill="#E24B4A" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">160</text>
-              <line x1="50" y1="55" x2="620" y2="55" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
-              <text x="45" y="58" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">140</text>
-              <line x1="50" y1="106" x2="620" y2="106" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.35"/>
-              <text x="45" y="109" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.75" font-family="DM Sans,sans-serif">90</text>
-              <text x="45" y="84" font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">120</text>
+              <line x1="50" y1="34" x2="620" y2="34" stroke="#E24B4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+              <text x="45" y="37" font-size="9" fill="#E24B4A" text-anchor="end" opacity="0.85" font-family="DM Sans,sans-serif">160</text>
+              <line x1="50" y1="55" x2="620" y2="55" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+              <text x="45" y="58" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.85" font-family="DM Sans,sans-serif">140</text>
+              <line x1="50" y1="106" x2="620" y2="106" stroke="#EF9F27" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+              <text x="45" y="109" font-size="9" fill="#EF9F27" text-anchor="end" opacity="0.85" font-family="DM Sans,sans-serif">90</text>
+              <text x="45" y="86" font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">120</text>
               <!-- area fills -->
-              <path d="M50,83 L154,80 L257,75 L361,67 L465,60 L542,55 L568,51 L594,47 L620,36 L620,136 L50,136 Z" fill="rgba(226,75,74,0.06)"/>
-              <path d="M50,124 L154,121 L257,118 L361,114 L465,108 L542,106 L568,102 L594,97 L620,93 L620,136 L50,136 Z" fill="rgba(239,159,39,0.05)"/>
+              <path d="M50,83 L154,80 L257,75 L361,67 L465,60 L542,55 L568,51 L594,47 L620,36 L620,136 L50,136 Z" fill="rgba(226,75,74,0.05)"/>
+              <path d="M50,124 L154,121 L257,118 L361,114 L465,108 L542,106 L568,102 L594,97 L620,93 L620,136 L50,136 Z" fill="rgba(239,159,39,0.04)"/>
               <!-- diastolic line -->
-              <polyline points="50,124 154,121 257,118 361,114 465,108 542,106 568,102 594,97 620,93" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+              <polyline points="50,124 154,121 257,118 361,114 465,108 542,106 568,102 594,97 620,93" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
               <!-- systolic line -->
               <polyline points="50,83 154,80 257,75 361,67 465,60 542,55 568,51 594,47 620,36" fill="none" stroke="#E24B4A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-              <!-- systolic dots (color = risk) -->
-              <circle cx="50"  cy="83"  r="3.5" fill="#0F6E56"/>
-              <circle cx="154" cy="80"  r="3.5" fill="#0F6E56"/>
-              <circle cx="257" cy="75"  r="3.5" fill="#0F6E56"/>
-              <circle cx="361" cy="67"  r="3.5" fill="#0F6E56"/>
-              <circle cx="465" cy="60"  r="3.5" fill="#EF9F27"/>
-              <circle cx="542" cy="55"  r="3.5" fill="#EF9F27"/>
-              <circle cx="568" cy="51"  r="3.5" fill="#EF9F27"/>
-              <circle cx="594" cy="47"  r="3.5" fill="#E24B4A"/>
-              <circle cx="620" cy="36"  r="4.5" fill="#E24B4A" stroke="rgba(226,75,74,0.25)" stroke-width="6"/>
-              <!-- diastolic dots -->
-              <circle cx="50"  cy="124" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="154" cy="121" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="257" cy="118" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="361" cy="114" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="465" cy="108" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="542" cy="106" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="568" cy="102" r="2.5" fill="#EF9F27" opacity="0.55"/>
-              <circle cx="594" cy="97"  r="2.5" fill="#E24B4A" opacity="0.7"/>
-              <circle cx="620" cy="93"  r="3.5" fill="#E24B4A" opacity="0.85"/>
-              <!-- value callouts (last point) -->
-              <text x="620" y="30" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">158</text>
-              <text x="620" y="88" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">102</text>
-              <!-- X axis -->
-              <text x="50"  y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
-              <text x="154" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
-              <text x="257" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
-              <text x="361" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
-              <text x="465" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
-              <text x="542" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
-              <text x="620" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S34</text>
+              <!-- diastolic dots with titles -->
+              <circle cx="50"  cy="124" r="3" fill="#0F6E56" opacity="0.6"><title>Sem 12 · Diastólica: 72 mmHg ✓ Normal</title></circle>
+              <circle cx="154" cy="121" r="3" fill="#0F6E56" opacity="0.6"><title>Sem 16 · Diastólica: 75 mmHg ✓ Normal</title></circle>
+              <circle cx="257" cy="118" r="3" fill="#0F6E56" opacity="0.6"><title>Sem 20 · Diastólica: 78 mmHg ✓ Normal</title></circle>
+              <circle cx="361" cy="114" r="3" fill="#0F6E56" opacity="0.6"><title>Sem 24 · Diastólica: 82 mmHg ✓ Normal</title></circle>
+              <circle cx="465" cy="108" r="3" fill="#EF9F27" opacity="0.7"><title>Sem 28 · Diastólica: 88 mmHg ⚠ Vigilancia</title></circle>
+              <circle cx="542" cy="106" r="3" fill="#EF9F27" opacity="0.8"><title>Sem 31 · Diastólica: 90 mmHg ⚠ Umbral HTA</title></circle>
+              <circle cx="568" cy="102" r="3" fill="#E24B4A" opacity="0.75"><title>Sem 32 · Diastólica: 94 mmHg 🔴 HTA activa</title></circle>
+              <circle cx="594" cy="97"  r="3" fill="#E24B4A" opacity="0.85"><title>Sem 33 · Diastólica: 98 mmHg 🔴 HTA severa</title></circle>
+              <circle cx="620" cy="93"  r="4" fill="#E24B4A"><title>Sem 34 · Diastólica: 102 mmHg 🚨 Emergencia</title></circle>
+              <!-- systolic dots with titles -->
+              <circle cx="50"  cy="83"  r="3.5" fill="#0F6E56"><title>Sem 12 · Sistólica: 112 mmHg ✓ Normal</title></circle>
+              <circle cx="154" cy="80"  r="3.5" fill="#0F6E56"><title>Sem 16 · Sistólica: 115 mmHg ✓ Normal</title></circle>
+              <circle cx="257" cy="75"  r="3.5" fill="#0F6E56"><title>Sem 20 · Sistólica: 120 mmHg ✓ Normal</title></circle>
+              <circle cx="361" cy="67"  r="3.5" fill="#0F6E56"><title>Sem 24 · Sistólica: 128 mmHg ✓ Normal</title></circle>
+              <circle cx="465" cy="60"  r="3.5" fill="#EF9F27"><title>Sem 28 · Sistólica: 135 mmHg ⚠ Vigilancia</title></circle>
+              <circle cx="542" cy="55"  r="3.5" fill="#EF9F27"><title>Sem 31 · Sistólica: 140 mmHg ⚠ Umbral HTA</title></circle>
+              <circle cx="568" cy="51"  r="3.5" fill="#EF9F27"><title>Sem 32 · Sistólica: 144 mmHg ⚠ HTA activa</title></circle>
+              <circle cx="594" cy="47"  r="3.5" fill="#E24B4A"><title>Sem 33 · Sistólica: 148 mmHg 🔴 HTA severa</title></circle>
+              <circle cx="620" cy="36"  r="5" fill="#E24B4A" stroke="rgba(226,75,74,0.28)" stroke-width="7"><title>Sem 34 · Sistólica: 158 mmHg 🚨 Emergencia hipertensiva</title></circle>
+              <!-- first point callout -->
+              <text x="50" y="76" font-size="8" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">112</text>
+              <text x="50" y="130" font-size="7" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0.7">72</text>
+              <!-- last point callout -->
+              <rect x="605" y="19" width="26" height="12" rx="3" fill="#E24B4A" opacity="0.9"/>
+              <text x="618" y="28" font-size="8" fill="white" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">158</text>
+              <text x="620" y="88" font-size="8" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">102</text>
+              <!-- X axis (all 9 weeks) -->
+              <text x="50"  y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="154" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
+              <text x="257" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
+              <text x="361" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="542" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
+              <text x="568" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S32</text>
+              <text x="594" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S33</text>
+              <text x="620" y="150" font-size="9" fill="#E24B4A" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">S34</text>
             </svg>
           </div>
 
           <!-- WEIGHT chart -->
-          <div class="hchart-wrap" id="hc-peso" style="display:none">
+          <div class="hchart-wrap" id="hc-peso" data-chart="peso" style="display:none">
             <div class="hchart-legend">
               <span class="hcl hcl-p">Peso corporal</span>
-              <span class="hcl-ref">Ganancia normal: 0.3–0.5 kg/semana en 3er trim.</span>
+              <span class="hcl-ref">Ganancia esperada T3: 0.3–0.5 kg/sem · puntós = ritmo de ganancia</span>
             </div>
             <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
               <!-- axes -->
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <!-- gridlines -->
+              <line x1="50" y1="57" x2="620" y2="57" stroke="var(--brd)" stroke-width="1" stroke-dasharray="2,5" opacity="0.5"/>
+              <line x1="50" y1="96" x2="620" y2="96" stroke="var(--brd)" stroke-width="1" stroke-dasharray="2,5" opacity="0.5"/>
               <!-- Y labels -->
-              <text x="45" y="18"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">75 kg</text>
-              <text x="45" y="57"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">65 kg</text>
-              <text x="45" y="96"  font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">55 kg</text>
-              <text x="45" y="136" font-size="9" fill="#888780" text-anchor="end" font-family="DM Sans,sans-serif">50 kg</text>
+              <text x="45" y="18"  font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">75 kg</text>
+              <text x="45" y="60"  font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">65 kg</text>
+              <text x="45" y="99"  font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">55 kg</text>
+              <text x="45" y="136" font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">50 kg</text>
               <!-- area -->
               <path d="M50,121 L154,111 L257,98 L361,85 L465,73 L542,61 L568,56 L594,49 L620,48 L620,136 L50,136 Z" fill="rgba(43,87,217,0.07)"/>
               <!-- line -->
               <polyline points="50,121 154,111 257,98 361,85 465,73 542,61 568,56 594,49 620,48" fill="none" stroke="#2B57D9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-              <!-- dots (color by weight gain rate) -->
-              <circle cx="50"  cy="121" r="3.5" fill="#0F6E56"/>
-              <circle cx="154" cy="111" r="3.5" fill="#0F6E56"/>
-              <circle cx="257" cy="98"  r="3.5" fill="#0F6E56"/>
-              <circle cx="361" cy="85"  r="3.5" fill="#0F6E56"/>
-              <circle cx="465" cy="73"  r="3.5" fill="#2B57D9"/>
-              <circle cx="542" cy="61"  r="3.5" fill="#2B57D9"/>
-              <circle cx="568" cy="56"  r="3.5" fill="#EF9F27"/>
-              <circle cx="594" cy="49"  r="3.5" fill="#EF9F27"/>
-              <circle cx="620" cy="48"  r="4.5" fill="#EF9F27" stroke="rgba(239,159,39,0.25)" stroke-width="6"/>
+              <!-- dots with titles -->
+              <circle cx="50"  cy="121" r="3.5" fill="#0F6E56"><title>Sem 12 · Peso: 53.0 kg · inicio del seguimiento</title></circle>
+              <circle cx="154" cy="111" r="3.5" fill="#0F6E56"><title>Sem 16 · Peso: 55.2 kg · +2.2 kg (normal)</title></circle>
+              <circle cx="257" cy="98"  r="3.5" fill="#0F6E56"><title>Sem 20 · Peso: 57.8 kg · +2.6 kg (normal)</title></circle>
+              <circle cx="361" cy="85"  r="3.5" fill="#0F6E56"><title>Sem 24 · Peso: 60.5 kg · +2.7 kg (normal)</title></circle>
+              <circle cx="465" cy="73"  r="3.5" fill="#2B57D9"><title>Sem 28 · Peso: 63.0 kg · +2.5 kg (acelerado)</title></circle>
+              <circle cx="542" cy="61"  r="3.5" fill="#2B57D9"><title>Sem 31 · Peso: 65.3 kg · +2.3 kg (acelerado)</title></circle>
+              <circle cx="568" cy="56"  r="3.5" fill="#EF9F27"><title>Sem 32 · Peso: 66.5 kg · +1.2 kg/sem ⚠ Edema</title></circle>
+              <circle cx="594" cy="49"  r="3.5" fill="#EF9F27"><title>Sem 33 · Peso: 67.8 kg · +1.3 kg/sem ⚠ Edema</title></circle>
+              <circle cx="620" cy="48"  r="5" fill="#EF9F27" stroke="rgba(239,159,39,0.28)" stroke-width="7"><title>Sem 34 · Peso: 68.0 kg · +1.2 kg/sem ⚠ Retención</title></circle>
               <!-- callouts -->
-              <text x="50"  y="116" font-size="9" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">53</text>
-              <text x="620" y="42"  font-size="9" fill="#EF9F27" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">68 kg</text>
-              <!-- X labels -->
-              <text x="50"  y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
-              <text x="154" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
-              <text x="257" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
-              <text x="361" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
-              <text x="465" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
-              <text x="542" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
-              <text x="620" y="150" font-size="9" fill="#888780" text-anchor="middle" font-family="DM Sans,sans-serif">S34</text>
+              <text x="50"  y="115" font-size="8" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">53 kg</text>
+              <rect x="604" y="31" width="32" height="12" rx="3" fill="#EF9F27" opacity="0.9"/>
+              <text x="620" y="40" font-size="8" fill="white" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">68 kg</text>
+              <!-- X labels (all 9) -->
+              <text x="50"  y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="154" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
+              <text x="257" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
+              <text x="361" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="542" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
+              <text x="568" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S32</text>
+              <text x="594" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S33</text>
+              <text x="620" y="150" font-size="9" fill="#EF9F27" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">S34</text>
+            </svg>
+          </div>
+
+          <!-- FCF chart (new) -->
+          <div class="hchart-wrap" id="hc-fcf" data-chart="fcf" style="display:none">
+            <div class="hchart-legend">
+              <span class="hcl hcl-fcf">Frecuencia cardíaca fetal</span>
+              <span class="hcl-ref">Rango normal: 110–160 lpm · FCF normal durante todo el seguimiento</span>
+            </div>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+              <!-- normal band -->
+              <rect x="50" y="44" width="570" height="77" fill="rgba(15,110,86,0.07)" rx="2"/>
+              <!-- axes -->
+              <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
+              <!-- gridlines -->
+              <line x1="50" y1="75" x2="620" y2="75" stroke="var(--brd)" stroke-width="1" stroke-dasharray="2,5" opacity="0.5"/>
+              <!-- threshold lines -->
+              <line x1="50" y1="44" x2="620" y2="44" stroke="#0F6E56" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+              <text x="45" y="47" font-size="9" fill="#0F6E56" text-anchor="end" opacity="0.8" font-family="DM Sans,sans-serif">160</text>
+              <line x1="50" y1="121" x2="620" y2="121" stroke="#0F6E56" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+              <text x="45" y="124" font-size="9" fill="#0F6E56" text-anchor="end" opacity="0.8" font-family="DM Sans,sans-serif">110</text>
+              <text x="45" y="78" font-size="9" fill="var(--txt3)" text-anchor="end" font-family="DM Sans,sans-serif">140</text>
+              <!-- area -->
+              <path d="M50,57 L154,75 L257,69 L361,63 L465,52 L542,60 L568,57 L594,63 L620,69 L620,136 L50,136 Z" fill="rgba(15,110,86,0.06)"/>
+              <!-- line -->
+              <polyline points="50,57 154,75 257,69 361,63 465,52 542,60 568,57 594,63 620,69" fill="none" stroke="#0F6E56" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- dots with titles -->
+              <circle cx="50"  cy="57"  r="3.5" fill="#0F6E56"><title>Sem 12 · FCF: 152 lpm ✓ Normal</title></circle>
+              <circle cx="154" cy="75"  r="3.5" fill="#0F6E56"><title>Sem 16 · FCF: 140 lpm ✓ Normal</title></circle>
+              <circle cx="257" cy="69"  r="3.5" fill="#0F6E56"><title>Sem 20 · FCF: 144 lpm ✓ Normal</title></circle>
+              <circle cx="361" cy="63"  r="3.5" fill="#0F6E56"><title>Sem 24 · FCF: 148 lpm ✓ Normal</title></circle>
+              <circle cx="465" cy="52"  r="3.5" fill="#0F6E56"><title>Sem 28 · FCF: 155 lpm ✓ Normal</title></circle>
+              <circle cx="542" cy="60"  r="3.5" fill="#0F6E56"><title>Sem 31 · FCF: 150 lpm ✓ Normal</title></circle>
+              <circle cx="568" cy="57"  r="3.5" fill="#0F6E56"><title>Sem 32 · FCF: 152 lpm ✓ Normal</title></circle>
+              <circle cx="594" cy="63"  r="3.5" fill="#0F6E56"><title>Sem 33 · FCF: 148 lpm ✓ Normal</title></circle>
+              <circle cx="620" cy="69"  r="5" fill="#0F6E56" stroke="rgba(15,110,86,0.25)" stroke-width="7"><title>Sem 34 · FCF: 144 lpm ✓ Normal</title></circle>
+              <!-- callouts -->
+              <text x="50"  y="51" font-size="8" fill="#0F6E56" text-anchor="middle" font-family="DM Sans,sans-serif">152</text>
+              <rect x="604" y="57" width="32" height="12" rx="3" fill="#0F6E56" opacity="0.85"/>
+              <text x="620" y="66" font-size="8" fill="white" text-anchor="middle" font-weight="700" font-family="DM Sans,sans-serif">144 lpm</text>
+              <!-- normal band label -->
+              <text x="56" y="53" font-size="7" fill="#0F6E56" opacity="0.55" font-family="DM Sans,sans-serif">Zona normal</text>
+              <!-- X labels (all 9) -->
+              <text x="50"  y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S12</text>
+              <text x="154" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S16</text>
+              <text x="257" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S20</text>
+              <text x="361" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S24</text>
+              <text x="465" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S28</text>
+              <text x="542" y="150" font-size="9" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S31</text>
+              <text x="568" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S32</text>
+              <text x="594" y="150" font-size="8" fill="var(--txt3)" text-anchor="middle" font-family="DM Sans,sans-serif">S33</text>
+              <text x="620" y="150" font-size="9" fill="#0F6E56" text-anchor="middle" font-weight="600" font-family="DM Sans,sans-serif">S34</text>
             </svg>
           </div>
         </div>
 
         <div class="htabs">
           <button class="htab on" onclick="filterHist(this,'all')">Todas (9)</button>
-          <button class="htab" onclick="filterHist(this,'alert')">⚠ Solo alertas (3)</button>
+          <button class="htab" onclick="filterHist(this,'alert')">⚠ Solo alertas (4)</button>
           <button class="htab" onclick="filterHist(this,'t3')">3er trimestre</button>
           <button class="htab" onclick="filterHist(this,'t2')">2do trimestre</button>
           <button class="htab" onclick="filterHist(this,'t1')">1er trimestre</button>
