@@ -1,6 +1,19 @@
 /* ui-helpers.js — Gia · Módulo Obstétrico Inteligente
  * Navegación, breadcrumb y helpers de UI. Sin lógica clínica. */
 
+/* ── STATE RESET — previene contaminación entre sesiones ─────────────────────*/
+function clearAllForms() {
+  document.querySelectorAll(".main input, .main select, .main textarea").forEach(el => {
+    if (el.type === "checkbox" || el.type === "radio") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+    el.classList.remove("fok", "ferr");
+  });
+  document.querySelectorAll(".main .fhint").forEach(h => { h.textContent = ""; h.className = "fhint"; });
+}
+
 /* ── NAVEGACIÓN ──────────────────────────────────────────────────────────────*/
 function go(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -36,6 +49,7 @@ function showPatient() {
 }
 
 function showForm() {
+  clearAllForms();
   go("sc-form");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Nueva consulta" }]);
 }
@@ -53,6 +67,7 @@ function showHistory() {
 }
 
 function showNueva() {
+  clearAllForms();
   go("sc-nueva");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Nueva paciente" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
@@ -62,6 +77,7 @@ function showNueva() {
 }
 
 function showLaboratorios() {
+  clearAllForms();
   go("sc-laboratorios");
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Laboratorios" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
@@ -88,6 +104,15 @@ function togB(btn) {
   const b = document.getElementById("tb");
   b.classList.toggle("open");
   btn.querySelector("span:last-child").textContent = b.classList.contains("open") ? "Colapsar ▲" : "Expandir ▼";
+}
+
+/* ── SÍNTOMAS — Ninguno deselecciona los demás ───────────────────────────────*/
+function togSintomasNinguno(cb) {
+  if (!cb.checked) return;
+  ['f-cefalea','f-escotomas-dest','f-escotomas-manch','f-epigastralgia','f-zumbido','f-eclampsia'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
 }
 
 /* ── HÁBITOS — toggle individual ─────────────────────────────────────────────*/
@@ -127,7 +152,9 @@ function filterHist(btn, f) {
   const semMap = { t1: [12, 19], t2: [20, 27], t3: [28, 42] };
   const entries = document.querySelectorAll("#hist-tl .hentry");
   let vis = 0;
+  let lastVisibleEntry = null;
   entries.forEach(e => {
+    e.classList.remove("last-visible");
     const st  = e.dataset.status;
     const sem = +e.dataset.sem;
     let show  = true;
@@ -136,14 +163,15 @@ function filterHist(btn, f) {
     else if (f === "t2")    show = sem >= semMap.t2[0] && sem <= semMap.t2[1];
     else if (f === "t3")    show = sem >= semMap.t3[0] && sem <= semMap.t3[1];
     e.style.display = show ? "flex" : "none";
-    if (show) vis++;
+    if (show) { vis++; lastVisibleEntry = e; }
   });
+  if (lastVisibleEntry) lastVisibleEntry.classList.add("last-visible");
   document.getElementById("hist-empty").classList.toggle("show", vis === 0);
 }
 
 /* ── CHARTS ──────────────────────────────────────────────────────────────────*/
 function switchChart(btn, id) {
-  document.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
   document.getElementById("hc-bp").style.display    = id === "bp"   ? "block" : "none";
   document.getElementById("hc-peso").style.display  = id === "peso" ? "block" : "none";
@@ -176,7 +204,7 @@ function togCierre(label) {
 }
 
 function switchResumenChart(btn, id) {
-  document.querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
+  btn.closest('.hcharts').querySelectorAll(".hctab").forEach(t => t.classList.remove("on"));
   btn.classList.add("on");
   document.getElementById("rc-bp").style.display    = id === "bp"   ? "block" : "none";
   document.getElementById("rc-peso").style.display  = id === "peso" ? "block" : "none";
