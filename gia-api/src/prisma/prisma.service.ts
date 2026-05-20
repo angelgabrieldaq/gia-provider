@@ -1,14 +1,16 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaClient } from '../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-// Prisma v7 generates PrismaClient as a const (not a class), so we use
-// composition instead of inheritance. Models are exposed via getters.
+// Prisma v7 with prisma-client generator requires a driver adapter.
+// PrismaClient is a const (not a class), so we use composition instead of inheritance.
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private readonly _client: InstanceType<typeof PrismaClient>;
 
   constructor() {
-    this._client = new (PrismaClient as any)({});
+    const adapter = new PrismaPg({ connectionString: process.env['DATABASE_URL'] });
+    this._client = new (PrismaClient as any)({ adapter });
   }
 
   async onModuleInit() {

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RobCalculationService } from '../clinical/services/rob-calculation.service';
 import { CreatePregnancyInput } from './dto/create-pregnancy.dto';
@@ -11,27 +11,20 @@ export class PregnanciesService {
   ) {}
 
   async createPregnancy(input: CreatePregnancyInput) {
-    // 1. Verificar si la paciente ya existe por DNI
-    const existing = await this.prisma.patient.findUnique({
-      where: { national_id: input.patient.national_id },
-    });
-
-    if (existing) {
-      throw new ConflictException(
-        'DNI ya existe en el sistema. Si es la misma paciente, cree un nuevo embarazo usando POST /api/pregnancies/{patient_id}/new-pregnancy',
-      );
-    }
-
-    // 2. Calcular ROB — UNA SOLA VEZ, inmutable (ADR-001)
+    // 1. Calcular ROB — UNA SOLA VEZ, inmutable (ADR-001)
     const robResult = this.robCalc.calculate(
       input.antecedents,
       input.antecedents.edad_al_embarazo,
     );
 
-    // 3. Crear paciente + embarazo en transacción atómica
+    // 2. Upsert paciente + crear embarazo en transacción atómica.
+    //    update: {} garantiza que los datos de la paciente NO se sobreescriben
+    //    si ya existe — solo se reutiliza su id para el embarazo nuevo.
     const result = await this.prisma.$transaction(async (tx) => {
-      const patient = await tx.patient.create({
-        data: {
+      const patient = await tx.patient.upsert({
+        where:  { national_id: input.patient.national_id },
+        update: {},
+        create: {
           first_name:  input.patient.first_name,
           last_name:   input.patient.last_name,
           national_id: input.patient.national_id,
@@ -61,7 +54,7 @@ export class PregnanciesService {
       return { patient, pregnancy };
     });
 
-    // 4. Respuesta exacta del API Contract
+    // 3. Respuesta exacta del API Contract
     return {
       success: true,
       data: {

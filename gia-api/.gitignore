@@ -6,4 +6,5 @@ dist/
 # prisma/migrations/ — NO ignorar: las migraciones son historial de BD
 *.log
 
-/generated/prisma
+generated/
+src/generated/
