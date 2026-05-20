@@ -1,0 +1,223 @@
+// Gia MVP — Prisma Schema v1.0
+// Autoridad: Clinical Operational Model (COM)
+// Última actualización: Mayo 2026
+// Nota tooling: generator/datasource adaptados a Prisma v7 (breaking change).
+// Modelos, enums e índices son idénticos al doc original.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL movida a prisma.config.ts (Prisma v7 breaking change)
+}
+
+// ============================================================================
+// ENUMS — La verdad clínica del sistema
+// ============================================================================
+
+enum RobLevel {
+  BAJO
+  MODERADO
+  ALTO
+}
+
+enum EcaStatus {
+  STABLE
+  WATCHFUL
+  ALERT
+  CRITICAL
+}
+
+enum AlertSeverity {
+  INFORMATIVE
+  MODERATE
+  HARD
+  SOFT
+}
+
+// ============================================================================
+// MODEL: Patient
+// ============================================================================
+// Una paciente existe una sola vez en el sistema.
+// Sus embarazos se crean y cierran, pero la paciente persiste.
+
+model Patient {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  national_id String      @unique // DNI — identificador único legal
+  first_name  String
+  last_name   String
+  birth_date  DateTime    // Para calcular edad en cada embarazo
+  phone       String?     // Contacto obstetra-paciente
+  health_ins  String?     // "OSDE", "Galeno", etc.
+  blood_type  String?     // "A+", "O-", etc.
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+
+  pregnancies Pregnancy[]
+
+  @@map("patients")
+}
+
+// ============================================================================
+// MODEL: Pregnancy
+// ============================================================================
+// Un embarazo es la unidad clínica principal.
+// El ROB (Riesgo Obstétrico Basal) se calcula UNA SOLA VEZ al crear el embarazo.
+// NO CAMBIA después, incluso si aparecen nuevos antecedentes (limitación conocida MVP).
+
+model Pregnancy {
+  id                String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  patient_id        String         @db.Uuid
+  patient           Patient        @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  
+  // Datos demográficos y obstétricos del embarazo
+  fum               DateTime       // Fecha última menstruación — calcula EGA automática
+  fpp               DateTime?      // Fecha probable de parto (pueden modificarla)
+  formula_g         Int?           // G (gestaciones)
+  formula_p         Int?           // P (partos)
+  formula_a         Int?           // A (abortos)
+  formula_c         Int?           // C (cesáreas)
+  
+  // Antecedentes en formato JSON para flexibilidad futura (Event Sourcing en v1.1)
+  // Estructura: {"hta_cronica": true, "diabetes_previa": false, "preeclampsia_previa": false, ...}
+  raw_antecedents   Json
+  
+  // LA VERDAD CLÍNICA INMUTABLE — Calculada por RobCalculationService en POST /api/pregnancies
+  // Una vez guardada, NO se modifica. Si cambian antecedentes, va en las notas, no aquí.
+  rob_status        RobLevel
+  rob_justification String[]       // Ej: ["Edad > 35", "HTA crónica", "Obesidad IMC > 30"]
+  rob_calculated_at DateTime       @default(now()) // Auditoría: cuándo se calculó
+
+  active            Boolean        @default(true)   // Para marcar embarazos cerrados (v1.1)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  consultations     Consultation[]
+
+  @@map("pregnancies")
+  @@index([patient_id]) // Buscar embarazos por paciente
+  @@index([active])     // Filtrar activos
+}
+
+// ============================================================================
+// MODEL: Consultation
+// ============================================================================
+// Cada visita genera UNA consulta.
+// Los campos se completan gradualmente: Tier A (obligatorio), Tier B, Tier C.
+// El ECA se calcula al guardar basándose en ROB + valores vitales.
+
+model Consultation {
+  id                        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pregnancy_id              String     @db.Uuid
+  pregnancy                 Pregnancy  @relation(fields: [pregnancy_id], references: [id], onDelete: Cascade)
+  
+  // Metadata de la consulta
+  consultation_date         DateTime   @default(now())
+  
+  // ========================================================================
+  // TIER A: Signos vitales críticos — SIEMPRE OBLIGATORIOS
+  // ========================================================================
+  gestational_weeks         Int        // EGA en semanas (4-44)
+  
+  // Presión arterial — La base del sistema de alertas
+  blood_pressure_systolic   Int        // 60-220 mmHg (validado por Zod)
+  blood_pressure_diastolic  Int        // 40-140 mmHg (validado por Zod)
+  
+  // Peso — Calcula delta vs consulta anterior (FasgoRiskService)
+  weight_kg                 Float      // 30-200 kg (validado por Zod)
+  
+  // FCF — Crítica en preeclampsia
+  fetal_heart_rate_bpm      Int?       // 80-220 lpm. Si ROB=ALTO, es obligatorio
+  
+  // ========================================================================
+  // TIER B: Contexto clínico — Condicional según ROB
+  // ========================================================================
+  uterine_height_cm         Int?       // 0-60 cm. Obligatorio si EGA > 20 semanas
+  
+  // Proteinuria — Signo objetivo clave de preeclampsia
+  // Válidos: "Negativa", "Trazas", "1+", "2+", "3+", "4+"
+  // Obligatorio si ROB=MODERADO o ALTO
+  proteinuria               String?
+  
+  // Síntomas de alarma: representados como booleans (checkboxes en UI)
+  // Obligatorios si ROB=MODERADO o ALTO
+  symp_edema                Boolean    @default(false)           // Edemas
+  symp_headache             Boolean    @default(false)           // Cefalea
+  symp_vision_changes       Boolean    @default(false)           // Fosfenos, escotomas
+  symp_contractions         Boolean    @default(false)           // Contracciones
+  symp_bleeding             Boolean    @default(false)           // Sangrado
+  symp_amniotic_fluid_loss  Boolean    @default(false)           // Pérdida de LA
+  
+  // ========================================================================
+  // TIER C: Contexto narrativo — Opcional pero preservado siempre
+  // ========================================================================
+  clinical_notes            String?    // Texto libre, sin límite
+  
+  // Conducta de la obstetra
+  // Válidos: "continúa_seguimiento", "solicita_estudios", "ajusta_medicación", "deriva", "interna"
+  conduct_taken             String?    // Ej: "deriva"
+  
+  // Fecha sugerida para próximo control (la obstetra puede modificarla)
+  next_control_date         DateTime?
+  
+  // ========================================================================
+  // LA VERDAD CLÍNICA ACTUAL — Calculada por FasgoRiskService
+  // ========================================================================
+  // El ECA refleja el estado en THIS consulta. Independiente del ROB.
+  // Ejemplo: ROB=ALTO pero ECA=STABLE (todo bien hoy).
+  eca_calculated            EcaStatus
+  
+  // Auditoría: cuándo se calculó el ECA
+  eca_calculated_at         DateTime   @default(now())
+  
+  // Relaciones
+  alerts                    ClinicalAlertLog[]
+  
+  created_at                DateTime   @default(now())
+  updated_at                DateTime   @updatedAt
+
+  @@map("consultations")
+  @@index([pregnancy_id])       // Buscar consultas de un embarazo
+  @@index([consultation_date])  // Timeline por fecha
+  @@index([eca_calculated])     // Filtrar por estado clínico
+}
+
+// ============================================================================
+// MODEL: ClinicalAlertLog
+// ============================================================================
+// Registro inmutable de TODAS las alertas generadas.
+// Cumple con ISO 14971 — auditoría médico-legal.
+
+model ClinicalAlertLog {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  consultation_id String        @db.Uuid
+  consultation    Consultation  @relation(fields: [consultation_id], references: [id], onDelete: Cascade)
+  
+  // Qué regla se dispara
+  rule_id         String        // Ej: "HTA_MODERADA", "PROTEINURIA_1PLUS", "PA_CRITICA_HARD"
+  
+  // Mensaje para la obstetra
+  message         String        // Ej: "Presión arterial ≥140/90. Solicitar laboratorio."
+  
+  // Nivel de severidad
+  severity        AlertSeverity // INFORMATIVE, MODERATE, HARD, SOFT
+  
+  // Auditoría
+  created_at      DateTime      @default(now())
+
+  @@map("clinical_alerts_log")
+  @@index([consultation_id])
+  @@index([severity])
+}
+
+// ============================================================================
+// ÍNDICES Y CONSTRAINTS DE INTEGRIDAD
+// ============================================================================
+// Prisma gestiona constraints automáticamente.
+// Únicas adiciones explícitas:
+// - Patient.national_id es UNIQUE (una paciente, un DNI)
+// - Consultation.pregnancy_id + consultation_date podrían tener índice
+//   para detectar duplicados (v1.1 si es necesario)
