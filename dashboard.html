@@ -1973,86 +1973,135 @@
 <script>
 function updateNPHeader() { if (typeof updateStickyHeader === 'function') updateStickyHeader(); }
 
-function savePatient() {
+async function savePatient() {
   const nombre   = document.getElementById('np-nombre')?.value?.trim()  || '';
   const apellido = document.getElementById('np-apellido')?.value?.trim() || '';
   const peso     = document.getElementById('np-peso')?.value || '';
   const talla    = document.getElementById('np-talla')?.value || '';
+  const fnac     = document.getElementById('np-fnac')?.value || '';
+  const fum      = document.getElementById('np-fum')?.value  || '';
+  const dni      = document.getElementById('np-dni')?.value?.trim() || '';
 
-  if (!nombre || !apellido) {
-    if (!nombre) { const el=document.getElementById('np-nombre'); el?.classList.add('ferr'); el?.scrollIntoView({behavior:'smooth',block:'center'}); }
-    if (!apellido) document.getElementById('np-apellido')?.classList.add('ferr');
-    goStep(1); return;
-  }
-  if (!peso)  { goStep(1); document.getElementById('np-peso')?.classList.add('ferr');  return; }
-  if (!talla) { goStep(1); document.getElementById('np-talla')?.classList.add('ferr'); return; }
+  // Validación básica de campos obligatorios para el API
+  if (!nombre)   { const el=document.getElementById('np-nombre');   el?.classList.add('ferr'); el?.scrollIntoView({behavior:'smooth',block:'center'}); goStep(1); return; }
+  if (!apellido) { document.getElementById('np-apellido')?.classList.add('ferr'); goStep(1); return; }
+  if (!peso)     { document.getElementById('np-peso')?.classList.add('ferr');  goStep(1); return; }
+  if (!talla)    { document.getElementById('np-talla')?.classList.add('ferr'); goStep(1); return; }
+  if (!fnac)     { document.getElementById('np-fnac')?.classList.add('ferr');  goStep(1); return; }
+  if (!fum)      { document.getElementById('np-fum')?.classList.add('ferr');   goStep(1); return; }
 
-  const payload = {
-    nombre,
-    apellido,
-    fnac:      document.getElementById('np-fnac')?.value             || '',
-    dni:       document.getElementById('np-dni')?.value?.trim()      || '',
-    telefono:  document.getElementById('np-tel')?.value?.trim()      || '',
-    cobertura: document.getElementById('np-cobertura')?.value        || '',
-    peso,
-    talla,
-    gs:        document.getElementById('np-gs')?.value               || '',
-    fum:       document.getElementById('np-fum')?.value              || '',
-    g:         document.getElementById('np-g')?.value                || '1',
-    p:         document.getElementById('np-p')?.value                || '0',
-    a:         document.getElementById('np-a')?.value                || '0',
-    c:         document.getElementById('np-c')?.value                || '0',
-    htaTipo:   document.getElementById('np-hta-tipo')?.value         || '',
-    eco1Fecha: document.getElementById('np-eco1-fecha')?.value       || '',
-    eco1Sem:   document.getElementById('np-eco1-sem')?.value         || '',
-    eco1Dias:  document.getElementById('np-eco1-dias')?.value        || '',
-    factoresRiesgo: Array.from(
-      document.querySelectorAll('#sc-nueva [data-w] input:checked')
-    ).map(cb => ({
-      code:   cb.value || '',
-      weight: cb.closest('[data-w]')?.dataset?.w || 'm',
-    })),
-    habitos: {
-      tabaquismo:   document.getElementById('h-tabaquismo')?.checked   || false,
-      cigarrillos:  document.getElementById('h-cigarrillos')?.value    || '',
-      deseaDejar:   document.getElementById('h-desea-dejar')?.value    || '',
-      alcohol:      document.getElementById('h-alcohol')?.checked      || false,
-      alcoholFreq:  document.getElementById('h-alcohol-freq')?.value   || '',
-      sustancias:   document.getElementById('h-sustancias')?.checked   || false,
-      sustDesc:     document.getElementById('h-sust-desc')?.value      || '',
-      actividadFis: document.getElementById('h-actividad')?.value      || '',
-      dieta:        document.getElementById('h-dieta')?.value          || '',
+  // Calcular edad al embarazo desde fecha de nacimiento
+  const edad_al_embarazo = (() => {
+    if (!fnac) return 0;
+    const hoy = new Date(), nac = new Date(fnac);
+    let edad = hoy.getFullYear() - nac.getFullYear();
+    if (hoy.getMonth() < nac.getMonth() || (hoy.getMonth() === nac.getMonth() && hoy.getDate() < nac.getDate())) edad--;
+    return edad;
+  })();
+
+  // Calcular IMC inicial desde peso (kg) y talla (cm)
+  const imc_inicial = (() => {
+    const p = parseFloat(peso), t = parseFloat(talla);
+    if (!p || !t || t < 100) return null;
+    return parseFloat((p / ((t / 100) ** 2)).toFixed(1));
+  })();
+
+  // Leer antecedentes desde checkboxes del formulario
+  const checkedValues = new Set(
+    Array.from(document.querySelectorAll('#sc-nueva [data-w] input[type="checkbox"]:checked'))
+      .map(cb => cb.value)
+  );
+  const htaTipo = document.getElementById('np-hta-tipo')?.value || '';
+
+  // Construir payload exacto del API Contract
+  const apiPayload = {
+    patient: {
+      first_name:  nombre,
+      last_name:   apellido,
+      national_id: dni || `TEMP-${Date.now()}`,
+      birth_date:  fnac ? new Date(fnac).toISOString() : new Date().toISOString(),
+      phone:       document.getElementById('np-tel')?.value?.trim() || '',
+      health_ins:  document.getElementById('np-cobertura')?.value || '',
+      blood_type:  document.getElementById('np-gs')?.value || '',
     },
-    vacunas: {
-      hepatitisB: document.getElementById('vac-hepb')?.checked     || false,
-      tripleB:    document.getElementById('vac-triple')?.checked    || false,
-      influenza:  document.getElementById('vac-influenza')?.checked || false,
-      covid:      document.getElementById('vac-covid')?.checked     || false,
+    pregnancy: {
+      fum:       new Date(fum).toISOString(),
+      formula_g: parseInt(document.getElementById('np-g')?.value) || 1,
+      formula_p: parseInt(document.getElementById('np-p')?.value) || 0,
+      formula_a: parseInt(document.getElementById('np-a')?.value) || 0,
+      formula_c: parseInt(document.getElementById('np-c')?.value) || 0,
     },
-    preventivo: {
-      papFecha:    document.getElementById('prev-pap-fecha')?.value  || '',
-      papHallazgo: document.getElementById('prev-pap-hall')?.value   || '',
-      mamFecha:    document.getElementById('prev-mam-fecha')?.value  || '',
-      mamHallazgo: document.getElementById('prev-mam-hall')?.value   || '',
-      hiv:         document.getElementById('prev-hiv')?.value        || '',
-      chagas:      document.getElementById('prev-chagas')?.value     || '',
-      rubeola:     document.getElementById('prev-rubeola')?.value    || '',
-      toxo:        document.getElementById('prev-toxo')?.value       || '',
+    antecedents: {
+      edad_al_embarazo,
+      hta_cronica:          htaTipo === 'esencial' || htaTipo === 'secundaria',
+      diabetes_previa:      checkedValues.has('diabetes_pregestacional'),
+      preeclampsia_previa:  checkedValues.has('preeclampsia_anterior'),
+      imc_inicial:          imc_inicial,
+      lupus:                false,
+      trombofilia:          checkedValues.has('saf'),
     },
-    createdAt: new Date().toISOString(),
-    savedBy:   'demo-user',
-    timeline:  [],
   };
 
-  console.log(JSON.stringify(payload, null, 2));
+  // Deshabilitar botón para prevenir doble-envío
+  const btn = document.querySelector('[onclick="savePatient()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
 
-  if (!window.giaPatients) window.giaPatients = [];
-  window.giaPatients.push(payload);
+  try {
+    const response = await fetch('http://localhost:3000/api/pregnancies', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer dev-obstetra-123',
+      },
+      body: JSON.stringify(apiPayload),
+    });
 
-  clearDraft('sc-nueva');
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar) sidebar.classList.remove('collapsed');
-  showDash();
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Error del servidor (400, 422, 500…)
+      const msg = result?.error || result?.message || 'Error desconocido del servidor';
+      alert(`Error al guardar la paciente:\n${msg}`);
+      if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
+      return;
+    }
+
+    // Éxito (201): persistir IDs en sessionStorage para cargar consultas después
+    const { patient_id, pregnancy_id, rob_calculated, rob_justification } = result.data;
+    sessionStorage.setItem('current_patient_id',  patient_id);
+    sessionStorage.setItem('current_pregnancy_id', pregnancy_id);
+    sessionStorage.setItem('current_rob',          rob_calculated);
+    sessionStorage.setItem('current_patient_name', `${nombre} ${apellido}`);
+
+    // Preservar payload local para que el dashboard pueda mostrarlo
+    if (!window.giaPatients) window.giaPatients = [];
+    window.giaPatients.push({
+      ...apiPayload.patient,
+      pregnancy_id,
+      patient_id,
+      rob_calculated,
+      rob_justification,
+      fum: apiPayload.pregnancy.fum,
+    });
+
+    // Mostrar ROB calculado por el servidor en la UI
+    const robBadge = document.getElementById('rob-result-badge');
+    if (robBadge) {
+      robBadge.textContent = `ROB: ${rob_calculated}`;
+      robBadge.className   = `rob-badge rob-${rob_calculated.toLowerCase()}`;
+      robBadge.style.display = 'inline-block';
+    }
+
+    clearDraft('sc-nueva');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('collapsed');
+    showDash();
+
+  } catch (err) {
+    // Error de red (servidor apagado, CORS, etc.)
+    alert(`No se pudo conectar con el servidor.\nVerificá que el backend esté corriendo en localhost:3000.\n\n${err.message}`);
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar'; }
+  }
 }
 
 /* ── FASGO 2025 — LEER DATOS DISPONIBLES ─────────────────────────────────── */
