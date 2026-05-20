@@ -7,8 +7,8 @@ export class RobCalculationService {
     const justification: string[] = [];
     let robLevel: 'BAJO' | 'MODERADO' | 'ALTO' = 'BAJO';
 
-    // Edad de riesgo — umbral COM: ≥40 (ver ADR-001 para contexto)
-    if (ageAtPregnancy >= 40) {
+    // Edad de riesgo — umbral FASGO 2025 / ACOG: ≥35 años
+    if (ageAtPregnancy >= 35) {
       justification.push(`Edad de riesgo (${ageAtPregnancy} años)`);
       robLevel = 'MODERADO';
     }

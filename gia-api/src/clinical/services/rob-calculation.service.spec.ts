@@ -14,16 +14,16 @@ describe('RobCalculationService', () => {
     expect(result.justification).toEqual(['Sin factores de riesgo identificados']);
   });
 
-  // ── Test 2: Edad ≥ 40 ────────────────────────────────────────────────────
-  it('should return MODERADO when age >= 40', () => {
-    const result = service.calculate({}, 40);
+  // ── Test 2: Edad ≥ 35 (FASGO 2025) ──────────────────────────────────────
+  it('should return MODERADO when age >= 35', () => {
+    const result = service.calculate({}, 35);
     expect(result.rob_status).toBe('MODERADO');
-    expect(result.justification).toContain('Edad de riesgo (40 años)');
+    expect(result.justification).toContain('Edad de riesgo (35 años)');
   });
 
-  // ── Test 3: Edad exactamente 39 (por debajo del umbral) ──────────────────
-  it('should return BAJO when age is 39 (below threshold)', () => {
-    const result = service.calculate({}, 39);
+  // ── Test 3: Edad exactamente 34 (por debajo del umbral) ──────────────────
+  it('should return BAJO when age is 34 (below threshold)', () => {
+    const result = service.calculate({}, 34);
     expect(result.rob_status).toBe('BAJO');
     expect(result.justification).toEqual(['Sin factores de riesgo identificados']);
   });
@@ -70,12 +70,12 @@ describe('RobCalculationService', () => {
     expect(result.justification).toContain('Enfermedad autoinmune / Trombofilia');
   });
 
-  // ── Test 10: edad >= 40 + HTA crónica → ALTO (dos escalones) ─────────────
-  it('should return ALTO when age >= 40 AND hta_cronica (two-step escalation)', () => {
+  // ── Test 10: edad >= 35 + HTA crónica → ALTO (dos escalones) ─────────────
+  it('should return ALTO when age >= 35 AND hta_cronica (two-step escalation)', () => {
     // edad: BAJO→MODERADO, luego HTA: MODERADO→ALTO
-    const result = service.calculate({ hta_cronica: true }, 42);
+    const result = service.calculate({ hta_cronica: true }, 38);
     expect(result.rob_status).toBe('ALTO');
-    expect(result.justification).toContain('Edad de riesgo (42 años)');
+    expect(result.justification).toContain('Edad de riesgo (38 años)');
     expect(result.justification).toContain('Hipertensión crónica');
     expect(result.justification.length).toBe(2);
   });
@@ -102,10 +102,10 @@ describe('RobCalculationService', () => {
   });
 
   // ── Test 13: Obesidad (MODERADO→ALTO por edad + IMC) ─────────────────────
-  it('should return ALTO when age >= 40 AND obesity (two-step escalation)', () => {
-    const result = service.calculate({ imc_inicial: 32 }, 41);
+  it('should return ALTO when age >= 35 AND obesity (two-step escalation)', () => {
+    const result = service.calculate({ imc_inicial: 32 }, 36);
     expect(result.rob_status).toBe('ALTO');
-    expect(result.justification).toContain('Edad de riesgo (41 años)');
+    expect(result.justification).toContain('Edad de riesgo (36 años)');
     expect(result.justification[1]).toMatch(/Obesidad/);
   });
 });
