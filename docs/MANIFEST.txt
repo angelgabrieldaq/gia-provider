@@ -1,0 +1,57 @@
+GIA — Módulo Obstétrico Inteligente
+Zenoxia · SaMD ANMAT Argentina
+Documentación de Arquitectura — Sprint 1 (Semanas 3-4)
+======================================================
+
+DOCUMENTOS EN ESTA CARPETA
+---------------------------
+
+Gia_Backend_Checklist_Weeks34.md
+  Biblia de ejecución del backend. Sigue este documento en orden estricto.
+  Semana 3: Infraestructura + ROB
+  Semana 4: Consultas + ECA
+  NO avances al día siguiente sin luz verde del PO.
+
+Gia_Prisma_Schema_MVP.prisma
+  Schema de base de datos. 4 tablas: patients, pregnancies, consultations, clinical_alerts_log.
+  Copiar a gia-api/prisma/schema.prisma para inicializar Prisma.
+
+Gia_API_Contract_MVP.md
+  Contrato de los 2 endpoints: POST /api/pregnancies y POST /api/consultations.
+  Incluye código completo de RobCalculationService y FasgoRiskService.
+
+ADR_001_ROB_Inmutable_MVP.md
+  Decisión arquitectónica: el ROB se calcula una sola vez y es inmutable.
+  No modificar rob_status después del INSERT. Ver sección "Consecuencias".
+
+ADR_002_Logica_Clinica_Backend.md
+  Decisión arquitectónica: toda lógica clínica vive en el backend.
+  El frontend NUNCA calcula ROB ni ECA. Solo captura inputs y pinta respuestas.
+
+LÍNEAS ROJAS (NO NEGOCIABLES)
+------------------------------
+1. NO tocar /assets ni dashboard.html ni index.html.
+2. Todo lo que no esté en estos documentos, NO se programa.
+3. Auth: guard estático con token "dev-obstetra-123" — no bcrypt, no login real.
+4. Thresholds clínicos (PA ≥140/90, ≥160/110, FCF <100/>180): NO cambiar sin médico.
+5. ROB es inmutable. RobCalculationService se llama UNA SOLA VEZ.
+
+ESTRUCTURA TARGET DEL MONOREPO
+-------------------------------
+gia-provider/
+├── assets/          ← Frontend actual (CONGELADO)
+├── dashboard.html   ← Frontend actual (CONGELADO)
+├── docs/            ← Esta carpeta
+├── docker-compose.yml
+└── gia-api/         ← Backend NestJS (Semanas 3-4)
+    ├── Dockerfile
+    ├── prisma/
+    │   └── schema.prisma
+    └── src/
+        ├── auth/
+        ├── clinical/
+        │   ├── services/
+        │   └── matrix/
+        ├── consultations/
+        ├── pregnancies/
+        └── prisma/

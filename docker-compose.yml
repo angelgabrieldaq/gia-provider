@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gia_postgres
+    environment:
+      POSTGRES_USER: gia_user
+      POSTGRES_PASSWORD: gia_pass
+      POSTGRES_DB: gia_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gia_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./gia-api
+      dockerfile: Dockerfile
+    container_name: gia_api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://gia_user:gia_pass@postgres:5432/gia_dev"
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./gia-api:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
