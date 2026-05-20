@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RobCalculationService } from '../clinical/services/rob-calculation.service';
 import { CreatePregnancyInput } from './dto/create-pregnancy.dto';
@@ -9,6 +9,85 @@ export class PregnanciesService {
     private readonly prisma: PrismaService,
     private readonly robCalc: RobCalculationService,
   ) {}
+
+  async searchByNationalId(nationalId: string) {
+    const patient = await this.prisma.patient.findUnique({
+      where: { national_id: nationalId },
+    });
+
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrada');
+    }
+
+    const pregnancy = await this.prisma.pregnancy.findFirst({
+      where: { patient_id: patient.id },
+      orderBy: { created_at: 'desc' },
+    });
+
+    if (!pregnancy) {
+      throw new NotFoundException('Paciente sin embarazos registrados');
+    }
+
+    const totalDays = Math.floor((Date.now() - new Date(pregnancy.fum).getTime()) / (24 * 60 * 60 * 1000));
+    const egaWeeks  = Math.floor(totalDays / 7);
+    const egaDays   = totalDays % 7;
+
+    return {
+      success: true,
+      data: {
+        patient: {
+          id:          patient.id,
+          first_name:  patient.first_name,
+          last_name:   patient.last_name,
+          national_id: patient.national_id,
+          phone:       patient.phone,
+        },
+        pregnancy: {
+          id:                  pregnancy.id,
+          fum:                 pregnancy.fum,
+          fpp:                 pregnancy.fpp,
+          rob_status:          pregnancy.rob_status,
+          rob_justification:   pregnancy.rob_justification,
+          current_ega_weeks:   egaWeeks,
+          current_ega_days:    egaDays,
+        },
+      },
+    };
+  }
+
+  async findOne(id: string) {
+    const pregnancy = await this.prisma.pregnancy.findUnique({
+      where: { id },
+      include: { patient: true },
+    });
+
+    if (!pregnancy) {
+      throw new NotFoundException(`Embarazo con ID ${id} no encontrado`);
+    }
+
+    const fumDate = new Date(pregnancy.fum);
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const totalDays = Math.floor((Date.now() - fumDate.getTime()) / (24 * 60 * 60 * 1000));
+    const egaWeeks = Math.floor(totalDays / 7);
+    const egaDays  = totalDays % 7;
+
+    return {
+      success: true,
+      data: {
+        pregnancy_id:      pregnancy.id,
+        patient_id:        pregnancy.patient_id,
+        patient_name:      `${pregnancy.patient.first_name} ${pregnancy.patient.last_name}`,
+        rob_status:        pregnancy.rob_status,
+        rob_justification: pregnancy.rob_justification,
+        fum:               pregnancy.fum,
+        fpp:               pregnancy.fpp,
+        ega_weeks:         egaWeeks,
+        ega_days:          egaDays,
+        active:            pregnancy.active,
+        created_at:        pregnancy.created_at,
+      },
+    };
+  }
 
   async createPregnancy(input: CreatePregnancyInput) {
     // 1. Calcular ROB — UNA SOLA VEZ, inmutable (ADR-001)

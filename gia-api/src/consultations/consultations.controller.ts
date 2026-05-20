@@ -1,7 +1,9 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
   BadRequestException,
@@ -18,6 +20,14 @@ import { AuthGuard } from '../auth/auth.guard';
 @UseGuards(AuthGuard)
 export class ConsultationsController {
   constructor(private readonly consultationsService: ConsultationsService) {}
+
+  @Get()
+  async findByPregnancy(@Query('pregnancy_id') pregnancyId: string) {
+    if (!pregnancyId) {
+      throw new BadRequestException({ success: false, error: 'Se requiere el parámetro pregnancy_id', code: 'MISSING_PARAM' });
+    }
+    return this.consultationsService.findByPregnancy(pregnancyId);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

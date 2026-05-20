@@ -187,6 +187,19 @@ function showHistory() {
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Evolutivo Longitudinal" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
   document.getElementById("si-l").classList.add("active");
+  const pregnancyId = sessionStorage.getItem('current_pregnancy_id');
+  if (pregnancyId && typeof cargarTimeline === 'function') {
+    cargarTimeline(pregnancyId);
+  }
+}
+
+function showBuscar() {
+  go("sc-buscar");
+  setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Buscar paciente" }]);
+  document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.classList.remove("collapsed");
+  setTimeout(() => document.getElementById('search-dni-input')?.focus(), 80);
 }
 
 function showNueva() {

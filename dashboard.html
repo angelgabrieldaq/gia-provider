@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/tokens.css" />
   <link rel="stylesheet" href="assets/css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -82,6 +83,11 @@
           <div class="kpi"><div class="kpi-v ok">3</div><div class="kpi-l">Estables</div></div>
           <div class="kpi"><div class="kpi-v">2</div><div class="kpi-l">Controles hoy</div></div>
         </div>
+        <div style="padding:8px 20px 0;display:flex;gap:8px">
+          <button class="btn-p" onclick="showBuscar()" style="font-size:12px">Buscar paciente por DNI</button>
+          <button class="btn-s" onclick="showNueva()" style="font-size:12px">+ Nueva paciente</button>
+        </div>
+
         <div class="strip" onclick="showPatient()">
           <div class="sdot"></div>
           <div class="stxt"><strong>Alerta crítica:</strong> Ramírez, Laura — presión 158/102 + proteínas en orina 2+. Requiere atención inmediata.</div>
@@ -130,6 +136,36 @@
             <div class="td"><span class="estado e-v">● En vigilancia</span></div>
             <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
           </div>
+        </div>
+      </div>
+
+      <!-- BUSCADOR DE PACIENTES -->
+      <div class="screen" id="sc-buscar">
+        <div class="ph" style="padding:14px 20px">
+          <div class="ph-top">
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700;font-family:'DM Serif Display',serif">Buscar paciente existente</div>
+              <div class="ph-meta">Ingresá el DNI para recuperar el embarazo activo</div>
+            </div>
+            <button class="btn-s" onclick="showDash()" style="align-self:center;font-size:11px">← Volver</button>
+          </div>
+        </div>
+
+        <div style="padding:0 20px 20px">
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <input
+              type="text"
+              id="search-dni-input"
+              placeholder="DNI sin puntos (ej: 32541872)"
+              class="fld-input"
+              style="flex:1;max-width:320px"
+              inputmode="numeric"
+            />
+            <button class="btn-p" onclick="buscarPaciente()">Buscar</button>
+            <button class="btn-s" onclick="showNueva()">+ Nueva paciente</button>
+          </div>
+
+          <div id="search-results"></div>
         </div>
       </div>
 
@@ -645,18 +681,18 @@
           <div class="ph-top">
             <div class="ph-av av-r" style="width:38px;height:38px;font-size:12px">LR</div>
             <div style="flex:1">
-              <div style="font-size:14px;font-weight:700;font-family:'DM Serif Display',serif">Evolutivo Longitudinal · Ramírez, Laura</div>
-              <div class="ph-meta">29 años · G2P1 · EGA actual: 34+2 semanas · Seguimiento S12–S34 · 9 consultas</div>
+              <div style="font-size:14px;font-weight:700;font-family:'DM Serif Display',serif" id="hist-header-name">Evolutivo Longitudinal · Ramírez, Laura</div>
+              <div class="ph-meta" id="hist-header-meta">29 años · G2P1 · EGA actual: 34+2 semanas · Seguimiento S12–S34 · 9 consultas</div>
             </div>
             <button class="btn-s" onclick="showPatient()" style="align-self:center;font-size:11px">← Volver a ficha</button>
           </div>
         </div>
 
         <div class="hsum">
-          <div class="hsc"><div class="hsc-v">9</div><div class="hsc-l">Consultas registradas</div></div>
-          <div class="hsc"><div class="hsc-v">22</div><div class="hsc-l">Semanas de seguimiento</div></div>
-          <div class="hsc"><div class="hsc-v" style="color:var(--s-err)">4</div><div class="hsc-l">Alertas generadas</div></div>
-          <div class="hsc"><div class="hsc-v" style="color:var(--s-warn)">↑46</div><div class="hsc-l">Variación sistólica total (mmHg)</div></div>
+          <div class="hsc"><div class="hsc-v" id="hist-stat-count">9</div><div class="hsc-l">Consultas registradas</div></div>
+          <div class="hsc"><div class="hsc-v" id="hist-stat-weeks">22</div><div class="hsc-l">Semanas de seguimiento</div></div>
+          <div class="hsc"><div class="hsc-v" id="hist-stat-alerts" style="color:var(--s-err)">4</div><div class="hsc-l">Alertas generadas</div></div>
+          <div class="hsc"><div class="hsc-v" id="hist-stat-variation" style="color:var(--s-warn)">↑46</div><div class="hsc-l">Variación sistólica total (mmHg)</div></div>
         </div>
 
         <!-- TREND CHARTS -->
@@ -681,7 +717,8 @@
               <span class="hcl hcl-d">Diastólica</span>
               <span class="hcl-ref">⋯ umbrales FASGO 2025 · puntos = nivel de riesgo</span>
             </div>
-            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+            <canvas id="chart-bp" style="width:100%;height:180px"></canvas>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg" id="svg-bp-static">
               <!-- ── ZONAS CLÍNICAS SEMÁNTICAS (FASGO 2025 / ISSHP) ── -->
               <!-- Zona roja: HTA severa ≥160 mmHg sistólica -->
               <rect x="50" y="14" width="570" height="20" fill="rgba(226,75,74,0.14)" rx="2"/>
@@ -758,7 +795,8 @@
               <span class="hcl hcl-p">Peso corporal</span>
               <span class="hcl-ref">Ganancia esperada T3: 0.3–0.5 kg/sem · puntós = ritmo de ganancia</span>
             </div>
-            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+            <canvas id="chart-peso" style="width:100%;height:180px"></canvas>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg" id="svg-peso-static">
               <!-- axes -->
               <line x1="50" y1="14" x2="50" y2="136" stroke="var(--brd2)" stroke-width="1"/>
               <line x1="50" y1="136" x2="620" y2="136" stroke="var(--brd2)" stroke-width="1"/>
@@ -807,7 +845,8 @@
               <span class="hcl hcl-fcf">Frecuencia cardíaca fetal</span>
               <span class="hcl-ref">Rango normal: 110–160 lpm · FCF normal durante todo el seguimiento</span>
             </div>
-            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+            <canvas id="chart-fcf" style="width:100%;height:180px"></canvas>
+            <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg" id="svg-fcf-static">
               <!-- normal band -->
               <rect x="50" y="44" width="570" height="77" fill="rgba(15,110,86,0.07)" rx="2"/>
               <!-- axes -->
@@ -2331,6 +2370,253 @@ function acknowledgeCritical() {
   _showToast('Alerta registrada. Procedé con la conducta clínica.');
 }
 
+/* ── TIMELINE + GRÁFICOS (PASO 3) ────────────────────────────────────────────*/
+
+let _chartBP   = null;
+let _chartPeso = null;
+let _chartFCF  = null;
+
+async function cargarTimeline(pregnancyId) {
+  const TOKEN = 'Bearer dev-obstetra-123';
+
+  try {
+    const [resPreg, resCons] = await Promise.all([
+      fetch(`http://localhost:3000/api/pregnancies/${pregnancyId}`, { headers: { Authorization: TOKEN } }),
+      fetch(`http://localhost:3000/api/consultations?pregnancy_id=${pregnancyId}`, { headers: { Authorization: TOKEN } }),
+    ]);
+
+    if (!resPreg.ok || !resCons.ok) throw new Error('Error al cargar datos del servidor');
+
+    const pregData  = await resPreg.json();
+    const consData  = await resCons.json();
+    const pregnancy = pregData.data;
+    const cons      = consData.data;
+
+    // ── HEADER ───────────────────────────────────────────────
+    const nameEl = document.getElementById('hist-header-name');
+    const metaEl = document.getElementById('hist-header-meta');
+    if (nameEl) nameEl.textContent = `Evolutivo Longitudinal · ${pregnancy.patient_name}`;
+    if (metaEl) {
+      const rob = pregnancy.rob_status;
+      metaEl.textContent = `ROB: ${rob} · EGA actual: ${pregnancy.ega_weeks}+${pregnancy.ega_days} semanas · ${cons.length} consulta${cons.length !== 1 ? 's' : ''} registrada${cons.length !== 1 ? 's' : ''}`;
+    }
+
+    // ── STATS ─────────────────────────────────────────────────
+    const totalAlerts = cons.reduce((sum, c) => sum + c.triggered_alerts.length, 0);
+    const weeks = cons.length >= 2
+      ? cons[cons.length - 1].gestational_weeks - cons[0].gestational_weeks
+      : 0;
+    const systolicValues = cons.map(c => c.blood_pressure_systolic);
+    const sysVariation = systolicValues.length >= 2
+      ? Math.max(...systolicValues) - Math.min(...systolicValues)
+      : 0;
+
+    const sc = document.getElementById('hist-stat-count');    if (sc) sc.textContent = cons.length;
+    const sw = document.getElementById('hist-stat-weeks');    if (sw) sw.textContent = weeks;
+    const sa = document.getElementById('hist-stat-alerts');   if (sa) sa.textContent = totalAlerts;
+    const sv = document.getElementById('hist-stat-variation');if (sv) sv.textContent = (sysVariation > 0 ? '↑' : '') + sysVariation;
+
+    // ── TIMELINE ─────────────────────────────────────────────
+    const tl = document.getElementById('hist-tl');
+    if (tl) {
+      if (cons.length === 0) {
+        tl.innerHTML = '<div class="hempty"><div class="hempty-ico">📋</div><div class="hempty-txt">Aún no hay consultas registradas para este embarazo.</div></div>';
+      } else {
+        const ECA_CLASS = { STABLE: 's', WATCHFUL: 'v', ALERT: 'a', CRITICAL: 'c' };
+        const ECA_LABEL = { STABLE: 'Estable', WATCHFUL: 'En vigilancia', ALERT: 'En alerta', CRITICAL: 'Crítico' };
+        const ECA_ESTADO = { STABLE: 'e-s', WATCHFUL: 'e-v', ALERT: 'e-a', CRITICAL: 'e-c' };
+
+        tl.innerHTML = cons.map((c, i) => {
+          const isLast = i === cons.length - 1;
+          const ecaKey = c.eca_calculated || 'STABLE';
+          const statusClass = ECA_CLASS[ecaKey] || 's';
+          const statusLabel = ECA_LABEL[ecaKey] || 'Estable';
+          const estadoClass = ECA_ESTADO[ecaKey] || 'e-s';
+          const fechaStr = new Date(c.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+          const alertsHtml = c.triggered_alerts.length
+            ? `<div class="hcond">⚠ ${c.triggered_alerts.map(a => a.message).join(' · ')}</div>`
+            : '';
+          const notesHtml = c.clinical_notes
+            ? `<div class="hnotes">${c.clinical_notes}</div>`
+            : '';
+
+          return `
+          <div class="hentry" data-sem="${c.gestational_weeks}" data-status="${statusClass}"${isLast ? ' style="--last:1"' : ''}>
+            <div class="hleft"><div class="hnode hn-${statusClass}"></div>${isLast ? '' : '<div class="hline"></div>'}</div>
+            <div class="hcard hc-${statusClass}">
+              <div class="hcard-top" onclick="togH(this)">
+                <div>
+                  <div class="hdate">${fechaStr}</div>
+                  <div class="hsem">Semana ${c.gestational_weeks}${isLast ? ' · <strong style="color:var(--p)">Última consulta</strong>' : ''}</div>
+                </div>
+                <span class="estado ${estadoClass}" style="margin-left:10px">● ${statusLabel}</span>
+                <div class="hvits">
+                  <div class="hvit"><div class="hvit-v">${c.blood_pressure_systolic}/${c.blood_pressure_diastolic}</div><div class="hvit-l">TA (mmHg)</div></div>
+                  <div class="hvit"><div class="hvit-v">${c.proteinuria || 'Negativa'}</div><div class="hvit-l">Proteínas</div></div>
+                  <div class="hvit"><div class="hvit-v">${c.weight_kg} kg</div><div class="hvit-l">Peso</div></div>
+                </div>
+                <span class="hexp">▾</span>
+              </div>
+              <div class="hbody">
+                <div class="hdet-grid">
+                  <div class="hdet"><div class="hdet-l">Presión sistólica</div><div class="hdet-v">${c.blood_pressure_systolic} mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Presión diastólica</div><div class="hdet-v">${c.blood_pressure_diastolic} mmHg</div></div>
+                  <div class="hdet"><div class="hdet-l">Proteínas en orina</div><div class="hdet-v">${c.proteinuria || 'Negativa'}</div></div>
+                  <div class="hdet"><div class="hdet-l">Peso</div><div class="hdet-v">${c.weight_kg} kg</div></div>
+                  ${c.fetal_heart_rate_bpm != null ? `<div class="hdet"><div class="hdet-l">FCF</div><div class="hdet-v">${c.fetal_heart_rate_bpm} lpm</div></div>` : ''}
+                  ${c.uterine_height_cm != null ? `<div class="hdet"><div class="hdet-l">Altura uterina</div><div class="hdet-v">${c.uterine_height_cm} cm</div></div>` : ''}
+                </div>
+                ${alertsHtml}
+                ${notesHtml}
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // ── GRÁFICOS ──────────────────────────────────────────────
+    if (cons.length >= 1) {
+      // Ocultar SVGs estáticos, mostrar canvases
+      ['svg-bp-static', 'svg-peso-static', 'svg-fcf-static'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      dibujarGraficos(cons);
+    }
+
+  } catch (err) {
+    console.error('[Gia] cargarTimeline error:', err);
+    _showToast('No se pudo cargar el historial. Verificá que el servidor esté activo.');
+  }
+}
+
+function dibujarGraficos(cons) {
+  // Datos ordenados de más antiguo a más reciente (la API devuelve DESC)
+  const ordenadas = [...cons].reverse();
+  const labels    = ordenadas.map(c => `S${c.gestational_weeks}`);
+
+  const ecaColors = {
+    STABLE:   '#0F6E56',
+    WATCHFUL: '#EF9F27',
+    ALERT:    '#EF9F27',
+    CRITICAL: '#E24B4A',
+  };
+  const ptColors = ordenadas.map(c => ecaColors[c.eca_calculated] || '#0F6E56');
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 } } },
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 } } },
+    },
+  };
+
+  // ── Presión arterial ─────────────────────────────────────
+  const ctxBP = document.getElementById('chart-bp');
+  if (ctxBP) {
+    if (_chartBP) _chartBP.destroy();
+    _chartBP = new Chart(ctxBP, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Sistólica (mmHg)',
+            data: ordenadas.map(c => c.blood_pressure_systolic),
+            borderColor: '#E24B4A',
+            backgroundColor: 'rgba(226,75,74,0.08)',
+            pointBackgroundColor: ptColors,
+            tension: 0.3, fill: true, pointRadius: 4,
+          },
+          {
+            label: 'Diastólica (mmHg)',
+            data: ordenadas.map(c => c.blood_pressure_diastolic),
+            borderColor: '#EF9F27',
+            backgroundColor: 'rgba(239,159,39,0.05)',
+            pointBackgroundColor: ptColors,
+            tension: 0.3, fill: true, pointRadius: 4,
+          },
+          {
+            label: 'Umbral HTA 140',
+            data: ordenadas.map(() => 140),
+            borderColor: 'rgba(226,75,74,0.4)',
+            borderDash: [4, 4], pointRadius: 0, fill: false,
+          },
+          {
+            label: 'Umbral severo 160',
+            data: ordenadas.map(() => 160),
+            borderColor: 'rgba(226,75,74,0.6)',
+            borderDash: [6, 3], pointRadius: 0, fill: false,
+          },
+        ],
+      },
+      options: { ...chartDefaults },
+    });
+  }
+
+  // ── Peso ──────────────────────────────────────────────────
+  const ctxPeso = document.getElementById('chart-peso');
+  if (ctxPeso) {
+    if (_chartPeso) _chartPeso.destroy();
+    _chartPeso = new Chart(ctxPeso, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Peso (kg)',
+          data: ordenadas.map(c => c.weight_kg),
+          borderColor: '#2B57D9',
+          backgroundColor: 'rgba(43,87,217,0.07)',
+          pointBackgroundColor: ptColors,
+          tension: 0.3, fill: true, pointRadius: 4,
+        }],
+      },
+      options: { ...chartDefaults },
+    });
+  }
+
+  // ── FCF ───────────────────────────────────────────────────
+  const ctxFCF = document.getElementById('chart-fcf');
+  if (ctxFCF) {
+    const fcfData = ordenadas.map(c => c.fetal_heart_rate_bpm ?? null);
+    if (fcfData.some(v => v !== null)) {
+      if (_chartFCF) _chartFCF.destroy();
+      _chartFCF = new Chart(ctxFCF, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'FCF (lpm)',
+              data: fcfData,
+              borderColor: '#0F6E56',
+              backgroundColor: 'rgba(15,110,86,0.07)',
+              pointBackgroundColor: ptColors,
+              tension: 0.3, fill: true, pointRadius: 4, spanGaps: true,
+            },
+            {
+              label: 'Límite superior 160',
+              data: ordenadas.map(() => 160),
+              borderColor: 'rgba(226,75,74,0.4)',
+              borderDash: [4, 4], pointRadius: 0, fill: false,
+            },
+            {
+              label: 'Límite inferior 110',
+              data: ordenadas.map(() => 110),
+              borderColor: 'rgba(226,75,74,0.4)',
+              borderDash: [4, 4], pointRadius: 0, fill: false,
+            },
+          ],
+        },
+        options: { ...chartDefaults },
+      });
+    }
+  }
+}
+
 /* ── FASGO 2025 — GUARDAR LABORATORIOS ──────────────────────────────────────*/
 function guardarLaboratorios() {
   try {
@@ -2429,6 +2715,103 @@ function renderAlertCardsFASGO(resultado) {
     area.appendChild(div);
   });
 }
+
+/* ── BUSCADOR DE PACIENTES (PASO 4) ─────────────────────────────────────────*/
+
+const ROB_BADGE = { BAJO: 'b-ok', MODERADO: 'b-warn', ALTO: 'b-err' };
+const ROB_LABEL = { BAJO: 'Riesgo bajo', MODERADO: 'Riesgo moderado', ALTO: 'Riesgo alto' };
+
+async function buscarPaciente() {
+  const input = document.getElementById('search-dni-input');
+  const results = document.getElementById('search-results');
+  const dni = input?.value?.trim() || '';
+
+  if (!dni) {
+    results.innerHTML = '<div class="warn-note" style="margin:0">Ingresá un DNI para buscar.</div>';
+    return;
+  }
+
+  results.innerHTML = '<div class="ph-meta" style="padding:8px 0">Buscando...</div>';
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/pregnancies/search?national_id=${encodeURIComponent(dni)}`, {
+      headers: { Authorization: 'Bearer dev-obstetra-123' },
+    });
+    const json = await res.json();
+
+    if (!res.ok) {
+      results.innerHTML = `
+        <div style="border:1px solid var(--brd2);border-radius:var(--r);padding:20px;text-align:center">
+          <div style="font-size:28px;margin-bottom:8px;opacity:.5">🔍</div>
+          <div style="font-weight:600;margin-bottom:4px">Paciente no encontrada</div>
+          <div class="ph-meta" style="margin-bottom:16px">No hay registros con DNI: <strong>${dni}</strong></div>
+          <button class="btn-p" onclick="showNueva()">+ Crear nueva paciente</button>
+        </div>`;
+      return;
+    }
+
+    const { patient, pregnancy } = json.data;
+    const robBadge = ROB_BADGE[pregnancy.rob_status] || 'b-ok';
+    const robLabel = ROB_LABEL[pregnancy.rob_status] || pregnancy.rob_status;
+    const fum = new Date(pregnancy.fum).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const fpp = pregnancy.fpp ? new Date(pregnancy.fpp).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }) : '—';
+    const initials = (patient.first_name[0] || '') + (patient.last_name[0] || '');
+
+    results.innerHTML = `
+      <div style="border:1px solid var(--brd2);border-radius:var(--r);overflow:hidden">
+        <div class="ph" style="padding:14px 16px;margin:0">
+          <div class="ph-top">
+            <div class="ph-av" style="background:var(--p);color:#fff;width:40px;height:40px;font-size:13px">${initials.toUpperCase()}</div>
+            <div style="flex:1">
+              <div class="ph-name" style="font-size:15px">${patient.last_name}, ${patient.first_name}</div>
+              <div class="ph-meta">DNI ${patient.national_id}${patient.phone ? ' · ' + patient.phone : ''}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="badge ${robBadge}">${robLabel}</span>
+              </div>
+            </div>
+            <div class="ph-r">
+              <div class="ph-ega">${pregnancy.current_ega_weeks}+${pregnancy.current_ega_days}</div>
+              <div class="ph-ega-s">semanas de EGA</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--brd);display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="ph-meta" style="flex:1">FUM: <strong>${fum}</strong> · FPP: <strong>${fpp}</strong>
+            ${pregnancy.rob_justification ? `<br><span style="font-size:11px;opacity:.75">${pregnancy.rob_justification}</span>` : ''}
+          </div>
+          <button class="btn-p" onclick="retomarSeguimiento('${patient.id}','${pregnancy.id}','${patient.first_name}','${patient.last_name}','${pregnancy.rob_status}')">
+            Continuar seguimiento →
+          </button>
+          <button class="btn-s" onclick="_verHistorico('${pregnancy.id}')">Ver histórico</button>
+        </div>
+      </div>`;
+
+  } catch (err) {
+    console.error('[Gia] buscarPaciente:', err);
+    results.innerHTML = `<div class="warn-note" style="margin:0">Error de conexión — verificá que el servidor esté activo.</div>`;
+  }
+}
+
+function retomarSeguimiento(patientId, pregnancyId, firstName, lastName, robStatus) {
+  sessionStorage.setItem('current_patient_id', patientId);
+  sessionStorage.setItem('current_pregnancy_id', pregnancyId);
+  sessionStorage.setItem('current_rob', robStatus);
+  document.getElementById('search-dni-input').value = '';
+  document.getElementById('search-results').innerHTML = '';
+  _showToast(`Paciente recuperada: ${firstName} ${lastName} · ROB ${robStatus}`);
+  showForm();
+}
+
+function _verHistorico(pregnancyId) {
+  sessionStorage.setItem('current_pregnancy_id', pregnancyId);
+  showHistory();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('search-dni-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') buscarPaciente();
+  });
+});
 </script>
 </body>
 </html>
