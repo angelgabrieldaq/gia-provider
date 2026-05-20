@@ -10,6 +10,44 @@ export class ConsultationsService {
     private readonly fasgoRiskService: FasgoRiskService,
   ) {}
 
+  async findByPregnancy(pregnancyId: string) {
+    const consultations = await this.prisma.consultation.findMany({
+      where: { pregnancy_id: pregnancyId },
+      include: { alerts: true },
+      orderBy: { created_at: 'desc' },
+    });
+
+    return {
+      success: true,
+      data: consultations.map((c) => ({
+        consultation_id:          c.id,
+        pregnancy_id:             c.pregnancy_id,
+        created_at:               c.created_at,
+        gestational_weeks:        c.gestational_weeks,
+        weight_kg:                c.weight_kg,
+        blood_pressure_systolic:  c.blood_pressure_systolic,
+        blood_pressure_diastolic: c.blood_pressure_diastolic,
+        fetal_heart_rate_bpm:     c.fetal_heart_rate_bpm,
+        uterine_height_cm:        c.uterine_height_cm,
+        proteinuria:              c.proteinuria,
+        eca_calculated:           c.eca_calculated,
+        symptoms: {
+          edema:               c.symp_edema,
+          headache:            c.symp_headache,
+          vision_changes:      c.symp_vision_changes,
+          contractions:        c.symp_contractions,
+          bleeding:            c.symp_bleeding,
+          amniotic_fluid_loss: c.symp_amniotic_fluid_loss,
+        },
+        triggered_alerts: c.alerts.map((a) => ({
+          rule_id:  a.rule_id,
+          message:  a.message,
+          severity: a.severity,
+        })),
+      })),
+    };
+  }
+
   async createConsultation(input: CreateConsultationInput): Promise<CreateConsultationResponse> {
     // PASO 1: Buscar el embarazo — ROB se extrae de BD, nunca del frontend (Regla H002)
     const pregnancy = await this.prisma.pregnancy.findUnique({

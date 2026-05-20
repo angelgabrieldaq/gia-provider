@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { PregnanciesService } from './pregnancies.service';
 import { CreatePregnancySchema } from './dto/create-pregnancy.dto';
@@ -7,6 +7,11 @@ import { CreatePregnancySchema } from './dto/create-pregnancy.dto';
 @UseGuards(AuthGuard)
 export class PregnanciesController {
   constructor(private readonly pregnanciesService: PregnanciesService) {}
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.pregnanciesService.findOne(id);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

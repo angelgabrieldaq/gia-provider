@@ -187,6 +187,10 @@ function showHistory() {
   setBB([{ l: "Dashboard", f: "showDash()" }, { l: "Ramírez, Laura", f: "showPatient()" }, { l: "Evolutivo Longitudinal" }]);
   document.querySelectorAll(".pitem").forEach(e => e.classList.remove("active"));
   document.getElementById("si-l").classList.add("active");
+  const pregnancyId = sessionStorage.getItem('current_pregnancy_id');
+  if (pregnancyId && typeof cargarTimeline === 'function') {
+    cargarTimeline(pregnancyId);
+  }
 }
 
 function showNueva() {
