@@ -10,6 +10,51 @@ export class PregnanciesService {
     private readonly robCalc: RobCalculationService,
   ) {}
 
+  async searchByNationalId(nationalId: string) {
+    const patient = await this.prisma.patient.findUnique({
+      where: { national_id: nationalId },
+    });
+
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrada');
+    }
+
+    const pregnancy = await this.prisma.pregnancy.findFirst({
+      where: { patient_id: patient.id },
+      orderBy: { created_at: 'desc' },
+    });
+
+    if (!pregnancy) {
+      throw new NotFoundException('Paciente sin embarazos registrados');
+    }
+
+    const totalDays = Math.floor((Date.now() - new Date(pregnancy.fum).getTime()) / (24 * 60 * 60 * 1000));
+    const egaWeeks  = Math.floor(totalDays / 7);
+    const egaDays   = totalDays % 7;
+
+    return {
+      success: true,
+      data: {
+        patient: {
+          id:          patient.id,
+          first_name:  patient.first_name,
+          last_name:   patient.last_name,
+          national_id: patient.national_id,
+          phone:       patient.phone,
+        },
+        pregnancy: {
+          id:                  pregnancy.id,
+          fum:                 pregnancy.fum,
+          fpp:                 pregnancy.fpp,
+          rob_status:          pregnancy.rob_status,
+          rob_justification:   pregnancy.rob_justification,
+          current_ega_weeks:   egaWeeks,
+          current_ega_days:    egaDays,
+        },
+      },
+    };
+  }
+
   async findOne(id: string) {
     const pregnancy = await this.prisma.pregnancy.findUnique({
       where: { id },

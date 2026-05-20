@@ -83,6 +83,11 @@
           <div class="kpi"><div class="kpi-v ok">3</div><div class="kpi-l">Estables</div></div>
           <div class="kpi"><div class="kpi-v">2</div><div class="kpi-l">Controles hoy</div></div>
         </div>
+        <div style="padding:8px 20px 0;display:flex;gap:8px">
+          <button class="btn-p" onclick="showBuscar()" style="font-size:12px">Buscar paciente por DNI</button>
+          <button class="btn-s" onclick="showNueva()" style="font-size:12px">+ Nueva paciente</button>
+        </div>
+
         <div class="strip" onclick="showPatient()">
           <div class="sdot"></div>
           <div class="stxt"><strong>Alerta crítica:</strong> Ramírez, Laura — presión 158/102 + proteínas en orina 2+. Requiere atención inmediata.</div>
@@ -131,6 +136,36 @@
             <div class="td"><span class="estado e-v">● En vigilancia</span></div>
             <div><button class="btn-sm" onclick="event.stopPropagation();showPatient()">Ver</button></div>
           </div>
+        </div>
+      </div>
+
+      <!-- BUSCADOR DE PACIENTES -->
+      <div class="screen" id="sc-buscar">
+        <div class="ph" style="padding:14px 20px">
+          <div class="ph-top">
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700;font-family:'DM Serif Display',serif">Buscar paciente existente</div>
+              <div class="ph-meta">Ingresá el DNI para recuperar el embarazo activo</div>
+            </div>
+            <button class="btn-s" onclick="showDash()" style="align-self:center;font-size:11px">← Volver</button>
+          </div>
+        </div>
+
+        <div style="padding:0 20px 20px">
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <input
+              type="text"
+              id="search-dni-input"
+              placeholder="DNI sin puntos (ej: 32541872)"
+              class="fld-input"
+              style="flex:1;max-width:320px"
+              inputmode="numeric"
+            />
+            <button class="btn-p" onclick="buscarPaciente()">Buscar</button>
+            <button class="btn-s" onclick="showNueva()">+ Nueva paciente</button>
+          </div>
+
+          <div id="search-results"></div>
         </div>
       </div>
 
@@ -2681,6 +2716,103 @@ function renderAlertCardsFASGO(resultado) {
     area.appendChild(div);
   });
 }
+
+/* ── BUSCADOR DE PACIENTES (PASO 4) ─────────────────────────────────────────*/
+
+const ROB_BADGE = { BAJO: 'b-ok', MODERADO: 'b-warn', ALTO: 'b-err' };
+const ROB_LABEL = { BAJO: 'Riesgo bajo', MODERADO: 'Riesgo moderado', ALTO: 'Riesgo alto' };
+
+async function buscarPaciente() {
+  const input = document.getElementById('search-dni-input');
+  const results = document.getElementById('search-results');
+  const dni = input?.value?.trim() || '';
+
+  if (!dni) {
+    results.innerHTML = '<div class="warn-note" style="margin:0">Ingresá un DNI para buscar.</div>';
+    return;
+  }
+
+  results.innerHTML = '<div class="ph-meta" style="padding:8px 0">Buscando...</div>';
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/pregnancies/search?national_id=${encodeURIComponent(dni)}`, {
+      headers: { Authorization: 'Bearer dev-obstetra-123' },
+    });
+    const json = await res.json();
+
+    if (!res.ok) {
+      results.innerHTML = `
+        <div style="border:1px solid var(--brd2);border-radius:var(--r);padding:20px;text-align:center">
+          <div style="font-size:28px;margin-bottom:8px;opacity:.5">🔍</div>
+          <div style="font-weight:600;margin-bottom:4px">Paciente no encontrada</div>
+          <div class="ph-meta" style="margin-bottom:16px">No hay registros con DNI: <strong>${dni}</strong></div>
+          <button class="btn-p" onclick="showNueva()">+ Crear nueva paciente</button>
+        </div>`;
+      return;
+    }
+
+    const { patient, pregnancy } = json.data;
+    const robBadge = ROB_BADGE[pregnancy.rob_status] || 'b-ok';
+    const robLabel = ROB_LABEL[pregnancy.rob_status] || pregnancy.rob_status;
+    const fum = new Date(pregnancy.fum).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const fpp = pregnancy.fpp ? new Date(pregnancy.fpp).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }) : '—';
+    const initials = (patient.first_name[0] || '') + (patient.last_name[0] || '');
+
+    results.innerHTML = `
+      <div style="border:1px solid var(--brd2);border-radius:var(--r);overflow:hidden">
+        <div class="ph" style="padding:14px 16px;margin:0">
+          <div class="ph-top">
+            <div class="ph-av" style="background:var(--p);color:#fff;width:40px;height:40px;font-size:13px">${initials.toUpperCase()}</div>
+            <div style="flex:1">
+              <div class="ph-name" style="font-size:15px">${patient.last_name}, ${patient.first_name}</div>
+              <div class="ph-meta">DNI ${patient.national_id}${patient.phone ? ' · ' + patient.phone : ''}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="badge ${robBadge}">${robLabel}</span>
+              </div>
+            </div>
+            <div class="ph-r">
+              <div class="ph-ega">${pregnancy.current_ega_weeks}+${pregnancy.current_ega_days}</div>
+              <div class="ph-ega-s">semanas de EGA</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 16px;background:var(--bg2);border-top:1px solid var(--brd);display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="ph-meta" style="flex:1">FUM: <strong>${fum}</strong> · FPP: <strong>${fpp}</strong>
+            ${pregnancy.rob_justification ? `<br><span style="font-size:11px;opacity:.75">${pregnancy.rob_justification}</span>` : ''}
+          </div>
+          <button class="btn-p" onclick="retomarSeguimiento('${patient.id}','${pregnancy.id}','${patient.first_name}','${patient.last_name}','${pregnancy.rob_status}')">
+            Continuar seguimiento →
+          </button>
+          <button class="btn-s" onclick="_verHistorico('${pregnancy.id}')">Ver histórico</button>
+        </div>
+      </div>`;
+
+  } catch (err) {
+    console.error('[Gia] buscarPaciente:', err);
+    results.innerHTML = `<div class="warn-note" style="margin:0">Error de conexión — verificá que el servidor esté activo.</div>`;
+  }
+}
+
+function retomarSeguimiento(patientId, pregnancyId, firstName, lastName, robStatus) {
+  sessionStorage.setItem('current_patient_id', patientId);
+  sessionStorage.setItem('current_pregnancy_id', pregnancyId);
+  sessionStorage.setItem('current_rob', robStatus);
+  document.getElementById('search-dni-input').value = '';
+  document.getElementById('search-results').innerHTML = '';
+  _showToast(`Paciente recuperada: ${firstName} ${lastName} · ROB ${robStatus}`);
+  showForm();
+}
+
+function _verHistorico(pregnancyId) {
+  sessionStorage.setItem('current_pregnancy_id', pregnancyId);
+  showHistory();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('search-dni-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') buscarPaciente();
+  });
+});
 </script>
 </body>
 </html>
