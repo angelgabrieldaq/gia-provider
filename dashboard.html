@@ -410,6 +410,23 @@
           <span style="font-weight:700;flex-shrink:0">⚠</span>
           <span>Paciente de riesgo alto — proteínas en orina, edemas y síntomas de alarma son obligatorios.</span>
         </div>
+        <!-- ECA badge — actualizado por guardarConsulta() tras respuesta del backend -->
+        <div id="eca-badge-area" style="display:none;padding:8px 16px">
+          <span id="eca-badge" class="eca-badge"></span>
+        </div>
+        <!-- Modal alertas críticas — se muestra si ECA=CRITICAL -->
+        <div id="critical-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center">
+          <div style="background:#fff;border-radius:12px;max-width:480px;width:90%;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,.25)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <span style="font-size:28px">🚨</span>
+              <h2 style="margin:0;font-size:18px;color:#b91c1c">ALERTA CRÍTICA DETECTADA</h2>
+            </div>
+            <div id="critical-modal-alerts" style="margin-bottom:20px"></div>
+            <button onclick="acknowledgeCritical()" style="width:100%;padding:12px;background:#b91c1c;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer">
+              Registrar conducta y continuar
+            </button>
+          </div>
+        </div>
         <div class="form-scroll-body">
         <div class="tier">
           <div class="tier-hd">
@@ -418,6 +435,11 @@
             <span class="tier-note">Siempre visibles · Obligatorios para cerrar</span>
           </div>
           <div class="fields">
+            <div class="fld">
+              <label class="flbl">Semanas gestacionales</label>
+              <input type="number" class="fld-input" id="f-ega-sem" min="4" max="44" placeholder="ej. 28"/>
+              <div class="fhint">Confirmá las semanas al momento de la consulta</div>
+            </div>
             <div class="fld">
               <label class="flbl">Presión sistólica (mmHg)</label>
               <input type="number" class="fld-input" id="f-s" min="60" max="220"
@@ -442,7 +464,7 @@
             </div>
             <div class="fld">
               <label class="flbl">Peso (kg)</label>
-              <input type="number" class="fld-input"/>
+              <input type="number" class="fld-input" id="f-peso" min="30" max="200" step="0.1" placeholder="ej. 68.5"/>
               <div class="fhint">+1.2 kg respecto a la consulta anterior</div>
             </div>
             <div class="fld">
@@ -461,7 +483,7 @@
             </div>
             <div class="fld">
               <label class="flbl">Edemas</label>
-              <select class="fld-input"><option>Ausentes</option><option>Leves</option><option>Moderados</option><option>Severos</option></select>
+              <select class="fld-input" id="f-edemas"><option value="Ausentes">Ausentes</option><option value="Leves">Leves</option><option value="Moderados">Moderados</option><option value="Severos">Severos</option></select>
             </div>
           </div>
           <div style="padding:0 16px 12px">
@@ -473,6 +495,9 @@
               <label class="chk"><input type="checkbox" id="f-epigastralgia"/> Dolor en boca del estómago</label>
               <label class="chk"><input type="checkbox" id="f-zumbido"/> Zumbido en los oídos</label>
               <label class="chk"><input type="checkbox" id="f-eclampsia"/> Convulsiones (Eclampsia)</label>
+              <label class="chk"><input type="checkbox" id="f-contracciones"/> Contracciones</label>
+              <label class="chk"><input type="checkbox" id="f-sangrado"/> Sangrado vaginal</label>
+              <label class="chk"><input type="checkbox" id="f-liquido-am"/> Pérdida de líquido amniótico</label>
               <label class="chk"><input type="checkbox" id="f-sintomas-ninguno" onchange="togSintomasNinguno(this)"/> Ninguno</label>
             </div>
           </div>
@@ -563,7 +588,7 @@
           </button>
           <div class="coll-body" id="tb">
             <div class="fields">
-              <div class="fld"><label class="flbl">Altura uterina (cm)</label><input type="number" class="fld-input" placeholder="ej. 32"/></div>
+              <div class="fld"><label class="flbl">Altura uterina (cm)</label><input type="number" class="fld-input" id="f-au" min="0" max="50" placeholder="ej. 32"/></div>
               <div class="fld"><label class="flbl">Movimientos fetales</label><select class="fld-input"><option>Presentes y normales</option><option>Disminuidos</option><option>Ausentes</option></select></div>
             </div>
             <div style="padding:0 16px 12px"><div class="flbl" style="margin-bottom:5px">Estudios solicitados</div><input type="text" class="fld-input" id="f-estudios-texto" placeholder="hemograma, proteínas en orina 24h…"/></div>
@@ -2144,37 +2169,167 @@ function _nullNum(id) {
   return isNaN(v) ? null : v;
 }
 
-/* ── FASGO 2025 — CERRAR CONSULTA ────────────────────────────────────────── */
-function guardarConsulta() {
-  /* Validación: PA sistólica y diastólica son obligatorias para cerrar */
-  const sEl = document.getElementById('f-s');
-  const dEl = document.getElementById('f-d');
-  if (!sEl?.value || !dEl?.value) {
-    [sEl, dEl].forEach(el => { if (el && !el.value) el.classList.add('ferr'); });
-    _showToast('Ingresar PA sistólica y diastólica antes de cerrar');
-    sEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+/* ── FASGO 2025 — CERRAR CONSULTA (conectado a API real) ─────────────────── */
+async function guardarConsulta() {
+  const sEl   = document.getElementById('f-s');
+  const dEl   = document.getElementById('f-d');
+  const pesoEl = document.getElementById('f-peso');
+  const egaEl  = document.getElementById('f-ega-sem');
+
+  // Validación campos obligatorios
+  let missingFocus = null;
+  if (!sEl?.value)    { sEl?.classList.add('ferr');    missingFocus = missingFocus || sEl; }
+  if (!dEl?.value)    { dEl?.classList.add('ferr');    missingFocus = missingFocus || dEl; }
+  if (!pesoEl?.value) { pesoEl?.classList.add('ferr'); missingFocus = missingFocus || pesoEl; }
+  if (!egaEl?.value)  { egaEl?.classList.add('ferr');  missingFocus = missingFocus || egaEl; }
+  if (missingFocus) {
+    _showToast('Completá los campos obligatorios marcados en rojo');
+    missingFocus.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
+  // Normalizar proteinuria ("Negativas" → "Negativa" para el backend)
+  const protRaw = document.getElementById('f-prot-select')?.value || 'Negativas';
+  const protNorm = protRaw === 'Negativas' ? 'Negativa' : protRaw;
+  const protValidos = ['Negativa', 'Trazas', '1+', '2+', '3+'];
+
+  // Obtener pregnancy_id del sessionStorage (guardado al crear paciente)
+  const pregnancy_id = sessionStorage.getItem('current_pregnancy_id');
+  if (!pregnancy_id) {
+    alert('Error: No hay un embarazo activo.\nCreá o seleccioná una paciente primero.');
+    return;
+  }
+
+  // Construir payload exacto del API Contract
+  const fcfRaw = parseFloat(document.getElementById('f-fcf')?.value);
+  const auRaw  = parseFloat(document.getElementById('f-au')?.value);
+
+  const payload = {
+    pregnancy_id,
+    gestational_weeks: parseInt(egaEl.value),
+    vital_signs: {
+      weight_kg:                parseFloat(pesoEl.value),
+      blood_pressure_systolic:  parseInt(sEl.value),
+      blood_pressure_diastolic: parseInt(dEl.value),
+      ...(fcfRaw > 0 && { fetal_heart_rate_bpm: fcfRaw }),
+      ...(auRaw  > 0 && { uterine_height_cm:    auRaw }),
+    },
+    symptoms: {
+      edema:               (document.getElementById('f-edemas')?.value || 'Ausentes') !== 'Ausentes',
+      headache:            document.getElementById('f-cefalea')?.checked          || false,
+      vision_changes:      (document.getElementById('f-escotomas-dest')?.checked  ||
+                            document.getElementById('f-escotomas-manch')?.checked) || false,
+      contractions:        document.getElementById('f-contracciones')?.checked    || false,
+      bleeding:            document.getElementById('f-sangrado')?.checked         || false,
+      amniotic_fluid_loss: document.getElementById('f-liquido-am')?.checked       || false,
+    },
+    ...(protValidos.includes(protNorm) && { proteinuria: protNorm }),
+    clinical_notes: document.getElementById('f-notas')?.value?.trim() || '',
+  };
+
+  // Deshabilitar botón para prevenir doble envío
+  const btn = document.querySelector('[onclick="guardarConsulta()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+
   try {
-    const data      = _readFASGOData('consulta');
-    const resultado = evaluarPreeclampsiaFASGO2025(data);
-    window.giaLastConsulta = {
-      ...data,
-      fasgoResult: resultado,
-      savedAt:     new Date().toISOString(),
-      _metadata:   { source: 'portal_medico', timestamp: new Date().toISOString() },
-    };
-    console.log('[FASGO 2025 — Consulta]', JSON.stringify(resultado, null, 2));
-    renderAlertCardsFASGO(resultado);
+    const response = await fetch('http://localhost:3000/api/consultations', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer dev-obstetra-123',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Error de validación o servidor
+      const msg    = result?.error || result?.message || 'Error desconocido';
+      const fields = result?.fields?.map(f => `• ${f.path}: ${f.message}`).join('\n') || '';
+      alert(`Error al guardar la consulta:\n${msg}${fields ? '\n\n' + fields : ''}`);
+      if (btn) { btn.disabled = false; btn.textContent = 'Cerrar consulta'; }
+      return;
+    }
+
+    // ── ÉXITO (201) ──────────────────────────────────────────────────────────
+    const { eca_calculated, triggered_alerts, consultation_id } = result.data;
+
+    console.log('[Gia API] Consulta guardada:', consultation_id);
+    console.log('[Gia API] ECA:', eca_calculated);
+    console.log('[Gia API] Alertas:', triggered_alerts);
+
+    // Persistir en sessionStorage
+    sessionStorage.setItem('last_consultation_id', consultation_id);
+    sessionStorage.setItem('last_eca',             eca_calculated);
+    sessionStorage.setItem('last_alerts',          JSON.stringify(triggered_alerts));
+
+    // Actualizar badge ECA
+    const badgeArea = document.getElementById('eca-badge-area');
+    const badge     = document.getElementById('eca-badge');
+    if (badge && badgeArea) {
+      const ecaLabels = { STABLE:'ESTABLE', WATCHFUL:'VIGILANCIA', ALERT:'ALERTA', CRITICAL:'CRÍTICO' };
+      const ecaColors = { STABLE:'#15803d', WATCHFUL:'#b45309', ALERT:'#c2410c', CRITICAL:'#b91c1c' };
+      badge.textContent    = `ECA: ${ecaLabels[eca_calculated] || eca_calculated}`;
+      badge.style.cssText  = `display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:13px;background:${ecaColors[eca_calculated] || '#555'};color:#fff`;
+      badgeArea.style.display = 'block';
+    }
+
+    // Renderizar alertas en fasgo-alert-area (convive con lógica FASGO existente)
+    if (triggered_alerts?.length > 0) {
+      const sevColors = { HARD:'#fef2f2', MODERATE:'#fff7ed', INFORMATIVE:'#eff6ff', SOFT:'#f0fdf4' };
+      const sevBorder = { HARD:'#fca5a5', MODERATE:'#fdba74', INFORMATIVE:'#93c5fd', SOFT:'#86efac' };
+      const alertsHtml = triggered_alerts.map(a => `
+        <div style="background:${sevColors[a.severity]||'#f8f8f8'};border:1px solid ${sevBorder[a.severity]||'#ccc'};border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:4px">[${a.severity}] ${a.rule_id}</div>
+          <div style="font-size:13px;color:#111827">${a.message}</div>
+        </div>`).join('');
+
+      const area = document.getElementById('fasgo-alert-area');
+      if (area) {
+        area.insertAdjacentHTML('afterbegin',
+          `<div id="api-alerts-block" style="margin-bottom:12px">${alertsHtml}</div>`);
+      }
+
+      // Modal bloqueante si hay alertas HARD
+      if (triggered_alerts.some(a => a.severity === 'HARD')) {
+        const modal = document.getElementById('critical-modal');
+        const mBody = document.getElementById('critical-modal-alerts');
+        if (modal && mBody) {
+          mBody.innerHTML = alertsHtml;
+          modal.style.display = 'flex';
+        }
+      }
+    }
+
+    // Evaluar también con motor local FASGO (mantiene compatibilidad)
+    try {
+      const data      = _readFASGOData('consulta');
+      const resultado = evaluarPreeclampsiaFASGO2025(data);
+      window.giaLastConsulta = { ...data, fasgoResult: resultado, apiEca: eca_calculated,
+        apiAlerts: triggered_alerts, savedAt: new Date().toISOString() };
+      renderAlertCardsFASGO(resultado);
+    } catch (_) { /* motor local opcional */ }
+
     clearDraft('sc-form');
+    if (btn) { btn.disabled = false; btn.textContent = 'Cerrar consulta'; }
+    _showToast(`✅ Consulta guardada — ECA: ${eca_calculated}`);
+
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.remove('collapsed');
     showPatient();
+
   } catch (err) {
-    console.error('[Gia] Error al cerrar consulta:', err);
-    _showToast('Error al evaluar — datos guardados localmente. Contactar soporte.');
+    console.error('[Gia] Error de red al guardar consulta:', err);
+    alert(`No se pudo conectar con el servidor.\nVerificá que el backend esté corriendo en localhost:3000.\n\n${err.message}`);
+    if (btn) { btn.disabled = false; btn.textContent = 'Cerrar consulta'; }
   }
+}
+
+function acknowledgeCritical() {
+  const modal = document.getElementById('critical-modal');
+  if (modal) modal.style.display = 'none';
+  _showToast('Alerta registrada. Procedé con la conducta clínica.');
 }
 
 /* ── FASGO 2025 — GUARDAR LABORATORIOS ──────────────────────────────────────*/
